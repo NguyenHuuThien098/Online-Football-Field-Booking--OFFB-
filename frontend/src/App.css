@@ -1,0 +1,74 @@
+/* App.css */
+
+/* Toàn bộ trang */
+.homepage {
+  font-family: Arial, sans-serif; /* Thêm phông chữ cho trang */
+  color: #333; /* Màu chữ chính */
+  background-color: #f4f4f4; /* Màu nền chính */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tiêu đề trang */
+.homepage-header {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between; /* Đưa biểu tượng về hai bên */
+  align-items: center;
+  background-color: #282c34;
+  color: white;
+  position: fixed; /* Định vị tiêu đề cố định trên đầu trang */
+  top: 0;
+  left: 0;
+}
+
+/* Biểu tượng */
+.icon {
+  font-size: 32px; /* Tăng kích thước biểu tượng */
+  cursor: pointer;
+  color: white;
+}
+
+.home-icon {
+  margin-left: 20px;
+}
+
+.user-icon {
+  margin-right: 20px;
+}
+
+/* Nội dung chính */
+main {
+  margin-top: 80px; /* Thêm lề để tránh bị che bởi tiêu đề cố định */
+  text-align: center;
+}
+
+/* Nút bấm */
+button {
+  background-color: #61dafb;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+button:hover {
+  background-color: #4fa3d8; /* Màu nền khi di chuột lên nút */
+}
+
+/* Hiệu ứng quay logo */
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
