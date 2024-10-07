@@ -1,17 +1,16 @@
+// routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const { authenticateUser, authorizeRole } = require('../middleware/auth'); // Import middleware
-
+const { authenticateUser, authorizeRole } = require('../middleware/auth')
 
 // Định nghĩa các route cho đăng ký và đăng nhập
 router.post('/register', authController.register);
-router.post('/login', authController.login);
-// router.post('/PlayerPage', authController.playerpage);
-// router.post('/FieldOwnerDashboard', authController.fieldownerdashboard);
+router.post('/login/google', authController.loginWithGoogle);
 
-router.get('/protected-route', authenticateUser, authorizeRole(['field_owner', 'player']), (req, res) => {
+// Route bảo vệ cho người dùng
+router.get('/api/auth', authenticateUser, authorizeRole(['field_owner', 'player']), (req, res) => {
     res.send('Đây là một route được bảo vệ!');
 });
 
-module.exports = authRouters;
+module.exports = router;
