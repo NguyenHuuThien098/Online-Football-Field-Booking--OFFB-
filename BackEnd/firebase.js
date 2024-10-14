@@ -1,5 +1,5 @@
 const admin = require('firebase-admin');
-const serviceAccount = require('./online-football-field-booking-firebase-adminsdk-1vrpo-056c11aef7.json'); // Đường dẫn mới
+const serviceAccount = require('./online-football-field-booking-firebase-adminsdk-1vrpo-056c11aef7.json'); 
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),

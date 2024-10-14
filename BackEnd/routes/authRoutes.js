@@ -8,9 +8,12 @@ const { authenticateUser, authorizeRole } = require('../middleware/auth')
 router.post('/register', authController.register);
 router.post('/login/google', authController.loginWithGoogle);
 
+
 // Route bảo vệ cho người dùng
 router.get('/api/auth', authenticateUser, authorizeRole(['field_owner', 'player']), (req, res) => {
     res.send('Đây là một route được bảo vệ!');
 });
+
+
 
 module.exports = router;

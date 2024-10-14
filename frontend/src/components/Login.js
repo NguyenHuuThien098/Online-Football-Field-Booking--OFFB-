@@ -1,8 +1,6 @@
-// src/components/Login.js
 import React, { useState } from 'react';
-import { auth } from '../firebase';
+import { auth, provider } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
-import { provider } from '../firebase';
 import { ref, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 import { database } from '../firebase';
@@ -17,6 +15,14 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
             const user = result.user;
             const userId = user.uid;
 
+            // Kiểm tra token trong local storage
+            let token = localStorage.getItem('token');
+
+            // Nếu không có token, lấy token mới
+            if (!token) {
+                token = await user.getIdToken();
+            }
+
             // Kiểm tra xem người dùng đã tồn tại chưa
             const userRef = ref(database, 'users/' + userId);
             const snapshot = await get(userRef);
@@ -25,6 +31,9 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 const userData = snapshot.val();
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
+
+                // Cập nhật token vào Realtime Database
+                await set(ref(database, 'tokens/' + userId), { token });
 
                 // Điều hướng dựa trên vai trò người dùng
                 if (userData.role === 'field_owner') {
