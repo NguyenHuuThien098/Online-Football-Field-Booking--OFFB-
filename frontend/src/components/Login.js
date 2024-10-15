@@ -33,7 +33,7 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 setUserRole(userData.role);
 
                 // Cập nhật token vào Realtime Database
-                await set(ref(database, 'tokens/' + userId), { token });
+                // await set(ref(database, 'tokens/' + userId), { token });
 
                 // Điều hướng dựa trên vai trò người dùng
                 if (userData.role === 'field_owner') {
