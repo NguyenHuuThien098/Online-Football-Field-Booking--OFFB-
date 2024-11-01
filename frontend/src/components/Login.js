@@ -17,6 +17,9 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
             const user = result.user;
             const userId = user.uid;
 
+            // Lấy token
+            const token = await user.getIdToken(); // Lấy token từ đối tượng người dùng
+
             // Kiểm tra xem người dùng đã tồn tại chưa
             const userRef = ref(database, 'users/' + userId);
             const snapshot = await get(userRef);
@@ -25,6 +28,10 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 const userData = snapshot.val();
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
+
+                // Nếu bạn không cần sử dụng token ở đây, hãy bỏ qua.
+                // Nếu bạn cần sử dụng token, hãy thêm một hàm gửi nó đến backend ở đây.
+                console.log("User Token: ", token); // Bạn có thể kiểm tra token ở đây
 
                 // Điều hướng dựa trên vai trò người dùng
                 if (userData.role === 'field_owner') {
