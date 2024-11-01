@@ -1,9 +1,7 @@
-// src/components/Register.js
 import React, { useState } from 'react';
-import { auth, database } from '../firebase'; 
-import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, database, provider } from '../firebase'; 
+import { signInWithPopup } from 'firebase/auth';
 import { ref, set, get } from 'firebase/database';
-import { provider } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 
 const Register = ({ setIsAuthenticated, setUserRole }) => {
@@ -18,6 +16,14 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             const user = result.user;
             const userId = user.uid;
 
+            // Kiểm tra token trong local storage
+            let token = localStorage.getItem('token');
+
+            // Nếu không có token, lấy token mới
+            if (!token) {
+                token = await user.getIdToken();
+            }
+
             const userRef = ref(database, 'users/' + userId);
             const snapshot = await get(userRef);
 
@@ -25,6 +31,12 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                 const userData = snapshot.val();
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
+                
+                // Cập nhật token vào Realtime Database
+                await set(ref(database, 'tokens/' + userId), { token });
+
+                // Lưu token vào local storage
+                localStorage.setItem('token', token);
 
                 if (userData.role === 'field_owner') {
                     navigate('/field-owner-dashboard');
@@ -38,11 +50,18 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             await set(ref(database, 'users/' + userId), {
                 email: user.email,
                 role: role,
+                token: token,
             });
 
             setSuccess('Đăng ký thành công với vai trò: ' + role);
             setIsAuthenticated(true);
             setUserRole(role);
+
+            // Cập nhật token vào Realtime Database
+            await set(ref(database, 'tokens/' + userId), { token });
+
+            // Lưu token vào local storage
+            localStorage.setItem('token', token);
 
             if (role === 'field_owner') {
                 navigate('/field-owner-dashboard');

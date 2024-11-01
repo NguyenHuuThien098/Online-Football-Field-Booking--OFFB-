@@ -3,17 +3,31 @@ const express = require('express');
 const admin = require('./firebase'); // Import Firebase Admin SDK
 const app = express();
 
+
 const authRoutes = require('./routes/authRoutes'); // Import route
 const fieldOwnerRoutes = require('./routes/fieldOwnerRoutes');
 const playerRoutes = require('./routes/playerRoutes');
 const guestRoutes = require('./routes/guestRoutes');
 const historyRoutes = require('./routes/histotyRoutes');
 const userRoutes = require('./routes/userRoutes');
+
+const authRoutes = require("./routes/authRoutes");
+const matchRoutes = require("./routes/matchRoutes"); // Thêm import cho matchRoutes
+
+// Middleware để log các yêu cầu
+app.use((req, res, next) => {
+    console.log(`Received ${req.method} request for '${req.url}'`);
+    next();
+});
+
+
 // CORS middleware
 app.use(cors({
     origin: 'http://localhost:3001' // Cho phép frontend truy cập
 }));
+
 app.use(express.json()); // Để phân tích JSON request body
+
 
 app.use('/api/auth', authRoutes); // Sử dụng route cho đăng ký và đăng nhập
 app.use('/api/field-owner', fieldOwnerRoutes); // Route cho chủ sân
@@ -21,6 +35,10 @@ app.use('/api/player', playerRoutes); // Route cho người chơi
 app.use('/api/guest', guestRoutes); // Route cho khách
 app.use('/api/history', historyRoutes); // Route cho lịch sử đặt sân
 app.use('/api/user', userRoutes);//thay doi thong tin nguoi dùng
+
+// Sử dụng route cho trận đấu
+app.use('/api/matches', matchRoutes); 
+
 // Endpoint để lấy danh sách người dùng
 app.get('/api/users', async (req, res) => {
     try {
@@ -51,6 +69,7 @@ app.post('/api/users', async (req, res) => {
         res.status(500).json({ error: 'Có lỗi xảy ra khi thêm người dùng!' });
     }
 });
+
 
 // Khởi động server
 const PORT = process.env.PORT || 5000;
