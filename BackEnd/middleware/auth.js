@@ -49,4 +49,10 @@ exports.authorizeRole = (roles) => {
         // Nếu người dùng đã được xác thực và có vai trò phù hợp, cho phép tiếp tục
         next();
     };
+
 };
+
+ //module.exports = { authenticateUser, authorizeRole };
+
+
+
