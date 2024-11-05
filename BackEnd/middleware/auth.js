@@ -1,4 +1,3 @@
-// BackEnd/middleware/auth.js
 const admin = require('../firebase'); // Import Firebase Admin SDK
 
 // Middleware xác thực người dùng
@@ -29,7 +28,6 @@ exports.authenticateUser = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Error during token verification:', error.message);
-        // Thêm thông báo lỗi chi tiết
         return res.status(403).json({ error: 'Forbidden: Invalid token' });
     }
 };
@@ -46,13 +44,6 @@ exports.authorizeRole = (roles) => {
         }
 
         console.log(`User role: ${userRole}, Allowed roles: ${roles}`); // Log vai trò người dùng và vai trò cho phép
-        // Nếu người dùng đã được xác thực và có vai trò phù hợp, cho phép tiếp tục
         next();
     };
-
 };
-
- //module.exports = { authenticateUser, authorizeRole };
-
-
-

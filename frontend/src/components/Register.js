@@ -1,28 +1,21 @@
 import React, { useState } from 'react';
-import { auth, database, provider } from '../firebase'; 
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithGoogle, database } from '../firebase';
 import { ref, set, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 
 const Register = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [role, setRole] = useState('player'); 
+    const [role, setRole] = useState('player');
     const navigate = useNavigate();
 
     const handleGoogleLogin = async () => {
         try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+            const user = await signInWithGoogle();
             const userId = user.uid;
 
-            // Kiểm tra token trong local storage
-            let token = localStorage.getItem('token');
-
-            // Nếu không có token, lấy token mới
-            if (!token) {
-                token = await user.getIdToken();
-            }
+            // Lấy ID token
+            const token = await user.getIdToken();
 
             const userRef = ref(database, 'users/' + userId);
             const snapshot = await get(userRef);
@@ -31,9 +24,6 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                 const userData = snapshot.val();
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
-                
-                // Cập nhật token vào Realtime Database
-                await set(ref(database, 'tokens/' + userId), { token });
 
                 // Lưu token vào local storage
                 localStorage.setItem('token', token);
@@ -57,9 +47,6 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             setIsAuthenticated(true);
             setUserRole(role);
 
-            // Cập nhật token vào Realtime Database
-            await set(ref(database, 'tokens/' + userId), { token });
-
             // Lưu token vào local storage
             localStorage.setItem('token', token);
 
@@ -81,20 +68,20 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             {success && <p style={{ color: 'green' }}>{success}</p>}
             <div>
                 <label>
-                    <input 
-                        type="radio" 
-                        value="player" 
-                        checked={role === 'player'} 
-                        onChange={() => setRole('player')} 
+                    <input
+                        type="radio"
+                        value="player"
+                        checked={role === 'player'}
+                        onChange={() => setRole('player')}
                     />
                     Player
                 </label>
                 <label>
-                    <input 
-                        type="radio" 
-                        value="field_owner" 
-                        checked={role === 'field_owner'} 
-                        onChange={() => setRole('field_owner')} 
+                    <input
+                        type="radio"
+                        value="field_owner"
+                        checked={role === 'field_owner'}
+                        onChange={() => setRole('field_owner')}
                     />
                     Field Owner
                 </label>

@@ -70,7 +70,6 @@ class Field {
         return Object.keys(fields).map(key => ({ fieldId: key, ...fields[key] })); // Trả về fieldId
     }
 
-
     // Lấy tất cả các sân hiện có với phân trang
     static async getAllFields(limit = 10, startAfter = null) {
         let query = admin.database().ref('fields').limitToFirst(limit);

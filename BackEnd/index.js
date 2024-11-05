@@ -11,7 +11,6 @@ const guestRoutes = require('./routes/guestRoutes');
 const historyRoutes = require('./routes/histotyRoutes');
 const userRoutes = require('./routes/userRoutes');
 
-const authRoutes = require("./routes/authRoutes");
 const matchRoutes = require("./routes/matchRoutes"); // Thêm import cho matchRoutes
 
 // Middleware để log các yêu cầu
@@ -27,6 +26,7 @@ app.use(cors({
 }));
 
 app.use(express.json()); // Để phân tích JSON request body
+
 
 app.use('/api/auth', authRoutes); // Sử dụng route cho đăng ký và đăng nhập
 app.use('/api/field-owner', fieldOwnerRoutes); // Route cho chủ sân

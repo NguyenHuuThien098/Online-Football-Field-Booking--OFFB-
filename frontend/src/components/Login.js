@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { auth, provider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithGoogle, database } from '../firebase';
 import { ref, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
-import { database } from '../firebase';
 
 const Login = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
@@ -11,22 +9,11 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
 
     const handleGoogleLogin = async () => {
         try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+            const user = await signInWithGoogle();
             const userId = user.uid;
 
-<<<<<<< HEAD
-            // Lấy token
-            const token = await user.getIdToken(); // Lấy token từ đối tượng người dùng
-=======
-            // Kiểm tra token trong local storage
-            let token = localStorage.getItem('token');
-
-            // Nếu không có token, lấy token mới
-            if (!token) {
-                token = await user.getIdToken();
-            }
->>>>>>> 3688b0a4d6d1810ed4bae0bf86638aa5de1ac908
+            // Lấy ID token
+            const token = await user.getIdToken();
 
             // Kiểm tra xem người dùng đã tồn tại chưa
             const userRef = ref(database, 'users/' + userId);
@@ -37,14 +24,9 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
 
-<<<<<<< HEAD
-                // Nếu bạn không cần sử dụng token ở đây, hãy bỏ qua.
-                // Nếu bạn cần sử dụng token, hãy thêm một hàm gửi nó đến backend ở đây.
-                console.log("User Token: ", token); // Bạn có thể kiểm tra token ở đây
-=======
-                // Cập nhật token vào Realtime Database
-                await set(ref(database, 'tokens/' + userId), { token });
->>>>>>> 3688b0a4d6d1810ed4bae0bf86638aa5de1ac908
+                // Lưu token và ownerId vào local storage
+                localStorage.setItem('token', token);
+                localStorage.setItem('ownerId', userId);
 
                 // Điều hướng dựa trên vai trò người dùng
                 if (userData.role === 'field_owner') {

@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer');
 exports.googleLogin = async (req, res) => {
     const { token } = req.body;
     try {
-        const user = await User.verifyGoogleToken(token);
+        // const user = await User.verifyGoogleToken(token);
         await User.setUserRole(user.uid, 'player'); // Đặt vai trò là Player
         res.status(200).send({ message: 'Đăng nhập thành công với tư cách Player', uid: user.uid });
     } catch (error) {

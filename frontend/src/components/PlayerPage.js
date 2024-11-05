@@ -1,4 +1,3 @@
-// src/components/PlayerPage.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -10,8 +9,18 @@ const PlayerPage = () => {
     useEffect(() => {
         const fetchMatches = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/matches');
-                setMatches(response.data);
+                const token = localStorage.getItem('token');
+                const response = await axios.get('http://localhost:5000/api/matches', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = response.data;
+                if (Array.isArray(data)) {
+                    setMatches(data);
+                } else {
+                    setError('Dữ liệu trả về không hợp lệ');
+                }
             } catch (error) {
                 console.error("Error fetching matches:", error);
                 setError('Có lỗi xảy ra khi tải danh sách trận đấu.');

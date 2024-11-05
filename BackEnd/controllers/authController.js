@@ -41,25 +41,19 @@ exports.loginWithGoogle = async (req, res) => {
         if (!existingUser) {
             // Nếu người dùng chưa tồn tại, tạo mới người dùng
             const newUser = await User.createUser(email, role);
-            // Lưu thông tin người dùng vào Realtime Database
-            await admin.database().ref(`users/${newUser.uid}`).set({ email, role });
-
             // Tạo token cho người dùng mới
             const token = await admin.auth().createCustomToken(newUser.uid);
-            // Lưu token vào Realtime Database
-            await admin.database().ref(`tokens/${newUser.uid}`).set({ token });
+            // Lưu thông tin người dùng và token vào Realtime Database
+            await admin.database().ref(`users/${newUser.uid}`).set({ email, role, token });
 
             // Trả về thông tin người dùng mới và token
             return res.status(201).send({ uid: newUser.uid, email, role, token });
-            
-            // Nếu người dùng chưa tồn tại, trả về thông báo yêu cầu đăng ký
-            return res.status(404).send({ error: 'Hãy đăng ký trước khi đăng nhập.' })
         }
 
         // Nếu người dùng đã tồn tại, tạo token cho người dùng cũ
-        const token = await admin.auth().createCustomToken(existingUser.uid);
-        // Cập nhật token vào Realtime Database
-        await admin.database().ref(`tokens/${existingUser.uid}`).set({ token });
+        const token = await admin.auth().createCustomToken(existingUser.uid); // Tạo token
+        // Cập nhật token vào thông tin người dùng trong Realtime Database
+        await admin.database().ref(`users/${existingUser.uid}`).update({ token });
 
         // Trả về thông tin người dùng và token đã tạo
         res.send({ uid: existingUser.uid, email: existingUser.email, role: existingUser.role, token });

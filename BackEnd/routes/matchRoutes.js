@@ -7,7 +7,7 @@ const { authenticateUser, authorizeRole } = require('../middleware/auth');
 router.post('/', authenticateUser, authorizeRole(['field_owner']), matchController.createMatch);
 
 // Route để lấy danh sách trận đấu
-router.get('/', matchController.getMatches);
+router.get('/owner/:ownerId', authenticateUser, authorizeRole(['field_owner']), matchController.getMatchesByOwner);
 
 // Route để lấy thông tin một trận đấu theo ID
 router.get('/:id', matchController.getMatchById); // Endpoint để lấy thông tin của trận đấu theo ID

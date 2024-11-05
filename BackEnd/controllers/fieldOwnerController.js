@@ -7,7 +7,7 @@ const googleLogin = async (req, res) => {
     const { token } = req.body;
    
     try {
-        const user = await User.verifyGoogleToken(token);
+        // const user = await User.verifyGoogleToken(token);
         console.log('User:', user); // Ghi log thông tin người dùng
 
 
@@ -60,7 +60,7 @@ const addField = async (req, res) => {
 const updateField = async (req, res) => {
     const { fieldId } = req.params;
     const data = req.body;
-   
+
     // Kiểm tra loại sân hợp lệ nếu có
     if (data.type) {
         const validTypes = ['5 người', '7 người', '11 người'];
@@ -69,11 +69,11 @@ const updateField = async (req, res) => {
         }
     }
 
-
     try {
         // Cập nhật thông tin sân
         await Field.updateField(fieldId, data);
-        res.status(200).json({ message: 'Cập nhật sân thành công' });
+        const updatedField = await Field.getFieldById(fieldId); // Lấy thông tin sân sau khi cập nhật
+        res.status(200).json({ message: 'Cập nhật sân thành công', field: updatedField });
     } catch (error) {
         console.error('Error when updating field:', error); // Ghi log lỗi
         res.status(500).json({ message: 'Lỗi khi cập nhật sân', error: error.message });
@@ -84,7 +84,7 @@ const updateField = async (req, res) => {
 // Xóa sân
 const deleteField = async (req, res) => {
     const { fieldId } = req.params;
-   
+
     try {
         // Xóa sân bằng ID
         await Field.deleteField(fieldId);
@@ -99,7 +99,7 @@ const deleteField = async (req, res) => {
 // Lấy danh sách sân của Field Owner
 const getOwnedFields = async (req, res) => {
     const { ownerId } = req.params;
-   
+
     try {
         // Lấy danh sách sân thuộc sở hữu của Field Owner
         const fields = await Field.getFieldsByOwner(ownerId);
