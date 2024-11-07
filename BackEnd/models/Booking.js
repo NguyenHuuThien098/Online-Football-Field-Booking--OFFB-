@@ -7,7 +7,7 @@ const Field = require('./Field');
 class Booking {
     // Tạo mới một booking
     static async createBooking(fieldId, userId, date, time, numberOfPeople) {
-        // Kiểm tra số người có hợp lệ không (chọn 1 trong 3: 5, 7, 11)
+       
         if (![5, 7, 11].includes(numberOfPeople)) {
             throw new Error('Số người không hợp lệ. Chọn 5, 7 hoặc 11.');
         }
@@ -36,16 +36,16 @@ class Booking {
         });
 
 
-        // Lấy email của chủ sân để gửi thông báo qua email
+        
         const owner = await User.getUserById(field.ownerId);
-        // Logic gửi email qua nodemailer...
+       
 
 
         return { id: newBookingRef.key, ...bookingData };
     }
 
 
-    // Lấy danh sách booking theo userId
+   
     static async getBookingsByUser(userId) {
         const snapshot = await admin.database().ref('bookings')
             .orderByChild('userId')
@@ -69,16 +69,16 @@ class Booking {
     }
 
 
-    // Lấy danh sách booking theo ownerId
+    
     static async getBookingsByFieldOwner(ownerId) {
         const snapshot = await admin.database().ref('fields').orderByChild('ownerId').equalTo(ownerId).once('value');
         const fields = snapshot.val() || {};
        
-        // Lấy tất cả fieldId từ các sân thuộc sở hữu của chủ sân
+      
         const fieldIds = Object.keys(fields);
 
 
-        // Lấy các booking tương ứng với các fieldId này
+       
         const bookingsPromises = fieldIds.map(fieldId =>
             admin.database().ref('bookings').orderByChild('fieldId').equalTo(fieldId).once('value')
         );
@@ -86,7 +86,7 @@ class Booking {
 
         const bookingsSnapshots = await Promise.all(bookingsPromises);
        
-        // Kết hợp tất cả booking lại thành một mảng
+       
         const bookings = bookingsSnapshots.flatMap(snapshot => {
             const bookingsData = snapshot.val() || {};
             return Object.keys(bookingsData).map(key => ({ id: key, ...bookingsData[key] }));

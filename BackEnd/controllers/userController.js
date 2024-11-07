@@ -2,12 +2,19 @@
 const User = require('../models/User');
 
 class UserController {
-    // Cập nhật thông tin người dùng
+   
     static async updateUser(req, res) {
-        const uid = req.user.uid; // Lấy uid từ thông tin người dùng đã xác thực
-        const userData = req.body;
+        const uid = req.user.uid; 
+        const { fullName, phoneNumber, birthYear, address, image } = req.body;
 
         try {
+            const userData = {
+                fullName,
+                phoneNumber,
+                birthYear,
+                address,
+                image 
+            };
             await User.updateUser(uid, userData);
             res.status(200).send({ message: 'Cập nhật thông tin thành công' });
         } catch (error) {
@@ -17,7 +24,7 @@ class UserController {
 
     // Lấy thông tin người dùng
     static async getUser(req, res) {
-        const uid = req.user.uid; // Lấy uid từ thông tin người dùng đã xác thực
+        const uid = req.user.uid; 
 
         try {
             const user = await User.getUserById(uid);

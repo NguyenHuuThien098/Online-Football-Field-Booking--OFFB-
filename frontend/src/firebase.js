@@ -23,7 +23,11 @@ const provider = new GoogleAuthProvider(); // Khởi tạo Google Authentication
 const signInWithGoogle = async () => {
     try {
         const result = await signInWithPopup(auth, provider);
-        return result.user; // Trả về thông tin người dùng
+        const user = result.user;
+        // Lưu thông tin người dùng vào localStorage
+        localStorage.setItem('userId', user.uid);
+        localStorage.setItem('token', await user.getIdToken());
+        return user; // Trả về thông tin người dùng
     } catch (error) {
         console.error("Lỗi khi đăng nhập bằng Google:", error);
         throw error;

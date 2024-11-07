@@ -40,7 +40,7 @@ exports.bookField = async (req, res) => {
 
 
     try {
-        // Xác thực token người dùng
+       
         const user = await User.verifyGoogleToken(token);
        
         if (!user) {
@@ -48,7 +48,6 @@ exports.bookField = async (req, res) => {
         }
 
 
-        // Chuyển đổi vai trò sang player
         await User.setUserRole(user.uid, 'player');
 
 

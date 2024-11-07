@@ -66,6 +66,11 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
         setShowDropdown(!showDropdown);
     };
 
+    const handleNavigateToProfile = () => {
+        // Điều hướng tới UserProfile
+        navigate('/user-profile');
+    };
+
     const handleNavigateToDashboard = () => {
         if (userRole === 'player') {
             navigate('/player-page');
@@ -87,6 +92,7 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
                             <FaUserCircle className="icon user-icon" onClick={handleProfileClick} />
                             {showDropdown && (
                                 <div className="dropdown-menu">
+                                    <button onClick={handleNavigateToProfile}>Chỉnh Trang cá nhân</button>
                                     <button onClick={handleNavigateToDashboard}>Trang cá nhân</button>
                                     <button onClick={handleLogout}>Đăng xuất</button>
                                 </div>

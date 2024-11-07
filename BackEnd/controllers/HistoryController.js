@@ -3,11 +3,11 @@ const Booking = require('../models/Booking');
 
 // Lấy lịch sử đặt sân của người dùng (Player)
 exports.getUserBookingHistory = async (req, res) => {
-    const { userId } = req.params;  // userId sẽ được gửi qua params
+    const { userId } = req.params; 
 
 
     try {
-        const bookings = await Booking.getBookingsByUser(userId); // Gọi phương thức từ Booking module
+        const bookings = await Booking.getBookingsByUser(userId);
         res.status(200).json(bookings);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi lấy lịch sử đặt sân', error: error.message });
@@ -21,7 +21,7 @@ exports.getFieldOwnerBookings = async (req, res) => {
 
 
     try {
-        const bookings = await Booking.getBookingsByFieldOwner(ownerId); // Gọi phương thức từ Booking module
+        const bookings = await Booking.getBookingsByFieldOwner(ownerId); 
         res.status(200).json(bookings);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi lấy lịch sử đặt sân', error: error.message });
