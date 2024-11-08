@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { auth, provider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithGoogle, database } from '../firebase';
 import { ref, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
-import { database } from '../firebase';
 
 const Login = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
@@ -11,17 +9,11 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
 
     const handleGoogleLogin = async () => {
         try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+            const user = await signInWithGoogle();
             const userId = user.uid;
 
-            // Kiểm tra token trong local storage
-            let token = localStorage.getItem('token');
-
-            // Nếu không có token, lấy token mới
-            if (!token) {
-                token = await user.getIdToken();
-            }
+            // Lấy ID token
+            const token = await user.getIdToken();
 
             // Kiểm tra xem người dùng đã tồn tại chưa
             const userRef = ref(database, 'users/' + userId);
@@ -32,8 +24,14 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
 
-                // Cập nhật token vào Realtime Database
-                // await set(ref(database, 'tokens/' + userId), { token });
+// <<<<<<< homepageview
+//                 // Cập nhật token vào Realtime Database
+//                 // await set(ref(database, 'tokens/' + userId), { token });
+// =======
+//                 // Lưu token và ownerId vào local storage
+//                 localStorage.setItem('token', token);
+//                 localStorage.setItem('ownerId', userId);
+// >>>>>>> main
 
                 // Điều hướng dựa trên vai trò người dùng
                 if (userData.role === 'field_owner') {

@@ -17,7 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app); // Khởi tạo Realtime Database
 const auth = getAuth(app); // Khởi tạo Authentication
-auth.languageCode = 'en'
+auth.languageCode = 'en';
 const provider = new GoogleAuthProvider(); // Khởi tạo Google Authentication
 
 const signInWithGoogle = async () => {
@@ -29,4 +29,5 @@ const signInWithGoogle = async () => {
         throw error;
     }
 };
-export { database, auth, provider,signInWithGoogle};
+
+export { database, auth, provider, signInWithGoogle };

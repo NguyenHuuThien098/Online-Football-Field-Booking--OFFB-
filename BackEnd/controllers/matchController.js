@@ -3,11 +3,11 @@ const Match = require('../models/Match'); // Import lớp Match
 
 // Hàm tạo trận đấu
 exports.createMatch = async (req, res) => {
-    const { address, time, ownerName, playerCount, notes, questions } = req.body;
+    const { address, time, ownerName, playerCount, notes, questions, ownerId } = req.body;
 
     // Kiểm tra dữ liệu đầu vào
-    if (!address || !time || !ownerName || !playerCount) {
-        return res.status(400).json({ error: 'Tất cả các trường address, time, ownerName và playerCount là bắt buộc!' });
+    if (!address || !time || !ownerName || !playerCount || !ownerId) {
+        return res.status(400).json({ error: 'Tất cả các trường address, time, ownerName, playerCount và ownerId là bắt buộc!' });
     }
 
     if (isNaN(playerCount) || playerCount <= 0) {
@@ -21,6 +21,7 @@ exports.createMatch = async (req, res) => {
         playerCount,
         notes,
         questions,
+        ownerId, // Lưu ownerId cùng với dữ liệu trận đấu
         createdAt: new Date().toISOString()
     };
 
@@ -34,14 +35,17 @@ exports.createMatch = async (req, res) => {
     }
 };
 
-// Hàm lấy danh sách trận đấu
-exports.getMatches = async (req, res) => {
+// Hàm lấy danh sách trận đấu mở do chủ sân tạo
+exports.getMatchesByOwner = async (req, res) => {
+    const { ownerId } = req.params;
+
     try {
-        const snapshot = await admin.database().ref('matches').once('value'); // Lấy dữ liệu trận đấu
+        const snapshot = await admin.database().ref('matches').orderByChild('ownerId').equalTo(ownerId).once('value'); // Lấy dữ liệu trận đấu
         const matches = snapshot.val() || {}; // Chuyển đổi dữ liệu thành đối tượng
-        res.status(200).json(matches); // Trả về danh sách trận đấu
+        const matchList = Object.keys(matches).map(key => ({ id: key, ...matches[key] })); // Chuyển đổi đối tượng thành mảng
+        res.status(200).json(matchList); // Trả về danh sách trận đấu
     } catch (error) {
-        console.error("Error fetching matches:", error);
+        console.error("Error fetching matches by owner:", error);
         res.status(500).json({ error: 'Có lỗi xảy ra khi lấy danh sách trận đấu!' });
     }
 };
@@ -66,7 +70,7 @@ exports.getMatchById = async (req, res) => {
     }
 };
 
-// Chỉnh sửa trận đấu
+// Hàm cập nhật trận đấu
 exports.editMatch = async (req, res) => {
     const matchId = req.params.id;
     const updatedData = req.body; // Dữ liệu mới từ yêu cầu
@@ -75,14 +79,14 @@ exports.editMatch = async (req, res) => {
         const matchRef = admin.database().ref(`matches/${matchId}`);
         await matchRef.update(updatedData); // Cập nhật dữ liệu trận đấu
 
-        res.status(200).json({ message: 'Match updated successfully' });
+        res.status(200).json({ message: 'Match updated successfully', match: { id: matchId, ...updatedData } });
     } catch (error) {
         console.error('Error updating match:', error);
         res.status(500).json({ error: 'Could not update match' });
     }
 };
 
-// Xóa trận đấu
+// Hàm xóa trận đấu
 exports.removeMatch = async (req, res) => {
     const matchId = req.params.id;
 
