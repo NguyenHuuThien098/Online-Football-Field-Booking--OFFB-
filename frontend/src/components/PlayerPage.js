@@ -70,7 +70,7 @@ const PlayerPage = () => {
             setBookings(validBookings);
         } catch (error) {
             console.error("Error fetching bookings:", error);
-            setError('Có lỗi xảy ra khi lấy lịch sử đặt sân.');
+            window.confirm('Có lỗi xảy ra khi lấy lịch sử đặt sân.');
         }
     };
 
@@ -85,7 +85,7 @@ const PlayerPage = () => {
             setFields(response.data);
         } catch (error) {
             console.error("Error searching fields:", error);
-            setError('Có lỗi xảy ra khi tìm kiếm sân.');
+            window.confirm('Có lỗi xảy ra khi tìm kiếm sân.');
         }
     }, 500), [searchParams]);
 
@@ -99,7 +99,7 @@ const PlayerPage = () => {
     const handleBookField = async () => {
         const token = localStorage.getItem('token');
         if (!searchParams.date || !searchParams.time || ![5, 7, 11].includes(numberOfPeople)) {
-            setError('Tất cả thông tin phải được cung cấp.');
+            window.confirm('Tất cả thông tin phải được cung cấp.');
             return;
         }
 
@@ -107,7 +107,14 @@ const PlayerPage = () => {
             setError('Chưa chọn sân.');
             return;
         }
-
+          const selectedDate = new Date(searchParams.date);
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < currentDate) {
+            window.confirm('Ngày đặt sân không thể là ngày trong quá khứ.');
+            return;
+        }
         const bookingData = {
             fieldId: selectedField.fieldId,
             userId: userId,

@@ -6,11 +6,11 @@ const UserProfile = () => {
     const [userData, setUserData] = useState({
         fullName: '',
         phoneNumber: '',
-        birthYear: '',
+        birthDate: '',
         address: '',
         image: '',
-        email: '',  // email không thay đổi
-        role: '',   // role không thay đổi
+        email: '',
+        role: '',
     });
     const [isLoading, setIsLoading] = useState(true);
     const [message, setMessage] = useState('');
@@ -21,19 +21,17 @@ const UserProfile = () => {
         // Lấy thông tin người dùng khi component được render lần đầu
         const fetchUserData = async () => {
             try {
-                const token = localStorage.getItem('token'); // Giả sử token lưu trong localStorage
+                const token = localStorage.getItem('token');
                 const response = await axios.get('http://localhost:5000/api/user/me', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                
-                // Kiểm tra nếu người dùng chưa có thông tin
-                if (!response.data.fullName || !response.data.phoneNumber || !response.data.birthYear || !response.data.address) {
-                    setIsNewUser(true); // Đánh dấu là người dùng mới, yêu cầu cập nhật thông tin
+
+                if (!response.data.fullName || !response.data.phoneNumber || !response.data.birthDate || !response.data.address) {
+                    setIsNewUser(true); // Đánh dấu là người dùng mới
                 }
 
-                // Lưu thông tin người dùng vào state
                 setUserData(response.data);
                 setIsLoading(false);
             } catch (error) {
@@ -54,27 +52,45 @@ const UserProfile = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        const imageUrl = URL.createObjectURL(file);
-        setUserData({
-            ...userData,
-            image: imageUrl,
-        });
+        if (file) {
+            const imageUrl = URL.createObjectURL(file);
+            setUserData({
+                ...userData,
+                image: imageUrl,
+            });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const currentDate = new Date();
+        const birthDate = new Date(userData.birthDate);
+
+        if (birthDate > currentDate) {
+            alert('Ngày sinh không thể lớn hơn ngày hiện tại.');
+            return;
+        }
+
+        if (!/^[0-9]{10,15}$/.test(userData.phoneNumber)) {
+            alert('Số điện thoại không hợp lệ');
+            return;
+        }
+
         try {
             const token = localStorage.getItem('token');
-            const { email, role, ...userDataToUpdate } = userData; // Loại bỏ email và role khi gửi lên server
+            const { email, role, ...userDataToUpdate } = userData;
+
             const response = await axios.put('http://localhost:5000/api/user/me', userDataToUpdate, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             setMessage(response.data.message);
+            setIsNewUser(false);
         } catch (error) {
             console.error('Lỗi khi cập nhật thông tin:', error);
-            setMessage('Cập nhật thông tin thất bại.');
+            alert('Cập nhật thông tin thất bại. Vui lòng thử lại.');
         }
     };
 
@@ -115,11 +131,11 @@ const UserProfile = () => {
                             />
                         </div>
                         <div>
-                            <label>Năm sinh</label>
+                            <label>Ngày sinh</label>
                             <input
-                                type="text"
-                                name="birthYear"
-                                value={userData.birthYear}
+                                type="date"
+                                name="birthDate"
+                                value={userData.birthDate}
                                 onChange={handleChange}
                                 required
                             />
@@ -147,7 +163,7 @@ const UserProfile = () => {
                     <p>Thông tin của bạn:</p>
                     <p>Họ và tên: {userData.fullName}</p>
                     <p>Số điện thoại: {userData.phoneNumber}</p>
-                    <p>Năm sinh: {userData.birthYear}</p>
+                    <p>Ngày sinh: {userData.birthDate}</p>
                     <p>Địa chỉ: {userData.address}</p>
                     <p>Email: {userData.email}</p>
                     <p>Vai trò: {userData.role}</p>
