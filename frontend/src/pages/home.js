@@ -11,6 +11,7 @@ const Home = () => {
         <Item/>
         <Item/>
         <Item/>
+        <Item/>
     </ MainLayout>
   );
 };
