@@ -2,7 +2,7 @@ import style from "./Item.module.scss"
 
 const item = () => {
     return (
-        <div className="p-5">
+        <div className="m-5">
             <div className= {style.br50 + " border border-black h-50 w-100"}>
             <div className="row h-100">
                 <div className="col-4 border-end border-black"></div>
@@ -20,6 +20,7 @@ const item = () => {
             </div>
                 
             </div>
+            <hr className={style.hr}/>
         </div>
     );
 };

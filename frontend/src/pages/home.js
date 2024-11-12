@@ -11,6 +11,11 @@ const Home = () => {
     <MainLayout>
       <SearchTool/>
       <Item/>
+      <Item/>
+      <Item/>
+      <Item/>
+      <Item/>
+      <Item/>
     </ MainLayout>
   );
 };
