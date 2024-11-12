@@ -13,7 +13,7 @@ import Report from './pages/report';
 const routers = [
   {
     path: "/",
-    element: <Home />
+  element: <Home />
   },
   {
     path: "/login",
