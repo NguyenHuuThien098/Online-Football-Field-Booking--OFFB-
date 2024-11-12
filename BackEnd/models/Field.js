@@ -2,18 +2,21 @@ const admin = require('../firebase');
 
 class Field {
     // Tạo sân lớn
-    static async createField(fieldData) {
+    static async createLargeField(fieldData) {
         const bookingSlots = {};
 
+        // Tạo các slots thời gian cho sân lớn
         for (let hour = 0; hour < 24; hour++) {
             const start = `${hour.toString().padStart(2, '0')}:00`;
             const end = `${(hour + 1).toString().padStart(2, '0')}:00`;
             bookingSlots[`${start}-${end}`] = null;
         }
 
+        // Thêm sân lớn vào cơ sở dữ liệu
         const newFieldRef = await admin.database().ref('fields').push({
             ...fieldData,
-            bookingSlots
+            bookingSlots,
+            fieldType: 'large'  // Đánh dấu là sân lớn
         });
 
         return { fieldId: newFieldRef.key, ...fieldData };
@@ -23,15 +26,18 @@ class Field {
     static async createSmallField(fieldData) {
         const bookingSlots = {};
 
+        // Tạo các slots thời gian cho sân nhỏ
         for (let hour = 0; hour < 24; hour++) {
             const start = `${hour.toString().padStart(2, '0')}:00`;
             const end = `${(hour + 1).toString().padStart(2, '0')}:00`;
             bookingSlots[`${start}-${end}`] = null;
         }
 
+        // Thêm sân nhỏ vào cơ sở dữ liệu
         const newSmallFieldRef = await admin.database().ref('smallFields').push({
             ...fieldData,
-            bookingSlots
+            bookingSlots,
+            fieldType: 'small'  // Đánh dấu là sân nhỏ
         });
 
         return { fieldId: newSmallFieldRef.key, ...fieldData };
@@ -55,7 +61,17 @@ class Field {
     static async getFieldsByOwner(ownerId) {
         const snapshot = await admin.database().ref('fields').orderByChild('ownerId').equalTo(ownerId).once('value');
         const fields = snapshot.val() || {};
+
+        // Trả về các sân bao gồm cả sân lớn và sân nhỏ
         return Object.keys(fields).map(key => ({ fieldId: key, ...fields[key] }));
+    }
+
+    // Lấy sân nhỏ theo ID sân lớn
+    static async getSmallFieldsByLargeFieldId(largeFieldId) {
+        const snapshot = await admin.database().ref('smallFields').orderByChild('largeFieldId').equalTo(largeFieldId).once('value');
+        const smallFields = snapshot.val() || {};
+
+        return Object.keys(smallFields).map(key => ({ fieldId: key, ...smallFields[key] }));
     }
 
     // Xóa sân
