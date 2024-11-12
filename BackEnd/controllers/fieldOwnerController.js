@@ -7,23 +7,24 @@ const googleLogin = async (req, res) => {
     const { token } = req.body;
    
     try {
-        
-        console.log('User:', user); 
+        // const user = await User.verifyGoogleToken(token);
+        console.log('User:', user); // Ghi log thông tin người dùng
 
 
         // Đặt vai trò cho người dùng
         await User.setUserRole(user.uid, 'fieldOwner');
         res.status(200).send({ message: 'Đăng nhập thành công với tư cách Field Owner', uid: user.uid });
     } catch (error) {
-        console.error('Error during Google login:', error);
+        console.error('Error during Google login:', error); // Ghi log lỗi
         res.status(400).send({ error: error.message });
     }
 };
 
 
+
 // Tạo sân lớn
 const addLargeField = async (req, res) => {
-    const { name, location, type, price, image, contactNumber, operatingHours } = req.body;
+    const { name, location, image, contactNumber } = req.body;
     const { uid: ownerId, email } = req.user;  // Lấy email và ownerId từ thông tin người dùng sau khi đăng nhập
 
     try {
@@ -58,11 +59,11 @@ const addLargeField = async (req, res) => {
 
 // Tạo sân nhỏ
 const addSmallField = async (req, res) => {
-    const { price, participants, image, operatingHours, largeFieldId } = req.body;  // Thêm largeFieldId vào req.body
+    const { price, type, image, operatingHours, largeFieldId } = req.body;  // Thêm largeFieldId vào req.body
     const { uid: ownerId } = req.user;  // Lấy ownerId từ thông tin người dùng sau khi đăng nhập
 
     // Kiểm tra số lượng người tham gia
-    if (!['5', '7', '11'].includes(participants.toString())) {
+    if (!['5', '7', '11'].includes(type.toString())) {
         return res.status(400).json({ message: 'Số người tham gia không hợp lệ. Vui lòng chọn từ 5, 7, hoặc 11.' });
     }
 
@@ -85,7 +86,7 @@ const addSmallField = async (req, res) => {
             image,
             
             price,
-            participants,
+            type,
             operatingHours,
             location: largeField.location,  
             ownerId,
