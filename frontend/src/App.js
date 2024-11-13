@@ -56,6 +56,10 @@ const App = () => {
                     path="/History_FieldBooked" 
                     element={  <History_FieldBooked />} 
                 />
+                <Route 
+                    path="/Report" 
+                    element={  <Report />} 
+                />
             </Routes>
         </Router>
     );
