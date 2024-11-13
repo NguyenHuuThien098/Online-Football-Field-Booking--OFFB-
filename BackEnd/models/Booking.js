@@ -5,6 +5,24 @@ const Field = require('./Field');
 
 
 class Booking {
+    // static async checkBookingConflict(fieldId, date, time) {
+    //     // Kiểm tra xem có booking nào cho sân, ngày và giờ đó chưa
+    //     const snapshot = await admin.database().ref('bookings')
+    //         .orderByChild('fieldId')
+    //         .equalTo(fieldId)
+    //         .once('value');
+    
+    //     const bookings = snapshot.val() || {};
+    
+    //     // Kiểm tra nếu có bất kỳ booking nào trùng ngày và giờ
+    //     const hasConflict = Object.keys(bookings).some(bookingId => {
+    //         const booking = bookings[bookingId];
+    //         return booking.date === date && booking.time === time;
+    //     });
+    
+    //     return hasConflict;
+    // }
+    
     // Tạo mới một booking
     static async createBooking(fieldId, userId, date, time, numberOfPeople) {
        
@@ -97,6 +115,31 @@ class Booking {
     }
 
 
+     // Lấy tất cả các booking của người chơi
+     static async getBookingsByUser(userId) {
+        const snapshot = await admin.database().ref('bookings')
+            .orderByChild('userId')
+            .equalTo(userId)
+            .once('value');
+
+        const bookings = snapshot.val() || {};
+        const bookingList = Object.keys(bookings).map(key => ({ id: key, ...bookings[key] }));
+
+        // Lấy thông tin sân cho mỗi booking
+        const bookingsWithFields = await Promise.all(bookingList.map(async (booking) => {
+            const field = await Field.getFieldById(booking.fieldId); // Lấy thông tin sân
+            return {
+                ...booking,
+                fieldName: field.name,
+                fieldLocation: field.location,
+                fieldPrice: field.price,
+                fieldType: field.type,
+            };
+        }));
+
+        return bookingsWithFields; // Trả về booking với thông tin sân
+    }
+
     // Lấy thông tin booking theo ID
     static async getBookingById(bookingId) {
         const snapshot = await admin.database().ref(`bookings/${bookingId}`).once('value');
@@ -105,7 +148,6 @@ class Booking {
         }
         return { id: bookingId, ...snapshot.val() };
     }
-
 
     // Xóa booking theo ID
     static async deleteBooking(bookingId) {

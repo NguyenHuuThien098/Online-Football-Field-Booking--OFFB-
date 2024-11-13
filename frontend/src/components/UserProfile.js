@@ -93,9 +93,17 @@ const UserProfile = () => {
             alert('Cập nhật thông tin thất bại. Vui lòng thử lại.');
         }
     };
-
     const handleBackToHome = () => {
-        navigate('/');
+        const role = userData.role;
+        
+        // Kiểm tra vai trò người dùng và chuyển hướng tới trang phù hợp
+        if (role === 'field_owner') {
+            navigate('/field-owner-dashboard');  // Điều hướng đến trang quản lý của chủ sân
+        } else if (role === 'player') {
+            navigate('/player-page');  // Điều hướng đến trang của người chơi
+        } else {
+            navigate('/');  // Điều hướng về trang chủ nếu không xác định được vai trò
+        }
     };
 
     if (isLoading) {
