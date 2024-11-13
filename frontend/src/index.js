@@ -11,6 +11,7 @@ import Login from './pages/login';
 import Report from './pages/report';
 import History_FieldBooked from './pages/History_FieldBooked';
 import History_Matchjoined from './pages/History_Matchjoined';
+import Personal from './pages/Personal.js';
 
 const routers = [
   {
@@ -24,6 +25,10 @@ const routers = [
   {
     path: "/Report",
     element: <Report />
+  },
+  {
+    path: "/Personal",
+    element: <Personal />
   },
   {
     path: "/History_FieldBooked",

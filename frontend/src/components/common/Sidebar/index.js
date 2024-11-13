@@ -8,7 +8,7 @@ const Sidebar = () => {
 
       <hr />
 
-      <a className="btn" href="Persional-view.html">Personal</a>
+      <a className="btn" href="Personal">Personal</a>
 
 
       <Accordion defaultActiveKey="0" flush>
