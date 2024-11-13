@@ -100,6 +100,7 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                             {loading ? 'Logging in with Google...' : 'Login with Google'}
                         </button>
                         {error && <p className="text-danger mt-3">{error}</p>}
+
                     </div>
                 </div>
             </div>

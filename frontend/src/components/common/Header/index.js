@@ -25,7 +25,7 @@ const Header = () => {
                     <div name="avatar">
                         <img src={avatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar"/>
                     </div>
-                    <a href="login-view.html" className="btn">login</a>
+                    <a href="Login" className="btn">login</a>
                 </div>
             </div>
         </div>

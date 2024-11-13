@@ -3,12 +3,12 @@ import Accordion from 'react-bootstrap/Accordion';
 const Sidebar = () => {
   return (
     <nav className="nav flex-column bg-light">
-      <a className="btn">Available Field</a>
+      <a className="btn" href="/">Available Field</a>
       <a className="btn">Open Match</a>
 
       <hr />
 
-      <a className="btn" href="Persional-view.html">Personal</a>
+      <a className="btn" href="Personal">Personal</a>
 
 
       <Accordion defaultActiveKey="0" flush>
@@ -19,9 +19,9 @@ const Sidebar = () => {
             </div>
           </Accordion.Header>
           <Accordion.Body>
-            <div className="nav flex-column">
-              <a className="btn" href="History">Field booked</a>
-              <a className="btn" href="MathchJoined-view.html">Math joined</a>
+            <div className="nav flex-column"> 
+              <a className="btn" href="History_FieldBooked">Field booked</a>
+              <a className="btn" href="History_Matchjoined">Math joined</a>
             </div>
           </Accordion.Body>
         </Accordion.Item>
