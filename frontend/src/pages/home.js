@@ -1,17 +1,63 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
-import Item from "../components/common/Item"
+import Item from "../components/common/Item"; // Đảm bảo import đúng cách
+import axios from "axios";
 
 const Home = () => {
-  
+  const [fields, setFields] = useState([]);
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchFieldsAndMatches = async () => {
+      try {
+        // Fetch fields
+        const fieldsResponse = await axios.get("http://localhost:5000/api/guest/fields");
+        const fieldsData = fieldsResponse.data;
+        setFields(fieldsData);
+
+        // Fetch matches
+        const matchesResponse = await axios.get("http://localhost:5000/api/matches/all");
+        const matchesData = matchesResponse.data;
+        setMatches(matchesData);
+      } catch (error) {
+        console.error("Error fetching fields and matches:", error);
+        setError("Có lỗi xảy ra khi tải danh sách sân và trận đấu.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFieldsAndMatches();
+  }, []);
+
+  if (loading) {
+    return <p>Đang tải danh sách sân và trận đấu...</p>;
+  }
+
+  if (error) {
+    return <p style={{ color: "red" }}>{error}</p>;
+  }
+
   return (
     <MainLayout>
-      <SearchTool/>
-        <Item/>
-        <Item/>
-        <Item/>
-    </ MainLayout>
+      <SearchTool />
+      <h2>Danh sách sân bóng:</h2>
+      <ul>
+        {fields.map((field) => (
+          <Item key={field.fieldId} field={field} />
+        ))}
+      </ul>
+      <h2>Danh sách trận đấu mở:</h2>
+      <ul>
+        {matches.map((match) => (
+          <Item key={match.id} match={match} />
+        ))}
+      </ul>
+    </MainLayout>
   );
 };
+
 export default Home;

@@ -1,6 +1,18 @@
 const admin = require('../firebase'); // Import Firebase Admin SDK
 const Match = require('../models/Match'); // Import lớp Match
 
+// Hàm lấy danh sách tất cả các trận đấu công khai
+exports.getAllMatchesPublic = async (req, res) => {
+    try {
+        const snapshot = await admin.database().ref('matches').once('value'); // Lấy dữ liệu tất cả các trận đấu
+        const matches = snapshot.val() || {}; // Chuyển đổi dữ liệu thành đối tượng
+        const matchList = Object.keys(matches).map(key => ({ id: key, ...matches[key] })); // Chuyển đổi đối tượng thành mảng
+        res.status(200).json(matchList); // Trả về danh sách trận đấu
+    } catch (error) {
+        console.error("Error fetching all matches:", error);
+        res.status(500).json({ error: 'Có lỗi xảy ra khi lấy danh sách tất cả các trận đấu!' });
+    }
+};
 // Hàm tạo trận đấu
 exports.createMatch = async (req, res) => {
     const { address, time, ownerName, playerCount, notes, questions, ownerId } = req.body;

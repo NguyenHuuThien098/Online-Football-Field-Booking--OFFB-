@@ -3,6 +3,9 @@ const router = express.Router();
 const matchController = require('../controllers/matchController'); // Import matchController
 const { authenticateUser, authorizeRole } = require('../middleware/auth');
 
+// Route để lấy danh sách tất cả các trận đấu công khai
+router.get('/all', matchController.getAllMatchesPublic);
+
 // Route để tạo trận đấu
 router.post('/', authenticateUser, authorizeRole(['field_owner']), matchController.createMatch);
 

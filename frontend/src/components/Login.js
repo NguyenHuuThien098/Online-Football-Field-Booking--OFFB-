@@ -24,14 +24,9 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
 
-// <<<<<<< homepageview
-//                 // Cập nhật token vào Realtime Database
-//                 // await set(ref(database, 'tokens/' + userId), { token });
-// =======
-//                 // Lưu token và ownerId vào local storage
-//                 localStorage.setItem('token', token);
-//                 localStorage.setItem('ownerId', userId);
-// >>>>>>> main
+                // Lưu token và ownerId vào local storage
+                localStorage.setItem('token', token);
+                localStorage.setItem('ownerId', userId);
 
                 // Điều hướng dựa trên vai trò người dùng
                 if (userData.role === 'field_owner') {
