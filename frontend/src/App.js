@@ -7,7 +7,8 @@ import FieldOwnerDashboard from './components/FieldOwnerDashboard';
 import Register from './components/Register'; // Nhập component Register
 
 import Home from "./pages/home";
-import History from './pages/history';
+import History_MatchJoined from './pages/History_Matchjoined';
+import History_FieldBooked from './pages/History_FieldBooked';
 import Login from './pages/login';
 import Report from './pages/report';
 
@@ -43,14 +44,17 @@ const App = () => {
                     path="/player-page" 
                     element={isAuthenticated && userRole === 'player' ? <PlayerPage /> : <Navigate to="/" />} 
                 />
-                <Route 
+                {/* <Route 
                     path="/history" 
                     element={isAuthenticated ? <History /> : <Navigate to="/login" />} 
+                /> */}
+                <Route 
+                    path="/History_MatchJoined" 
+                    element={  <History_MatchJoined />} 
                 />
                 <Route 
-                    path="/report" 
-                    // element={isAuthenticated ? <Report /> : <Navigate to="/report" />} 
-                    element = {<Report />}
+                    path="/History_FieldBooked" 
+                    element={  <History_FieldBooked />} 
                 />
             </Routes>
         </Router>
