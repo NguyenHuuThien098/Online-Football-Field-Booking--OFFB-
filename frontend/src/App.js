@@ -49,7 +49,8 @@ const App = () => {
                 />
                 <Route 
                     path="/report" 
-                    element={isAuthenticated ? <Report /> : <Navigate to="/login" />} 
+                    // element={isAuthenticated ? <Report /> : <Navigate to="/report" />} 
+                    element = {<Report />}
                 />
             </Routes>
         </Router>
