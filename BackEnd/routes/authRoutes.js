@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 const { authenticateUser, authorizeRole } = require('../middleware/auth')
 
 // Định nghĩa các route cho đăng ký và đăng nhập
-router.post('/register', authController.register);
+router.post('/register/google', authController.registerWithGoogle);
 router.post('/login/google', authController.loginWithGoogle);
 
 // Route để lấy danh sách người chơi do chủ sân làm chủ

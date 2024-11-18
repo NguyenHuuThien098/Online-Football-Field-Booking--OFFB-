@@ -1,4 +1,3 @@
-// models/User.js
 const admin = require('../firebase'); // Đảm bảo bạn đã cấu hình Firebase
 
 class User {
@@ -6,6 +5,7 @@ class User {
     static async createUser(email, role) {
         try {
             const userRecord = await admin.auth().createUser({ email });
+            await admin.auth().setCustomUserClaims(userRecord.uid, { role });
             return { uid: userRecord.uid, email, role };
         } catch (error) {
             console.error('Error creating user:', error);
@@ -17,7 +17,12 @@ class User {
     static async getUserByEmail(email) {
         try {
             const userRecord = await admin.auth().getUserByEmail(email);
-            return userRecord;
+            const customClaims = userRecord.customClaims || {};
+            return {
+                uid: userRecord.uid,
+                email: userRecord.email,
+                role: customClaims.role || 'player' // Giả sử vai trò mặc định là 'player'
+            };
         } catch (error) {
             if (error.code === 'auth/user-not-found') {
                 return null;

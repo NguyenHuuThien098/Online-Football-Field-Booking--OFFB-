@@ -1,137 +1,119 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { signInWithGoogle } from "../firebase";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from 'react';
+import { signInWithGoogle, database } from '../firebase';
+import { ref, get } from 'firebase/database';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ setIsAuthenticated, setUserRole }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        { email, password }
-      );
-      const { token, role } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userRole", role);
-      setIsAuthenticated(true);
-      setUserRole(role);
-      if (role === "player") {
-        navigate("/player-page");
-      } else if (role === "field_owner") {
-        navigate("/field-owner-dashboard");
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || "Invalid email or password");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleGoogleLogin = async () => {
+        try {
+            const user = await signInWithGoogle();
+            const userId = user.uid;
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const user = await signInWithGoogle();
-      const idToken = await user.getIdToken();
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login/google",
-        { idToken }
-      );
-      const { token, role } = response.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("userRole", role);
-      setIsAuthenticated(true);
-      setUserRole(role);
-      if (role === "player") {
-        navigate("/player-page");
-      } else if (role === "field_owner") {
-        navigate("/field-owner-dashboard");
-      }
-    } catch (error) {
-      setError(error.response?.data?.message || "Error logging in with Google");
-    } finally {
-      setLoading(false);
-    }
-  };
-//   setSelectedOption(event.target.value);   const [selectedOption, setSelectedOption] = useState('owner'); // Giá trị mặc định
+            const token = await user.getIdToken();
+            const userRef = ref(database, 'users/' + userId);
+            const snapshot = await get(userRef);
 
-  // const handleOptionChange = (event) => {
-  // };
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                setIsAuthenticated(true);
+                setUserRole(userData.role);
+                localStorage.setItem('token', token);
+                localStorage.setItem('ownerId', userId);
 
-  return (
-    <div className="vh-100 d-flex align-items-center">
-      <div className="mb-5 container rounded d-flex w-25 justify-content-center">
-        <div className="vw-100 card border border-dark d-flex align-items-center">
-          <div className="card-header text-center w-100 border-bottom border-dark">
-            <h3 className="card-title">OFFB</h3>
-          </div>
-          <div className="card-body">
-            <div className="text-center">
-              <h2 className="card-title">Login / Signup</h2>
-            </div>
-            <hr />
+                if (userData.role === 'field_owner') {
+                    navigate('/field-owner-dashboard');
+                } else if (userData.role === 'player') {
+                    navigate('/player-page');
+                } else {
+                    navigate('/');
+                }
+            } else {
+                setError('Tài khoản không tồn tại. Vui lòng đăng ký.');
+            }
+        } catch (error) {
+            console.error("Lỗi khi đăng nhập bằng Google:", error);
+            setError(error.message);
+        }
+    };
 
-            <form>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="option"
-                  id="owner"
-                  value="owner"
-                  // checked={selectedOption === 'owner'}
-                  // onChange={handleOptionChange}
-                />
-                <label className="form-check-label" htmlFor="owner">
-                  Chủ sân
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  className="form-check-input"
-                  type="radio"
-                  name="option"
-                  id="player"
-                  value="player"
-                  // checked={selectedOption === 'player'}
-                  // onChange={handleOptionChange}
-                />
-                <label className="form-check-label" htmlFor="player">
-                  Người chơi
-                </label>
-              </div>
-            </form>
-            {/* <p>Bạn đã chọn: {selectedOption}</p> */}
+    const handleNavigateToRegister = () => {
+        navigate('/register');
+    };
 
-            <hr />
+    const styles = {
+        container: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            backgroundColor: '#f0f4f8',
+            padding: '20px',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px',
+        },
+        heading: {
+            marginBottom: '20px',
+            color: '#333',
+        },
+        errorMessage: {
+            color: 'red',
+            marginBottom: '10px',
+        },
+        button: {
+            backgroundColor: '#4285F4',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+        },
+        buttonHover: {
+            backgroundColor: '#357AE8',
+        },
+        registerButton: {
+            backgroundColor: '#34A853',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+            marginTop: '10px',
+        },
+        registerButtonHover: {
+            backgroundColor: '#2C8C47',
+        },
+    };
 
-            <div className="text-center">
-              <button
+    return (
+        <div style={styles.container}>
+            <h2 style={styles.heading}>Đăng Nhập</h2>
+            {error && <p style={styles.errorMessage}>{error}</p>}
+            <button
+                style={styles.button}
+                onMouseOver={e => e.currentTarget.style.backgroundColor = styles.buttonHover.backgroundColor}
+                onMouseOut={e => e.currentTarget.style.backgroundColor = styles.button.backgroundColor}
                 onClick={handleGoogleLogin}
-                className="btn btn-outline-danger mt-3"
-                disabled={loading}
-              >
-                {loading ? "Sign in with Google..." : "Sign in with Google"}
-              </button>
-              {error && <p className="text-danger mt-3">{error}</p>}
-            </div>
-          </div>
+            >
+                Đăng Nhập Bằng Google
+            </button>
+            <button
+                style={styles.registerButton}
+                onMouseOver={e => e.currentTarget.style.backgroundColor = styles.registerButtonHover.backgroundColor}
+                onMouseOut={e => e.currentTarget.style.backgroundColor = styles.registerButton.backgroundColor}
+                onClick={handleNavigateToRegister}
+            >
+                Đăng Ký
+            </button>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Login;

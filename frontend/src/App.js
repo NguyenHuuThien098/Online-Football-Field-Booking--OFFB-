@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// import Homepage from './components/Homepage_temp'; // Import đúng Homepage
 import PlayerPage from './components/PlayerPage';
 import FieldOwnerDashboard from './components/FieldOwnerDashboard';
-// import Login from './components/Login'; // Nhập component Login
-import Register from './components/Register'; // Nhập component Register
-
 import Home from "./pages/home";
 import History_MatchJoined from './pages/History_Matchjoined';
 import History_FieldBooked from './pages/History_FieldBooked';
 import Login from './pages/login';
+import Register from './components/Register'; // Import trang đăng ký
 import Report from './pages/report';
 
 const App = () => {
@@ -30,35 +27,31 @@ const App = () => {
                 />
                 <Route 
                     path="/login" 
-                    element={<Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} 
+                    element={<Login setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}
                 />
                 <Route 
                     path="/register" 
-                    element={<Register setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />} 
-                />
-                <Route 
-                    path="/field-owner-dashboard" 
-                    element={isAuthenticated && userRole === 'field_owner' ? <FieldOwnerDashboard /> : <Navigate to="/" />} 
+                    element={<Register setIsAuthenticated={setIsAuthenticated} setUserRole={setUserRole} />}
                 />
                 <Route 
                     path="/player-page" 
-                    element={isAuthenticated && userRole === 'player' ? <PlayerPage /> : <Navigate to="/" />} 
-                />
-                {/* <Route 
-                    path="/history" 
-                    element={isAuthenticated ? <History /> : <Navigate to="/login" />} 
-                /> */}
-                <Route 
-                    path="/History_MatchJoined" 
-                    element={  <History_MatchJoined />} 
+                    element={isAuthenticated && userRole === 'player' ? <PlayerPage /> : <Navigate to="/login" />} 
                 />
                 <Route 
-                    path="/History_FieldBooked" 
-                    element={  <History_FieldBooked />} 
+                    path="/field-owner-dashboard" 
+                    element={isAuthenticated && userRole === 'field_owner' ? <FieldOwnerDashboard /> : <Navigate to="/login" />} 
                 />
                 <Route 
-                    path="/Report" 
-                    element={  <Report />} 
+                    path="/history-matchjoined" 
+                    element={isAuthenticated ? <History_MatchJoined /> : <Navigate to="/login" />} 
+                />
+                <Route 
+                    path="/history-fieldbooked" 
+                    element={isAuthenticated ? <History_FieldBooked /> : <Navigate to="/login" />} 
+                />
+                <Route 
+                    path="/report" 
+                    element={isAuthenticated ? <Report /> : <Navigate to="/login" />} 
                 />
             </Routes>
         </Router>

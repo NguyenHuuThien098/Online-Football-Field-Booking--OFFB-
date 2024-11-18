@@ -1,10 +1,16 @@
 const User = require('../models/User'); // Nhập model User để tương tác với cơ sở dữ liệu người dùng
 const admin = require('../firebase'); // Nhập Firebase Admin SDK để sử dụng các chức năng của Firebase
 
-// Hàm xử lý đăng ký người dùng
-exports.register = async (req, res) => {
-    const { email, role } = req.body; // Nhận email và vai trò từ yêu cầu của client
+// Hàm xử lý đăng ký người dùng bằng Google
+exports.registerWithGoogle = async (req, res) => {
+    const { idToken, role } = req.body; // Nhận idToken và vai trò từ yêu cầu của client
+
     try {
+        // Xác thực idToken và lấy thông tin người dùng
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const uid = decodedToken.uid;
+        const email = decodedToken.email;
+
         // Kiểm tra xem người dùng đã tồn tại chưa
         const existingUser = await User.getUserByEmail(email);
         if (existingUser) {
@@ -15,52 +21,46 @@ exports.register = async (req, res) => {
         // Nếu người dùng chưa tồn tại, tạo người dùng mới
         const newUser = await User.createUser(email, role);
         // Lưu thông tin người dùng vào Realtime Database
-        await admin.database().ref(`users/${newUser.uid}`).set({ email, role });
+        await admin.database().ref(`users/${uid}`).set({ email, role });
 
         // Tạo token tùy chỉnh cho người dùng mới
-        const token = await admin.auth().createCustomToken(newUser.uid);
-        // Lưu token vào Realtime Database để có thể truy cập sau này
-        await admin.database().ref(`tokens/${newUser.uid}`).set({ token });
+        const token = await admin.auth().createCustomToken(uid);
 
         // Trả về thông tin người dùng và token đã tạo
-        res.status(201).send({ uid: newUser.uid, email, role, token });
+        res.status(201).send({ message: 'Registration successful', uid, email, role, token });
     } catch (error) {
-        // Nếu có lỗi trong quá trình đăng ký, ghi log và trả về lỗi
-        console.error('Error during registration:', error);
+        console.error('Error during Google registration:', error);
         res.status(400).send({ error: error.message });
     }
 };
 
 // Hàm xử lý đăng nhập bằng Google
 exports.loginWithGoogle = async (req, res) => {
-    const { googleId, email, role } = req.body; // Nhận googleId, email và vai trò từ yêu cầu của client
+    const { idToken } = req.body; // Nhận idToken từ yêu cầu của client
 
     try {
-        // Kiểm tra xem người dùng đã tồn tại chưa
-        const existingUser = await User.getUserByEmail(email);
-        if (!existingUser) {
-            // Nếu người dùng chưa tồn tại, tạo mới người dùng
-            const newUser = await User.createUser(email, role);
-            // Tạo token cho người dùng mới
-            const token = await admin.auth().createCustomToken(newUser.uid);
-            // Lưu thông tin người dùng và token vào Realtime Database
-            await admin.database().ref(`users/${newUser.uid}`).set({ email, role, token });
+        // Xác thực idToken và lấy thông tin người dùng
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const uid = decodedToken.uid;
+        const email = decodedToken.email;
 
-            // Trả về thông tin người dùng mới và token
-            return res.status(201).send({ uid: newUser.uid, email, role, token });
+        // Kiểm tra xem người dùng đã tồn tại chưa
+        let user = await User.getUserByEmail(email);
+        if (!user) {
+            // Nếu người dùng chưa tồn tại, trả về lỗi
+            return res.status(400).send({ error: 'User does not exist. Please register first.' });
         }
 
-        // Nếu người dùng đã tồn tại, tạo token cho người dùng cũ
-        const token = await admin.auth().createCustomToken(existingUser.uid); // Tạo token
-        // Cập nhật token vào thông tin người dùng trong Realtime Database
-        await admin.database().ref(`users/${existingUser.uid}`).update({ token });
+        // Tạo custom token để gửi về frontend
+        const customToken = await admin.auth().createCustomToken(uid);
 
-        // Trả về thông tin người dùng và token đã tạo
-        res.send({ uid: existingUser.uid, email: existingUser.email, role: existingUser.role, token });
+        // In ra thông tin người dùng và vai trò của họ
+        console.log(`User logged in: ${email}, Role: ${user.role}`);
+
+        res.status(200).json({ message: 'Login successful', token: customToken, role: user.role });
     } catch (error) {
-        // Nếu có lỗi trong quá trình đăng nhập, ghi log và trả về lỗi
-        console.error('Error during Google login:', error);
-        res.status(400).send({ error: error.message });
+        console.error('Error logging in with Google:', error);
+        res.status(500).json({ message: 'Error logging in with Google', error: error.message });
     }
 };
 

@@ -13,10 +13,7 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
         try {
             const user = await signInWithGoogle();
             const userId = user.uid;
-
-            // Lấy ID token
             const token = await user.getIdToken();
-
             const userRef = ref(database, 'users/' + userId);
             const snapshot = await get(userRef);
 
@@ -24,19 +21,12 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                 const userData = snapshot.val();
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
-
-                // Lưu token vào local storage
                 localStorage.setItem('token', token);
 
-                if (userData.role === 'field_owner') {
-                    navigate('/field-owner-dashboard');
-                } else {
-                    navigate('/player-page');
-                }
+                navigate(userData.role === 'field_owner' ? '/field-owner-dashboard' : '/player-page');
                 return;
             }
 
-            // Ghi thông tin người dùng vào Realtime Database
             await set(ref(database, 'users/' + userId), {
                 email: user.email,
                 role: role,
@@ -46,28 +36,67 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             setSuccess('Đăng ký thành công với vai trò: ' + role);
             setIsAuthenticated(true);
             setUserRole(role);
-
-            // Lưu token vào local storage
             localStorage.setItem('token', token);
 
-            if (role === 'field_owner') {
-                navigate('/field-owner-dashboard');
-            } else {
-                navigate('/player-page');
-            }
+            navigate(role === 'field_owner' ? '/field-owner-dashboard' : '/player-page');
         } catch (error) {
             console.error("Lỗi khi đăng nhập bằng Google:", error);
             setError(error.message);
         }
     };
 
+    const styles = {
+        container: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100vh',
+            backgroundColor: '#f0f4f8',
+            padding: '20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+        },
+        heading: {
+            marginBottom: '20px',
+            color: '#333',
+        },
+        errorMessage: {
+            color: 'red',
+            marginBottom: '10px',
+        },
+        successMessage: {
+            color: 'green',
+            marginBottom: '10px',
+        },
+        radioGroup: {
+            marginBottom: '20px',
+        },
+        button: {
+            backgroundColor: '#4285F4',
+            color: 'white',
+            border: 'none',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s',
+        },
+        buttonHover: {
+            backgroundColor: '#357AE8',
+        },
+        label: {
+            marginRight: '15px',
+        },
+    };
+
     return (
-        <div>
-            <h2>Đăng Ký</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
-            <div>
-                <label>
+        <div style={styles.container}>
+            <h2 style={styles.heading}>Đăng Ký</h2>
+            {error && <p style={styles.errorMessage}>{error}</p>}
+            {success && <p style={styles.successMessage}>{success}</p>}
+            <div style={styles.radioGroup}>
+                <label style={styles.label}>
                     <input
                         type="radio"
                         value="player"
@@ -76,7 +105,7 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                     />
                     Player
                 </label>
-                <label>
+                <label style={styles.label}>
                     <input
                         type="radio"
                         value="field_owner"
@@ -86,7 +115,12 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                     Field Owner
                 </label>
             </div>
-            <button onClick={handleGoogleLogin}>
+            <button
+                style={styles.button}
+                onMouseOver={e => e.currentTarget.style.backgroundColor = styles.buttonHover.backgroundColor}
+                onMouseOut={e => e.currentTarget.style.backgroundColor = styles.button.backgroundColor}
+                onClick={handleGoogleLogin}
+            >
                 Đăng Ký Bằng Google
             </button>
         </div>
