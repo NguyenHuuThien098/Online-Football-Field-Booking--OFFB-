@@ -3,6 +3,8 @@ import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
 import Item from "../components/common/Item"; // Đảm bảo import đúng cách
 import axios from "axios";
+import Sidebar from "../components/common/Sidebar";
+import Header from "../components/common/Header";
 
 const Home = () => {
   const [fields, setFields] = useState([]);
@@ -14,12 +16,16 @@ const Home = () => {
     const fetchFieldsAndMatches = async () => {
       try {
         // Fetch fields
-        const fieldsResponse = await axios.get("http://localhost:5000/api/guest/fields");
+        const fieldsResponse = await axios.get(
+          "http://localhost:5000/api/guest/fields"
+        );
         const fieldsData = fieldsResponse.data;
         setFields(fieldsData);
 
         // Fetch matches
-        const matchesResponse = await axios.get("http://localhost:5000/api/matches/all");
+        const matchesResponse = await axios.get(
+          "http://localhost:5000/api/matches/all"
+        );
         const matchesData = matchesResponse.data;
         setMatches(matchesData);
       } catch (error) {
@@ -34,17 +40,26 @@ const Home = () => {
   }, []);
 
   if (loading) {
-    return <p>Đang tải danh sách sân và trận đấu...</p>;
+    return (
+      <MainLayout>
+        <SearchTool />
+        <p style={{ margin: "50px" }}> Đang tải danh sách sân và trận đấu...</p>
+      </MainLayout>
+    );
   }
 
   if (error) {
-    return <p style={{ color: "red" }}>{error}</p>;
+    return (
+      <MainLayout>
+        <SearchTool />
+        <p style={{ color: "red", margin: "50px" }}>{error}</p>
+      </MainLayout>
+    );
   }
 
   return (
     <MainLayout>
       <SearchTool />
-      <h2>Danh sách sân bóng:</h2>
       <ul>
         {fields.map((field) => (
           <Item key={field.fieldId} field={field} />
