@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const FieldOwnerDashboard = (setIsAuthenticated, setUserRole) => {
+const FieldOwnerDashboard = ({ setIsAuthenticated = () => {}, setUserRole = () => {} }) => {
     const [fields, setFields] = useState([]);
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('sAuthenticated') === 'true');
+    const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
     const [userRole, setUserRoleState] = useState(localStorage.getItem('userRole'));
     const [newField, setNewField] = useState({
         name: '',
@@ -77,7 +77,21 @@ const FieldOwnerDashboard = (setIsAuthenticated, setUserRole) => {
 
         fetchFieldsAndMatches();
     }, []); // Chỉ chạy một lần khi component được mount
+    
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const imageUrl = URL.createObjectURL(file);
+            setNewField({
+                ...newField,
+                image: imageUrl,
+            });
+            console.log("Image URL:", imageUrl); // Kiểm tra đường dẫn URL của ảnh
+        }
+    };
+   
+    
     const handleAddField = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -215,12 +229,17 @@ const FieldOwnerDashboard = (setIsAuthenticated, setUserRole) => {
     };
 
     const handleNavigateToProfile = () => {
-        // Điều hướng đến trang cá nhân
+       
         navigate('/user-profile');
     };
 
     const handleLogout = () => {
-        
+        localStorage.removeItem('token');
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('ownerId');
+        setIsLoggedIn(false);
+        setUserRole('');  
         navigate('/');
     };
 
@@ -236,11 +255,8 @@ const FieldOwnerDashboard = (setIsAuthenticated, setUserRole) => {
         <div>
             <h1>Field Owner Dashboard</h1>
             <p>Welcome to the Field Owner Dashboard!</p>
-            
-            {/* Nút Chỉnh Trang cá nhân */}
+ 
             <button onClick={handleNavigateToProfile}>Chỉnh Trang cá nhân</button>
-
-           {/* Nút Đăng xuất */} 
             <button onClick={handleLogout}>đăng xuất</button>
             <h2>Danh sách sân của bạn:</h2>
             <ul>
@@ -250,7 +266,8 @@ const FieldOwnerDashboard = (setIsAuthenticated, setUserRole) => {
                         <p>Địa điểm: {field.location}</p>
                         <p>Loại sân: {field.type}</p>
                         <p>Giá: {field.price}</p>
-                        <p>Hình ảnh: {field.image}</p>
+
+                        <p>Hình ảnh:  {field.image && <img src={field.image} alt="Ảnh sân" width="100" />}</p>
                         <p>Số điện thoại liên hệ: {field.contactNumber}</p>
                         <p>Giờ hoạt động: {field.operatingStart} - {field.operatingEnd}</p> 
                         <button onClick={() => handleUpdateField(field.fieldId)}>Cập nhật</button>
@@ -283,7 +300,12 @@ const FieldOwnerDashboard = (setIsAuthenticated, setUserRole) => {
         <option value="11 người">11 người</option>
     </select>
     <input type="number" placeholder="Giá" value={newField.price} onChange={(e) => setNewField({ ...newField, price: e.target.value })} required />
-    <input type="text" placeholder="Hình ảnh" value={newField.image} onChange={(e) => setNewField({ ...newField, image: e.target.value })} />
+    <input
+        type="file"
+        onChange={handleImageChange}
+    />
+    {/* Hiển thị ảnh nếu có */}
+    {newField.image && <img src={newField.image} alt="Ảnh sân" width="100" />}
     <input type="text" placeholder="Số điện thoại liên hệ" value={newField.contactNumber} onChange={(e) => setNewField({ ...newField, contactNumber: e.target.value })} required />
     
 

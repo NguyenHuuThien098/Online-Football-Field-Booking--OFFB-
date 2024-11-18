@@ -14,7 +14,7 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
     const [isRegistering, setIsRegistering] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem('isAuthenticated') === 'true');
-    const [userRole, setUserRoleState] = useState(localStorage.getItem('userRole'));
+    const [userRole] = useState(localStorage.getItem('userRole'));
     const [showDropdown, setShowDropdown] = useState(false);
 
     const [searchCriteria, setSearchCriteria] = useState({
@@ -116,10 +116,6 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
         setShowDropdown(!showDropdown);
     };
 
-    const handleNavigateToProfile = () => {
-        navigate('/user-profile');
-    };
-
     const handleNavigateToDashboard = () => {
         if (userRole === 'player') {
             navigate('/player-page');
@@ -172,9 +168,8 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
                             <FaUserCircle className="icon user-icon" onClick={handleProfileClick} />
                             {showDropdown && (
                                 <div className="dropdown-menu">
-                                  
                                     <button onClick={handleNavigateToDashboard}>Trang cá nhân</button>
-                                   
+                                    <button onClick={handleLogout}>Đăng xuất</button>
                                 </div>
                             )}
                         </div>
@@ -188,45 +183,44 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
                 <div>
                     <h2>Tìm kiếm sân:</h2>
                     <form onSubmit={handleSearchSubmit}>
-    <input
-        type="text"
-        name="name"
-        placeholder="Tên sân"
-        value={searchCriteria.name}
-        onChange={handleSearchChange}
-    />
-    <input
-        type="text"
-        name="location"
-        placeholder="Địa điểm"
-        value={searchCriteria.location}
-        onChange={handleSearchChange}
-    />
-    <select
-        name="type"
-        value={searchCriteria.type}
-        onChange={handleSearchChange}
-    >
-        <option value="">Chọn loại sân</option>
-        <option value="5 người">5 người</option>
-        <option value="7 người">7 người</option>
-        <option value="11 người">11 người</option>
-    </select>
-    <input
-        type="date"
-        name="date"
-        value={searchCriteria.date}
-        onChange={handleSearchChange}
-    />
-    <input
-        type="time"
-        name="time"
-        value={searchCriteria.time}
-        onChange={handleSearchChange}
-    />
-    <button type="submit">Tìm kiếm</button>
-</form>
-
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Tên sân"
+                            value={searchCriteria.name}
+                            onChange={handleSearchChange}
+                        />
+                        <input
+                            type="text"
+                            name="location"
+                            placeholder="Địa điểm"
+                            value={searchCriteria.location}
+                            onChange={handleSearchChange}
+                        />
+                        <select
+                            name="type"
+                            value={searchCriteria.type}
+                            onChange={handleSearchChange}
+                        >
+                            <option value="">Chọn loại sân</option>
+                            <option value="5 người">5 người</option>
+                            <option value="7 người">7 người</option>
+                            <option value="11 người">11 người</option>
+                        </select>
+                        <input
+                            type="date"
+                            name="date"
+                            value={searchCriteria.date}
+                            onChange={handleSearchChange}
+                        />
+                        <input
+                            type="time"
+                            name="time"
+                            value={searchCriteria.time}
+                            onChange={handleSearchChange}
+                        />
+                        <button type="submit">Tìm kiếm</button>
+                    </form>
                 </div>
 
                 {loading ? (
@@ -243,6 +237,9 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
                                     <p><strong>Địa điểm:</strong> {field.location}</p>
                                     <p><strong>Loại sân:</strong> {field.type}</p>
                                     <p><strong>Giá:</strong> {field.price} VND</p>
+                                    <p><strong> Hình ảnh: </strong>  
+                                        {field.image && <img src={field.image} alt={field.name} style={{ width: '100%', height: 'auto', borderRadius: '5px' }} />}
+                                    </p>
                                     <p><strong>Tình trạng:</strong> {field.isAvailable ? 'Có sẵn' : 'Không có sẵn'}</p>
                                     <button onClick={() => handleBookField(field.fieldId)} disabled={!field.isAvailable}>
                                         Đặt sân

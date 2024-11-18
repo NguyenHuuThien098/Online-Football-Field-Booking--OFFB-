@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { getDatabase, ref, get, onValue, onChildAdded, onChildChanged, onChildRemoved } from 'firebase/database';
 import { onAuthStateChanged } from 'firebase/auth';
-import { debounce } from 'lodash';
 
 const PlayerPage = () => {
     const [fields, setFields] = useState([]);
@@ -23,7 +22,6 @@ const PlayerPage = () => {
     const [numberOfPeople, setNumberOfPeople] = useState(5);
     const [error, setError] = useState('');
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-    
     const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -37,7 +35,6 @@ const PlayerPage = () => {
                 if (token) {
                     getUserBookings(user.uid, token);
                 }
-                // Lắng nghe thay đổi trong Firestore (Realtime Database)
                 listenToFieldChanges(user.uid);
                 listenToBookingChanges(user.uid);
             } else {
@@ -77,13 +74,12 @@ const PlayerPage = () => {
         const db = getDatabase();
         const fieldsRef = ref(db, 'fields');
         
-        // Lắng nghe sự thay đổi trong bộ sưu tập "fields"
         onValue(fieldsRef, (snapshot) => {
             const fieldsData = [];
             snapshot.forEach((childSnapshot) => {
                 fieldsData.push(childSnapshot.val());
             });
-            console.log("Dữ liệu các sân hiện tại:", fieldsData); // Log để kiểm tra dữ liệu
+            console.log("Dữ liệu các sân hiện tại:", fieldsData);
             setFields(fieldsData);
         });
     };
@@ -92,7 +88,6 @@ const PlayerPage = () => {
         const db = getDatabase();
         const bookingsRef = ref(db, `bookings/${userId}`);
         
-        // Lắng nghe sự thay đổi trong lịch sử đặt sân của người chơi
         onChildAdded(bookingsRef, (snapshot) => {
             const newBooking = snapshot.val();
             setBookings((prevBookings) => [...prevBookings, newBooking]);
@@ -100,7 +95,7 @@ const PlayerPage = () => {
 
         onChildChanged(bookingsRef, (snapshot) => {
             const updatedBooking = snapshot.val();
-            setBookings((prevBookings) => 
+            setBookings((prevBookings) =>
                 prevBookings.map((booking) =>
                     booking.id === updatedBooking.id ? updatedBooking : booking
                 )
@@ -117,18 +112,18 @@ const PlayerPage = () => {
 
     const handleSearchFields = useCallback(async () => {
         const token = localStorage.getItem('token');
-        setIsLoading(true); // Hiển thị thông báo đang xử lý
+        setIsLoading(true);
         try {
             const response = await axios.get(`http://localhost:5000/api/player/fields`, {
                 headers: { 'Authorization': `Bearer ${token}` },
                 params: searchParams,
             });
-            setFields(response.data); // Cập nhật danh sách sân
+            setFields(response.data);
         } catch (error) {
             console.error("Error searching fields:", error);
             window.confirm('Có lỗi xảy ra khi tìm kiếm sân.');
         } finally {
-            setIsLoading(false); // Dừng hiển thị thông báo đang xử lý
+            setIsLoading(false);
         }
     }, [searchParams]);
 
@@ -216,7 +211,6 @@ const PlayerPage = () => {
     };
 
     const handleNavigateToProfile = () => {
-        // Điều hướng đến trang cá nhân
         navigate('/user-profile');
     };
 
@@ -226,7 +220,7 @@ const PlayerPage = () => {
         localStorage.removeItem('userRole');
         localStorage.removeItem('ownerId');
         setIsLoggedIn(false);
-        setUserRole(''); // Đặt lại vai trò của người dùng
+        setUserRole('');
         navigate('/');
     };
 
@@ -284,6 +278,7 @@ const PlayerPage = () => {
                         {fields.map(field => (
                             <li key={field.id}>
                                 <h3>{field.name}</h3>
+                                <h4> {field.image && <img src={field.image} alt={field.name} />}</h4>
                                 <p>Địa điểm: {field.location}</p>
                                 <p>Loại sân: {field.type}</p>
                                 <p>Giá: {field.price} VND</p> 
@@ -302,6 +297,7 @@ const PlayerPage = () => {
                 <div style={{ border: '1px solid #ccc', padding: '20px', borderRadius: '5px', width: '300px' }}>
                     <h3>Đặt Sân {selectedField.name}</h3>
                     <p>Giá: {selectedField.price} VND</p>
+                    
                     <label>Ngày:</label>
                     <input
                         type="date"
