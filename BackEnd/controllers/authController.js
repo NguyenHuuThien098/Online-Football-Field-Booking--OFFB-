@@ -21,7 +21,11 @@ exports.registerWithGoogle = async (req, res) => {
         // Nếu người dùng chưa tồn tại, tạo người dùng mới
         const newUser = await User.createUser(email, role);
         // Lưu thông tin người dùng vào Realtime Database
-        await admin.database().ref(`users/${uid}`).set({ email, role });
+        await admin.database().ref(`users/${uid}`).set({ 
+            email, 
+            role, 
+            token: idToken // Lưu token vào Firebase
+        });
 
         // Tạo token tùy chỉnh cho người dùng mới
         const token = await admin.auth().createCustomToken(uid);

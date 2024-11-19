@@ -72,6 +72,7 @@ const Homepage = ({ setIsAuthenticated, setUserRole }) => {
         } else if (userRole === 'field_owner') {
             navigate('/field-owner-dashboard');
         }
+        
     };
 
     return (

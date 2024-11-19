@@ -10,8 +10,8 @@ const playerRoutes = require('./routes/playerRoutes');
 const guestRoutes = require('./routes/guestRoutes');
 const historyRoutes = require('./routes/histotyRoutes');
 const userRoutes = require('./routes/userRoutes');
-
-const matchRoutes = require("./routes/matchRoutes"); // Thêm import cho matchRoutes
+const adminRoutes =  require('./routes/adminRoutes');
+const matchRoutes = require('./routes/matchRoutes'); // Thêm import cho matchRoutes
 
 // Middleware để log các yêu cầu
 app.use((req, res, next) => {
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 // CORS middleware
 app.use(cors({
-    origin: 'http://localhost:3001' // Cho phép frontend truy cập
+    origin: 'http://localhost:3000' // Cho phép frontend truy cập
 }));
 
 app.use(express.json()); // Để phân tích JSON request body
@@ -34,7 +34,7 @@ app.use('/api/player', playerRoutes); // Route cho người chơi
 app.use('/api/guest', guestRoutes); // Route cho khách
 app.use('/api/history', historyRoutes); // Route cho lịch sử đặt sân
 app.use('/api/user', userRoutes);//thay doi thong tin nguoi dùng
-
+app.use('/api/admin', adminRoutes);
 // Sử dụng route cho trận đấu
 app.use('/api/matches', matchRoutes); 
 
