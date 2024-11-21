@@ -22,9 +22,10 @@ app.use((req, res, next) => {
 
 // CORS middleware
 app.use(cors({
-    origin: 'http://localhost:3000' // Cho phép frontend truy cập
+    origin: 'http://localhost:3000',  // Cho phép frontend truy cập
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Cho phép các phương thức
+    allowedHeaders: ['Content-Type', 'Authorization']  // Các header được phép
 }));
-
 app.use(express.json()); // Để phân tích JSON request body
 
 
