@@ -12,7 +12,7 @@ router.post('/login/google', authController.loginWithGoogle);
 router.get('/field-owner/:uid/players', authenticateUser, authorizeRole(['field_owner']), authController.getPlayersByFieldOwner);
 
 // Route bảo vệ cho người dùng
-router.get('/api/auth', authenticateUser, authorizeRole(['field_owner', 'player']), (req, res) => {
+router.get('/api/auth', authenticateUser, authorizeRole(['field_owner', 'player', 'admin']), (req, res) => {
     res.send('Đây là một route được bảo vệ!');
 });
 

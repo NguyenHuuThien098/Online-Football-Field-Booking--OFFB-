@@ -4,25 +4,23 @@ const Field = require('../models/Field');
 const Notification = require('../models/Notification');
 const nodemailer = require('nodemailer');
 
-
 // Đăng nhập bằng Google cho Player
 exports.googleLogin = async (req, res) => {
     const { token } = req.body;
     try {
-        // const user = await User.verifyGoogleToken(token);
-        await User.setUserRole(user.uid, 'player'); // Đặt vai trò là Player
+        const user = await User.verifyGoogleToken(token);
+        await User.setUserRole(user.uid, 'player');
         res.status(200).send({ message: 'Đăng nhập thành công với tư cách Player', uid: user.uid });
     } catch (error) {
         res.status(400).send({ error: error.message });
     }
 };
 
-
 // Tìm kiếm sân
 exports.searchFields = async (req, res) => {
-    const { name, location, type, date, time } = req.query; // Nhận các tham số từ truy vấn
+    const { name, location, type, date, time } = req.query;
     try {
-        const fields = await Field.getAllFields(); // Lấy danh sách tất cả các sân
+        const fields = await Field.getAllFields();
         const filteredFields = fields.filter(field => {
             const matchName = name ? field.name && field.name.toLowerCase().includes(name.toLowerCase()) : true;
             const matchLocation = location ? field.location && field.location.toLowerCase().includes(location.toLowerCase()) : true;
@@ -31,126 +29,144 @@ exports.searchFields = async (req, res) => {
                 ? field.bookingSlots && field.bookingSlots[date] && field.bookingSlots[date][time] === false
                 : true;
 
-
             return matchName && matchLocation && matchType && isAvailable;
         });
-
 
         if (filteredFields.length === 0) {
             return res.status(404).json({ message: 'Không tìm thấy sân phù hợp.' });
         }
 
-
-        res.status(200).json(filteredFields); // Trả về danh sách sân phù hợp
+        res.status(200).json(filteredFields);
     } catch (error) {
         res.status(500).json({ message: 'Lỗi khi tìm kiếm sân', error: error.message });
     }
 };
-
-
-// Đặt sân
 exports.bookField = async (req, res) => {
-    const { fieldId, userId, date, time, numberOfPeople } = req.body;
-
+    const { fieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
     try {
+        const playerName = await getPlayerName(userId);  // Lấy tên người chơi
+
         const field = await Field.getFieldById(fieldId);
+        if (!field) {
+            return res.status(404).json({ message: 'Sân không tồn tại.' });
+        }
 
+        if (field.isAvailable === false) {
+            return res.status(400).json({ message: 'Sân hiện không khả dụng.' });
+        }
 
+        // Kiểm tra nếu ngày đặt sân là ngày trong quá khứ
+        const today = new Date();
+        const selectedDate = new Date(date);
+        if (selectedDate < today.setHours(0, 0, 0, 0)) { // So sánh ngày mà không xét giờ
+            return res.status(400).json({ message: 'Không thể đặt sân trong ngày quá khứ.' });
+        }
+
+        // Đảm bảo có sẵn bookingSlots
         if (!field.bookingSlots) {
             field.bookingSlots = {};
         }
 
+        // Kiểm tra xung đột thời gian
+        const conflictResult = Booking.isTimeConflicting(field.bookingSlots, date, startTime, endTime);
+        
+        if (conflictResult === true) {
+            const availableSlots = Booking.getAvailableTimeSlots(field.bookingSlots, date, parseInt(startTime), parseInt(endTime));
+            return res.status(400).json({
+                message: 'Khoảng thời gian đã được đặt. Vui lòng chọn thời gian khác.',
+                availableSlots: availableSlots
+            });
+        }
 
+        // Tạo booking
+        const booking = await Booking.createBooking(fieldId, userId, date, startTime, endTime, numberOfPeople);
+        
+        // Cập nhật bookingSlots của sân
         if (!field.bookingSlots[date]) {
             field.bookingSlots[date] = {};
         }
-
-
-        if (field.bookingSlots[date][time]) {
-            return res.status(400).json({ message: 'Thời gian đã được đặt. Vui lòng chọn thời gian khác.' });
-        }
-
-
-        const booking = await Booking.createBooking(fieldId, userId, date, time, numberOfPeople);
-
-
-        field.bookingSlots[date][time] = true;
+        field.bookingSlots[date][`${startTime}-${endTime}`] = true;
         await Field.updateField(fieldId, { bookingSlots: field.bookingSlots });
 
-
-        // Thông báo chủ sân khi có đặt sân mới
-        const ownerId = field.ownerId;
+        // Thông báo cho chủ sân
         const notificationData = {
-            message: `Player đã đặt sân cho ngày ${date} lúc ${time}.`,
+            message: `${playerName} đã đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,  // Sử dụng tên người chơi
             date: new Date().toISOString(),
             fieldId,
             bookingId: booking.id,
         };
-        await Notification.notifyFieldOwner(ownerId, notificationData); // Gửi thông báo đến Firebase
 
-
-        const ownerEmail = await getFieldOwnerEmail(ownerId); // Lấy email của chủ sân
-        await sendEmailNotification(ownerEmail, notificationData); // Gửi email
-
+        await Notification.notifyFieldOwner(field.ownerId, notificationData);
+        const ownerEmail = await getFieldOwnerEmail(field.ownerId);
+        await sendEmailNotification(ownerEmail, notificationData);
 
         res.status(201).json({ message: 'Đặt sân thành công', booking });
     } catch (error) {
+        console.error("Error during booking:", error);
         res.status(500).json({ message: 'Lỗi khi đặt sân', error: error.message });
     }
 };
 
 
-// Hủy đặt sân
+
 exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;
 
-
     try {
+        // Lấy thông tin đặt sân theo bookingId
         const booking = await Booking.getBookingById(bookingId);
-
 
         if (!booking) {
             return res.status(404).json({ message: 'Không tìm thấy đặt sân.' });
         }
 
+        const { fieldId, userId, date, startTime, endTime } = booking;
 
-        const fieldId = booking.fieldId;
-        const date = booking.date;
-        const time = booking.time;
+        // Lấy tên người chơi
+        const playerName = await getPlayerName(userId);
 
+        // Cập nhật lại trạng thái bookingSlots của sân
+        const field = await Field.getFieldById(fieldId);
+        if (!field) {
+            return res.status(404).json({ message: 'Không tìm thấy sân.' });
+        }
 
+        // Kiểm tra xem sân có bookingSlots không, nếu không thì tạo mới
+        if (!field.bookingSlots) {
+            field.bookingSlots = {};
+        }
+
+        // Nếu có ngày và thời gian đã đặt, đặt lại bookingSlots thành false
+        if (field.bookingSlots[date] && field.bookingSlots[date][`${startTime}-${endTime}`]) {
+            field.bookingSlots[date][`${startTime}-${endTime}`] = false;
+            await Field.updateField(fieldId, { bookingSlots: field.bookingSlots });
+        }
+
+        // Xóa booking
         await Booking.deleteBooking(bookingId);
 
-
-        await Field.updateField(fieldId, {
-            [`bookingSlots/${date}/${time}`]: false
-        });
-
-
         // Thông báo cho chủ sân khi hủy đặt sân
-        const field = await Field.getFieldById(fieldId);
-        const ownerId = field.ownerId;
-
-
         const notificationData = {
-            message: `Player đã hủy đặt sân cho ngày ${date} lúc ${time}.`,
+            message: `${playerName} đã hủy đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,  // Thông báo với tên người chơi
             date: new Date().toISOString(),
             fieldId,
             bookingId,
         };
-        await Notification.notifyFieldOwner(ownerId, notificationData); // Gửi thông báo đến Firebase
+        
+        const ownerId = field.ownerId;  // Lấy ownerId của sân
+        await Notification.notifyFieldOwner(ownerId, notificationData);
 
-
-        const ownerEmail = await getFieldOwnerEmail(ownerId); // Lấy email của chủ sân
-        await sendEmailNotification(ownerEmail, notificationData); // Gửi email
-
+        const ownerEmail = await getFieldOwnerEmail(ownerId);
+        await sendEmailNotification(ownerEmail, notificationData);
 
         res.status(200).json({ message: 'Hủy đặt sân thành công.' });
     } catch (error) {
+        console.error("Error during booking cancellation:", error);
         res.status(500).json({ message: 'Lỗi khi hủy đặt sân', error: error.message });
     }
 };
+
 
 
 // Lấy lịch sử đặt sân của Player
@@ -164,41 +180,49 @@ exports.getUserBookings = async (req, res) => {
     }
 };
 
-
 // Trang chủ của Player
 exports.playerHome = (req, res) => {
     res.status(200).send('Đây là trang chủ của Player');
+};
+//lấy tên
+const getPlayerName = async (userId) => {
+    try {
+        const user = await User.getUserById(userId);
+        if (user && user.name) {
+            console.log("Player name:", user.name);  
+            return user.name;
+        }
+        console.log("Player name: Player");  
+        return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
+    } catch (error) {
+        console.error("Error fetching player name:", error);
+        return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
+    }
 };
 
 
 // Hàm lấy email của chủ sân dựa trên ownerId
 const getFieldOwnerEmail = async (ownerId) => {
-    const owner = await User.getUserById(ownerId); // Giả định bạn có phương thức này để lấy thông tin người dùng
-    return owner.email;
+    const owner = await User.getUserById(ownerId);
+    return owner.email; // Giả sử owner có trường email
 };
-
 
 // Hàm gửi email thông báo
 const sendEmailNotification = async (email, notificationData) => {
-    // Cấu hình transporter cho nodemailer
     const transporter = nodemailer.createTransport({
-        service: 'gmail', // Hoặc dùng dịch vụ email khác
+        service: 'gmail',
         auth: {
-            user: 'huut789@gmail.com', // Thay bằng email của bạn
-            pass: 'urvjqxxggqbkmgst', // Thay bằng mật khẩu ứng dụng
+            user: 'huut789@gmail.com',
+            pass: 'urvjqxxggqbkmgst',
         },
     });
 
-
-    // Tạo nội dung email
     const mailOptions = {
-        from: 'huut789@gmail.com', // Email của bạn
-        to: email, // Email của chủ sân
+        from: 'huut789@gmail.com',
+        to: email,
         subject: 'Thông báo đặt sân / hủy đặt sân',
         text: notificationData.message,
     };
 
-
-    // Gửi email
     await transporter.sendMail(mailOptions);
 };
