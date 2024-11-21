@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 
 // CORS middleware
 app.use(cors({
-    origin: 'http://localhost:3000' // Cho phép frontend truy cập
+    origin: 'http://localhost:3001' // Cho phép frontend truy cập
 }));
 
 app.use(express.json()); // Để phân tích JSON request body
