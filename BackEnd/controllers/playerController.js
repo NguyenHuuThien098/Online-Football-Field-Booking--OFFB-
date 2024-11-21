@@ -41,48 +41,51 @@ exports.searchFields = async (req, res) => {
         res.status(500).json({ message: 'Lỗi khi tìm kiếm sân', error: error.message });
     }
 };
+
+// Đặt sân
 exports.bookField = async (req, res) => {
     const { fieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
     try {
-        const playerName = await getPlayerName(userId);  // Lấy tên người chơi
+        console.log("bookField request received with body:", req.body); // Log request body
+
+        
 
         const field = await Field.getFieldById(fieldId);
         if (!field) {
+            console.error("Field not found:", fieldId); // Log lỗi không tìm thấy sân
             return res.status(404).json({ message: 'Sân không tồn tại.' });
         }
 
+        console.log("Field found:", field);
+
         if (field.isAvailable === false) {
+            console.log("Field is not available"); // Log khi sân không khả dụng
             return res.status(400).json({ message: 'Sân hiện không khả dụng.' });
         }
 
-        // Kiểm tra nếu ngày đặt sân là ngày trong quá khứ
         const today = new Date();
         const selectedDate = new Date(date);
         if (selectedDate < today.setHours(0, 0, 0, 0)) { // So sánh ngày mà không xét giờ
+            console.log("Selected date is in the past"); // Log nếu ngày trong quá khứ
             return res.status(400).json({ message: 'Không thể đặt sân trong ngày quá khứ.' });
-        }
-
-        // Đảm bảo có sẵn bookingSlots
-        if (!field.bookingSlots) {
-            field.bookingSlots = {};
         }
 
         // Kiểm tra xung đột thời gian
         const conflictResult = Booking.isTimeConflicting(field.bookingSlots, date, startTime, endTime);
-        
         if (conflictResult === true) {
-            const availableSlots = Booking.getAvailableTimeSlots(field.bookingSlots, date, parseInt(startTime), parseInt(endTime));
-            return res.status(400).json({
-                message: 'Khoảng thời gian đã được đặt. Vui lòng chọn thời gian khác.',
-                availableSlots: availableSlots
-            });
+            console.log("Time conflict detected, available slots:", availableSlots);
+            return res.status(400).json({ message: 'Khoảng thời gian đã được đặt.' });
         }
 
         // Tạo booking
         const booking = await Booking.createBooking(fieldId, userId, date, startTime, endTime, numberOfPeople);
-        
+        console.log("Booking created:", booking);
+
         // Cập nhật bookingSlots của sân
+        if (!field.bookingSlots) {
+            field.bookingSlots = {};
+        }
         if (!field.bookingSlots[date]) {
             field.bookingSlots[date] = {};
         }
@@ -91,25 +94,24 @@ exports.bookField = async (req, res) => {
 
         // Thông báo cho chủ sân
         const notificationData = {
-            message: `${playerName} đã đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,  // Sử dụng tên người chơi
+            message: `Player đã đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
             fieldId,
             bookingId: booking.id,
         };
-
         await Notification.notifyFieldOwner(field.ownerId, notificationData);
+
+        // Gửi email thông báo
         const ownerEmail = await getFieldOwnerEmail(field.ownerId);
         await sendEmailNotification(ownerEmail, notificationData);
 
         res.status(201).json({ message: 'Đặt sân thành công', booking });
     } catch (error) {
-        console.error("Error during booking:", error);
+        console.error("Error in bookField:", error); // Log lỗi chi tiết
         res.status(500).json({ message: 'Lỗi khi đặt sân', error: error.message });
     }
 };
-
-
-
+// Hủy đặt sân
 exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;
 
@@ -167,8 +169,6 @@ exports.cancelBooking = async (req, res) => {
     }
 };
 
-
-
 // Lấy lịch sử đặt sân của Player
 exports.getUserBookings = async (req, res) => {
     const { userId } = req.params;
@@ -184,7 +184,8 @@ exports.getUserBookings = async (req, res) => {
 exports.playerHome = (req, res) => {
     res.status(200).send('Đây là trang chủ của Player');
 };
-//lấy tên
+
+// Lấy tên người chơi
 const getPlayerName = async (userId) => {
     try {
         const user = await User.getUserById(userId);
@@ -199,7 +200,6 @@ const getPlayerName = async (userId) => {
         return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
     }
 };
-
 
 // Hàm lấy email của chủ sân dựa trên ownerId
 const getFieldOwnerEmail = async (ownerId) => {
@@ -224,5 +224,9 @@ const sendEmailNotification = async (email, notificationData) => {
         text: notificationData.message,
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 };
