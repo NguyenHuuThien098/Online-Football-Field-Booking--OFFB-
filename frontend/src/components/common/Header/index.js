@@ -15,7 +15,7 @@ const Header = () => {
             </div>
         </div>
         <div name="middle" className="col-7 d-flex align-items-center">
-            <h1 name="role">Guest</h1>
+            <h1 name="role">Role</h1>
         </div>
         <div name="right" className="col border-start">
             <div className="row d-flex justify-content-evenly">

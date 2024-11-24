@@ -3,8 +3,6 @@ import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
 import Item from "../components/common/Item"; // Đảm bảo import đúng cách
 import axios from "axios";
-import Sidebar from "../components/common/Sidebar";
-import Header from "../components/common/Header";
 
 const Home = () => {
   const [fields, setFields] = useState([]);
