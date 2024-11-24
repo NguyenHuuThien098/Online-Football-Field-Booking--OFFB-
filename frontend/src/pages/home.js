@@ -37,38 +37,29 @@ const Home = () => {
     fetchFieldsAndMatches();
   }, []);
 
-  if (loading) {
-    return (
-      <MainLayout>
-        <SearchTool />
-        <p style={{ margin: "50px" }}> Đang tải danh sách sân và trận đấu...</p>
-      </MainLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <MainLayout>
-        <SearchTool />
-        <p style={{ color: "red", margin: "50px" }}>{error}</p>
-      </MainLayout>
-    );
-  }
-
   return (
-    <MainLayout>
+    <MainLayout role="guest">
       <SearchTool />
-      <ul>
-        {fields.map((field) => (
-          <Item key={field.fieldId} field={field} />
-        ))}
-      </ul>
-      <h2>Danh sách trận đấu mở:</h2>
-      <ul>
-        {matches.map((match) => (
-          <Item key={match.id} match={match} />
-        ))}
-      </ul>
+      {loading ? (
+        <p style={{ margin: "50px" }}> Đang tải danh sách sân và trận đấu...</p>
+      ) : error ? (
+        <p style={{ color: "red", margin: "50px" }}>{error}</p>
+      ) : (
+        <>
+          <h2>Danh sách sân mở:</h2>
+          <ul>
+            {fields.map((field) => (
+              <Item key={field.fieldId} field={field} />
+            ))}
+          </ul>
+          <h2>Danh sách trận đấu mở:</h2>
+          <ul>
+            {matches.map((match) => (
+              <Item key={match.id} match={match} />
+            ))}
+          </ul>
+        </>
+      )}
     </MainLayout>
   );
 };

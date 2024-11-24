@@ -1,7 +1,7 @@
 import logo from "../../../img/iconTraiBanh.png";
 import avatar from "../../../img/avatar.png";
 import style from "./Header.module.scss";
-const Header = () => {
+const Header = ({ role }) => {
   return (
     <div className="row border">
         <div name="left" className="col-2 p-0 border-end d-flex align-items-center">
@@ -15,7 +15,7 @@ const Header = () => {
             </div>
         </div>
         <div name="middle" className="col-7 d-flex align-items-center">
-            <h1 name="role">Role</h1>
+            <h1 name="role">{role}</h1>
         </div>
         <div name="right" className="col border-start">
             <div className="row d-flex justify-content-evenly">

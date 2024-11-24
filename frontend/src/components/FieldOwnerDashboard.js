@@ -221,9 +221,10 @@ const FieldOwnerDashboard = () => {
         return <p style={{ color: 'red' }}>{error}</p>;
     }
 
+    const role = 'Field owner'
     return (
         <div>
-            <MainLayout>
+            <MainLayout role={role}>
                 <div class="container-fluid m-5">
 
                     <button className='btn btn-dark' onClick={() => navigate('/')}>Back to Homepage</button>
