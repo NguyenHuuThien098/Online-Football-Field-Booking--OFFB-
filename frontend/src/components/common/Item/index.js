@@ -52,8 +52,8 @@ const Item = ({ field, match }) => {
                 <img
                   src={field.image}
                   alt={field.name}
-                  className="img-fluid h-100 w-100"
-                  style={{ objectFit: "cover", borderRadius: "10px" }}
+                  className={style.br50 + " img-fluid h-100 w-100"}
+                  style={{ objectFit: "cover", borderRadius: "49px"}}
                 />
               )}
             </div>
