@@ -42,15 +42,13 @@ exports.searchFields = async (req, res) => {
     }
 };
 
-// Đặt sân
 exports.bookField = async (req, res) => {
     const { fieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
     try {
         console.log("bookField request received with body:", req.body); // Log request body
 
-        
-
+        // Lấy thông tin sân
         const field = await Field.getFieldById(fieldId);
         if (!field) {
             console.error("Field not found:", fieldId); // Log lỗi không tìm thấy sân
@@ -74,8 +72,16 @@ exports.bookField = async (req, res) => {
         // Kiểm tra xung đột thời gian
         const conflictResult = Booking.isTimeConflicting(field.bookingSlots, date, startTime, endTime);
         if (conflictResult === true) {
-            console.log("Time conflict detected, available slots:", availableSlots);
-            return res.status(400).json({ message: 'Khoảng thời gian đã được đặt.' });
+            console.log("Time conflict detected for field:", fieldId);
+
+            // Lấy danh sách khung giờ còn trống
+            const availableSlots = Booking.getAvailableTimeSlots(field.bookingSlots, date, parseInt(startTime), parseInt(endTime));
+            console.log("Available slots:", availableSlots);
+
+            return res.status(400).json({
+                message: 'Khoảng thời gian đã được đặt.',
+                availableSlots: availableSlots.length ? availableSlots : 'Không có khung giờ nào khả dụng trong ngày này.'
+            });
         }
 
         // Tạo booking

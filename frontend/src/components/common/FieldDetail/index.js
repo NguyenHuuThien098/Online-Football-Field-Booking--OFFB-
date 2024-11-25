@@ -1,86 +1,110 @@
-import { Container, Card, Button, Row, Col, ListGroup, Accordion, Form, FormGroup, FormControl, FormLabel } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
-// import style from "/FieldDetail.module.scss";
-import Image from 'react-bootstrap/Image';
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-
-
+import React, { useState, useEffect } from 'react';
+import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { getDatabase, ref, get } from 'firebase/database'; // Import Firebase functions
 
 const FieldDetail = () => {
     const location = useLocation();
-    const field = location.state;
+    const navigate = useNavigate();
+    const field = location.state; // Lấy thông tin sân từ state của route
 
-    const [users, setUsers] = useState([]);
-    const [matches, setMatches] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-  
+    const [ownerName, setOwnerName] = useState(null); // Lưu tên chủ sân
+    const [ownerPhone, setOwnerPhone] = useState(null); // Lưu số điện thoại chủ sân
+
     useEffect(() => {
-      const fetchUsersAndMatches = async () => {
-        try {
-          // Fetch fields
-          const usersResponse = await axios.get(
-            "http://localhost:5000/api/user/me"
-          );
-          const usersData = usersResponse.data;
-          setUsers(usersData);
-  
-        } catch (error) {
-          console.error("Error fetching users and matches:", error);
-          setError("Có lỗi xảy ra khi tải danh sách sân và trận đấu.");
-        } finally {
-          setLoading(false);
+        if (field?.ownerId) {
+            fetchOwnerInfo(field.ownerId); // Lấy thông tin chủ sân khi có ownerId
         }
-      };
-  
-      fetchUsersAndMatches();
-    }, []);
+    }, [field]);
+
+    const fetchOwnerInfo = async (ownerId) => {
+        try {
+            const db = getDatabase();
+            const userRef = ref(db, `users/${ownerId}`);
+            const snapshot = await get(userRef);
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                setOwnerName(userData.fullName || "Không rõ");
+                setOwnerPhone(userData.phoneNumber || "Không có");
+            } else {
+                setOwnerName("Không rõ");
+                setOwnerPhone("Không có");
+            }
+        } catch (error) {
+            console.error("Error fetching owner info:", error);
+            setOwnerName("Không rõ");
+            setOwnerPhone("Không có");
+        }
+    };
+
+    const handleBookField = () => {
+        const token = localStorage.getItem('token'); // Kiểm tra token trong localStorage
+
+        if (!token) {
+            // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+            alert('Bạn cần đăng nhập để đặt sân.');
+            navigate('/login');
+            return;
+        }
+
+        if (field) {
+            // Điều hướng đến trang FieldBooked và truyền thông tin sân
+            navigate('/fieldBookied', { state: { field } });
+        } else {
+            alert('Thông tin sân không khả dụng.');
+        }
+    };
+
+    if (!field) {
+        return <p>Không có thông tin sân. Vui lòng quay lại trang trước.</p>;
+    }
+
     return (
         <Container className="mt-5">
-        <Row className='justify-content-center'>
-          <Col md={6}>
-            <Card className='shadow rounded'>
-              <Card.Img variant="top" src={field.image} rounded />
-              <Card.Body>
-                <Card.Title>{field.name}</Card.Title>
-                <Card.Text>
-                  <b>Chủ sân:</b> {field.ownerId} <br />
-                  <b>SĐT:</b> 0796942241 <br />
-                  <b>Địa chỉ:</b> {field.location}
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col xs={12} md={6}>
-            <Card className='shadow rounded'>
-              <Card.Body>
-                <div className="d-flex justify-content-end">
-                  <Button variant="primary">Đặt sân</Button>
-                </div>
-                <Card.Title>Thông tin liên hệ</Card.Title>
-                <Card.Text>
-                  <div className="d-flex justify-content-between">
-                    <div>
-                      <b>Zalo:</b> <a href="#">zalo</a>
-                    </div>
-                    <div>
-                      <b>Facebook:</b> <a href="#">Facebook</a>
-                    </div>
-                  </div>
-                  <Card.Title>Ghi chú</Card.Title>
-                  <ul className="list-group list-group-flush">
-                    <li className="list-group-item">10-sáng - 3h chiều sale</li>
-                    <li className="list-group-item">10-sáng - 3h chiều sale</li>
-                  </ul>
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+            <Row className="justify-content-center">
+                <Col md={6}>
+                    <Card className="shadow rounded">
+                        <Card.Img variant="top" src={field.image} rounded />
+                        <Card.Body>
+                            <Card.Title>{field.name}</Card.Title>
+                            <Card.Text>
+                                <b>Chủ sân:</b> {ownerName || "Đang tải..."} <br />
+                                <b>SĐT:</b> {ownerPhone || "Đang tải..."} <br />
+                                <b>Địa chỉ:</b> {field.location}
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col xs={12} md={6}>
+                    <Card className="shadow rounded">
+                        <Card.Body>
+                            <div className="d-flex justify-content-end">
+                                <Button variant="primary" onClick={handleBookField}>
+                                    Đặt sân
+                                </Button>
+                            </div>
+                            <Card.Title>Thông tin liên hệ</Card.Title>
+                            <Card.Text>
+                                <div className="d-flex justify-content-between">
+                                    <div>
+                                        <b>Zalo:</b> <a href="#">zalo</a>
+                                    </div>
+                                    <div>
+                                        <b>Facebook:</b> <a href="#">Facebook</a>
+                                    </div>
+                                </div>
+                                <Card.Title>Ghi chú</Card.Title>
+                                <ul className="list-group list-group-flush">
+                                    <li className="list-group-item">10-sáng - 3h chiều sale</li>
+                                    <li className="list-group-item">10-sáng - 3h chiều sale</li>
+                                </ul>
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     );
-}
-            {/* test */}
-            {/* <pre>{JSON.stringify(field, null, 2)}</pre> */}
+};
+
 export default FieldDetail;

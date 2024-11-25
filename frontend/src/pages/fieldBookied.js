@@ -1,0 +1,208 @@
+import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Compressor from 'compressorjs';
+const FieldBooked = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { field } = location.state || {};
+
+    const [bookingDetails, setBookingDetails] = useState({
+        date: '',
+        startTime: '',
+        endTime: '',
+        numberOfPeople: 5,
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [availableSlots, setAvailableSlots] = useState([]); // Lưu danh sách khung giờ còn trống
+    const [showModal, setShowModal] = useState(false); // Trạng thái mở modal
+
+    const handleBookingChange = (key, value) => {
+        setBookingDetails((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
+
+    const handleBookField = async (selectedSlot = null) => {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+
+        if (!field) {
+            setError('Thông tin sân không khả dụng.');
+            return;
+        }
+
+        const details = selectedSlot
+            ? {
+                  ...bookingDetails,
+                  startTime: selectedSlot.split('-')[0],
+                  endTime: selectedSlot.split('-')[1],
+              }
+            : bookingDetails;
+
+        if (!details.date || !details.startTime || !details.endTime || ![5, 7, 11].includes(details.numberOfPeople)) {
+            alert('Vui lòng nhập đầy đủ thông tin và chọn số lượng người hợp lệ.');
+            return;
+        }
+
+        if (selectedSlot) {
+            const confirm = window.confirm(
+                `Bạn có chắc muốn đặt sân vào khung giờ ${selectedSlot}?`
+            );
+            if (!confirm) return;
+        }
+
+        setIsLoading(true);
+        try {
+            await axios.post(
+                `http://localhost:5000/api/player/book-field`,
+                {
+                    fieldId: field.fieldId,
+                    userId,
+                    date: details.date,
+                    startTime: details.startTime,
+                    endTime: details.endTime,
+                    numberOfPeople: details.numberOfPeople,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            alert('Đặt sân thành công!');
+            navigate('/player-page');
+        } catch (error) {
+            console.error('Error booking field:', error);
+
+            if (error.response && error.response.status === 400) {
+                // Nhận danh sách khung giờ còn trống nếu có lỗi
+                const { message, availableSlots } = error.response.data;
+                setError(message);
+                setAvailableSlots(availableSlots || []);
+                setShowModal(true); // Mở modal để hiển thị các khung giờ còn trống
+            } else {
+                setError('Có lỗi xảy ra khi đặt sân.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCancel = () => {
+        navigate('/player-page');
+    };
+
+    return (
+        <div style={{ padding: '20px', margin: 'auto', maxWidth: '400px' }}>
+            <h3>Đặt Sân {field?.name}</h3>
+            <p>Địa chỉ: {field?.location}</p>
+            <p>Giá: {field?.price?.toLocaleString()} VND</p>
+
+            <label>Ngày:</label>
+            <input
+                type="date"
+                value={bookingDetails.date}
+                onChange={(e) => handleBookingChange('date', e.target.value)}
+                required
+            /><br /><br />
+
+            <label>Giờ Bắt Đầu:</label>
+            <input
+                type="time"
+                value={bookingDetails.startTime}
+                onChange={(e) => handleBookingChange('startTime', e.target.value)}
+                required
+            /><br /><br />
+
+            <label>Giờ Kết Thúc:</label>
+            <input
+                type="time"
+                value={bookingDetails.endTime}
+                onChange={(e) => handleBookingChange('endTime', e.target.value)}
+                required
+            /><br /><br />
+
+            <label>Số Người:</label>
+            <select
+                value={bookingDetails.numberOfPeople}
+                onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
+            >
+                <option value="5">5 Người</option>
+                <option value="7">7 Người</option>
+                <option value="11">11 Người</option>
+            </select><br /><br />
+
+            <button onClick={() => handleBookField()} disabled={isLoading}>
+                Xác Nhận Đặt Sân
+            </button>
+            <button onClick={handleCancel} disabled={isLoading} style={{ marginLeft: '10px' }}>
+                Hủy
+            </button>
+
+            {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
+
+            {/* Modal hiển thị khung giờ còn trống */}
+            {showModal && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        background: 'rgba(0, 0, 0, 0.7)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1000,
+                    }}
+                >
+                    <div
+                        style={{
+                            background: 'white',
+                            padding: '20px',
+                            borderRadius: '10px',
+                            width: '90%',
+                            maxWidth: '500px',
+                            textAlign: 'center',
+                        }}
+                    >
+                        <h4>Các khung giờ còn trống</h4>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '20px' }}>
+                            {availableSlots.map((slot, index) => (
+                                <button
+                                    key={index}
+                                    style={{
+                                        padding: '10px 15px',
+                                        borderRadius: '5px',
+                                        border: '1px solid #ccc',
+                                        background: '#f0f0f0',
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => handleBookField(slot)}
+                                >
+                                    {slot}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setShowModal(false)}
+                            style={{
+                                marginTop: '20px',
+                                padding: '10px 20px',
+                                borderRadius: '5px',
+                                border: 'none',
+                                background: '#d9534f',
+                                color: 'white',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default FieldBooked;

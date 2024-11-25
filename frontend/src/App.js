@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -6,18 +5,17 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-// import Homepage from './components/Homepage_temp'; // Import đúng Homepage
 import PlayerPage from "./components/PlayerPage";
 import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
-// import Login from './components/Login'; // Nhập component Login
-import Register from "./components/Register"; // Nhập component Register
-
+import Register from "./components/Register";
 import Home from "./pages/homeForQuest";
 import History_MatchJoined from "./pages/History_Matchjoined";
 import History_FieldBooked from "./pages/History_FieldBooked";
-import Login from './pages/login';
+import Login from "./pages/login";
 import Report from "./pages/report";
 import FieldDetail from "./components/common/FieldDetail";
+import FieldBookied from "./pages/fieldBookied"; // Import FieldBookied
+import Personal from "./pages/Personal"; // Import trang cá nhân
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -30,9 +28,20 @@ const App = () => {
     localStorage.setItem("userRole", userRole);
   }, [isAuthenticated, userRole]);
 
+  const ProtectedRoute = ({ element, role }) => {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" />;
+    }
+    if (role && userRole !== role) {
+      return <Navigate to="/" />;
+    }
+    return element;
+  };
+
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route
           path="/"
           element={
@@ -60,39 +69,45 @@ const App = () => {
             />
           }
         />
+
+        {/* Protected Routes */}
         <Route
           path="/field-owner-dashboard"
           element={
-            isAuthenticated && userRole === "field_owner" ? (
-              <FieldOwnerDashboard />
-            ) : (
-              <Navigate to="/" />
-            )
+            <ProtectedRoute
+              element={<FieldOwnerDashboard />}
+              role="field_owner"
+            />
           }
         />
         <Route
           path="/player-page"
-          element={
-            isAuthenticated && userRole === "player" ? (
-              <PlayerPage />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
+          element={<ProtectedRoute element={<PlayerPage />} role="player" />}
         />
-
         <Route
-          path="/fieldDetail/"
-          element={<FieldDetail />}
+          path="/fieldBookied"
+          element={<ProtectedRoute element={<FieldBookied />} role="player" />}
         />
-
-        {/* <Route 
-                    path="/history" 
-                    element={isAuthenticated ? <History /> : <Navigate to="/login" />} 
-                /> */}
-        <Route path="/History_MatchJoined" element={<History_MatchJoined />} />
-        <Route path="/History_FieldBooked" element={<History_FieldBooked />} />
-        <Route path="/Report" element={<Report />} />
+        <Route
+          path="/personal"
+          element={<ProtectedRoute element={<Personal />} />}
+        />
+        <Route
+          path="/fieldDetail"
+          element={<ProtectedRoute element={<FieldDetail />} />}
+        />
+        <Route
+          path="/History_MatchJoined"
+          element={<ProtectedRoute element={<History_MatchJoined />} />}
+        />
+        <Route
+          path="/History_FieldBooked"
+          element={<ProtectedRoute element={<History_FieldBooked />} />}
+        />
+        <Route
+          path="/Report"
+          element={<ProtectedRoute element={<Report />} role="field_owner" />}
+        />
       </Routes>
     </Router>
   );
