@@ -27,7 +27,7 @@ const Sidebar = () => {
         </Accordion.Item>
       </Accordion>
 
-      <a className="btn">Field managerment</a>
+      <a className="btn" href='/field-owner-dashboard'>Field managerment</a>
     </nav>
 
   );

@@ -251,7 +251,7 @@ const FieldOwnerDashboard = () => {
                             <Row>
                                 <h2 className="text-center">Danh sách sân của bạn:</h2>
                                 {fields.map((field) => (
-                                    <Col key={field.fieldId}>
+                                    <Col key={field.fieldId} md={6}>
                                         <Accordion>
                                             <Accordion.Item eventKey={field.fieldId}>
                                                 <Accordion.Header>
@@ -375,7 +375,7 @@ const FieldOwnerDashboard = () => {
                                             required
                                         />
                                     </FormGroup>
-                                    <Button variant="primary" type="submit">
+                                    <Button variant="primary" type="submit" className='my-3'>
                                         Thêm sân
                                     </Button>
                                 </Form>
@@ -396,7 +396,7 @@ const FieldOwnerDashboard = () => {
                                         />
                                     </FormGroup>
                                     {/* Other form fields for newMatch */}
-                                    <Button variant="primary" type="submit">
+                                    <Button variant="primary" type="submit" className='my-3'>
                                         Thêm trận đấu
                                     </Button>
                                 </Form>
