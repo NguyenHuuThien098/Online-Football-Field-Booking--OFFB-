@@ -12,11 +12,12 @@ import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
 // import Login from './components/Login'; // Nhập component Login
 import Register from "./components/Register"; // Nhập component Register
 
-import Home from "./pages/home";
+import Home from "./pages/homeForQuest";
 import History_MatchJoined from "./pages/History_Matchjoined";
 import History_FieldBooked from "./pages/History_FieldBooked";
 import Login from './pages/login';
 import Report from "./pages/report";
+import FieldDetail from "./components/common/FieldDetail";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -79,6 +80,12 @@ const App = () => {
             )
           }
         />
+
+        <Route
+          path="/fieldDetail/"
+          element={<FieldDetail />}
+        />
+
         {/* <Route 
                     path="/history" 
                     element={isAuthenticated ? <History /> : <Navigate to="/login" />} 
