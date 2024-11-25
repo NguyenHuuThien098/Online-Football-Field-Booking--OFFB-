@@ -3,6 +3,9 @@ import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
 import Item from "../components/common/Item"; // Đảm bảo import đúng cách
 import axios from "axios";
+import { Container } from 'react-bootstrap';
+
+
 
 const Home = () => {
   const [fields, setFields] = useState([]);
@@ -38,28 +41,30 @@ const Home = () => {
   }, []);
 
   return (
-    <MainLayout role="guest">
+    <MainLayout role="Guest">
       <SearchTool />
-      {loading ? (
-        <p style={{ margin: "50px" }}> Đang tải danh sách sân và trận đấu...</p>
-      ) : error ? (
-        <p style={{ color: "red", margin: "50px" }}>{error}</p>
-      ) : (
-        <>
-          <h2>Danh sách sân mở:</h2>
-          <ul>
-            {fields.map((field) => (
-              <Item key={field.fieldId} field={field} />
-            ))}
-          </ul>
-          <h2>Danh sách trận đấu mở:</h2>
-          <ul>
-            {matches.map((match) => (
-              <Item key={match.id} match={match} />
-            ))}
-          </ul>
-        </>
-      )}
+      <Container>
+        {loading ? (
+          <p > Đang tải danh sách sân và trận đấu...</p>
+        ) : error ? (
+          <p style={{ color: "red", margin: "50px" }}>{error}</p>
+        ) : (
+          <>
+            <h2>Danh sách sân mở:</h2>
+            <ul>
+              {fields.map((field) => (
+                <Item key={field.fieldId} field={field} />
+              ))}
+            </ul>
+            <h2>Danh sách trận đấu mở:</h2>
+            <ul>
+              {matches.map((match) => (
+                <Item key={match.id} match={match} />
+              ))}
+            </ul>
+          </>
+        )}
+      </Container>
     </MainLayout>
   );
 };

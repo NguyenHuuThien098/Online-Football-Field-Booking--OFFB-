@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from "../layouts/MainLayout";
+import { Container, Button, Row, Col, ListGroup, Accordion, Form, FormGroup, FormControl, FormLabel } from 'react-bootstrap';
 
 
 const FieldOwnerDashboard = () => {
@@ -28,6 +29,7 @@ const FieldOwnerDashboard = () => {
     });
 
     const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchFieldsAndMatches = async () => {
@@ -214,79 +216,194 @@ const FieldOwnerDashboard = () => {
     };
 
     if (loading) {
-        return <p>Đang tải danh sách sân và trận đấu...</p>;
+        return (
+            <MainLayout>
+                <p>Đang tải danh sách sân và trận đấu...</p>;
+            </MainLayout>
+        );
+
     }
 
     if (error) {
-        return <p style={{ color: 'red' }}>{error}</p>;
+        return (
+            <MainLayout>
+                <p style={{ color: 'red' }}>{error}</p>
+            </MainLayout>
+        );
     }
 
-    const role = 'Field owner'
+    const role = 'Field owner';
+
     return (
         <div>
             <MainLayout role={role}>
-                <div class="container-fluid m-5">
+                <Container fluid className="p-5">
 
-                    <button className='btn btn-dark' onClick={() => navigate('/')}>Back to Homepage</button>
                     <h1>Field Owner Dashboard</h1>
+                    <Button variant="dark" onClick={() => navigate('/')}>
+                        Back to Homepage
+                    </Button>
+
                     <p>Welcome to the Field Owner Dashboard!</p>
-                    <h2>Danh sách sân của bạn:</h2>
-                    <ul>
-                        {fields.map((field) => (
-                            <li key={field.fieldId}>
-                                <p>Tên sân: {field.name ? field.name : 'Tên sân không xác định'}</p>
-                                <p>Địa điểm: {field.location}</p>
-                                <p>Loại sân: {field.type}</p>
-                                <p>Giá: {field.price}</p>
-                                <p>Hình ảnh: {field.image}</p>
-                                <p>Số điện thoại liên hệ: {field.contactNumber}</p>
-                                <p>Giờ hoạt động: {field.operatingHours}</p>
-                                <button onClick={() => handleUpdateField(field.fieldId)}>Cập nhật</button>
-                                <button onClick={() => handleDeleteField(field.fieldId)}>Xóa</button>
-                            </li>
-                        ))}
-                    </ul>
-                    <h2>Danh sách trận đấu mở:</h2>
-                    <ul>
-                        {matches.map((match) => (
-                            <li key={match.id}>
-                                <p>Địa chỉ: {match.address}</p>
-                                <p>Thời gian: {match.time}</p>
-                                <p>Tên chủ sân: {match.ownerName}</p>
-                                <p>Số lượng người chơi: {match.playerCount}</p>
-                                <p>Ghi chú: {match.notes}</p>
-                                <p>Câu hỏi: {match.questions}</p>
-                                <button onClick={() => handleUpdateMatch(match.id)}>Cập nhật</button>
-                                <button onClick={() => handleDeleteMatch(match.id)}>Xóa</button>
-                            </li>
-                        ))}
-                    </ul>
-                    <h2>Thêm sân mới:</h2>
-                    <form onSubmit={(e) => { e.preventDefault(); handleAddField(); }}>
-                        <input type="text" placeholder="Tên sân" value={newField.name} onChange={(e) => setNewField({ ...newField, name: e.target.value })} required />
-                        <input type="text" placeholder="Địa điểm" value={newField.location} onChange={(e) => setNewField({ ...newField, location: e.target.value })} required />
-                        <select value={newField.type} onChange={(e) => setNewField({ ...newField, type: e.target.value })}>
-                            <option value="5 người">5 người</option>
-                            <option value="7 người">7 người</option>
-                            <option value="11 người">11 người</option>
-                        </select>
-                        <input type="number" placeholder="Giá" value={newField.price} onChange={(e) => setNewField({ ...newField, price: e.target.value })} required />
-                        <input type="text" placeholder="Hình ảnh" value={newField.image} onChange={(e) => setNewField({ ...newField, image: e.target.value })} />
-                        <input type="text" placeholder="Số điện thoại liên hệ" value={newField.contactNumber} onChange={(e) => setNewField({ ...newField, contactNumber: e.target.value })} required />
-                        <input type="text" placeholder="Giờ hoạt động" value={newField.operatingHours} onChange={(e) => setNewField({ ...newField, operatingHours: e.target.value })} required />
-                        <button type="submit">Thêm sân</button>
-                    </form>
-                    <h2>Thêm trận đấu mở:</h2>
-                    <form onSubmit={(e) => { e.preventDefault(); handleAddMatch(); }}>
-                        <input type="text" placeholder="Địa chỉ" value={newMatch.address} onChange={(e) => setNewMatch({ ...newMatch, address: e.target.value })} required />
-                        <input type="datetime-local" placeholder="Thời gian" value={newMatch.time} onChange={(e) => setNewMatch({ ...newMatch, time: e.target.value })} required />
-                        <input type="text" placeholder="Tên chủ sân" value={newMatch.ownerName} onChange={(e) => setNewMatch({ ...newMatch, ownerName: e.target.value })} required />
-                        <input type="number" placeholder="Số lượng người chơi" value={newMatch.playerCount} onChange={(e) => setNewMatch({ ...newMatch, playerCount: e.target.value })} required />
-                        <textarea placeholder="Ghi chú" value={newMatch.notes} onChange={(e) => setNewMatch({ ...newMatch, notes: e.target.value })}></textarea>
-                        <textarea placeholder="Câu hỏi" value={newMatch.questions} onChange={(e) => setNewMatch({ ...newMatch, questions: e.target.value })}></textarea>
-                        <button type="submit">Thêm trận đấu</button>
-                    </form>
-                </div>
+                    {/* Chưa chạy được */}
+                    <Row className='border p-5'>
+                        <Col>
+                            <Row>
+                                <h2 className="text-center">Danh sách sân của bạn:</h2>
+                                {fields.map((field) => (
+                                    <Col key={field.fieldId}>
+                                        <Accordion>
+                                            <Accordion.Item eventKey={field.fieldId}>
+                                                <Accordion.Header>
+                                                    {field.name || 'Tên sân không xác định'}</Accordion.Header>
+                                                <Accordion.Body>
+                                                    <ListGroup variant="flush">
+                                                        <ListGroup.Item>Địa điểm: {field.location}</ListGroup.Item>
+                                                        <ListGroup.Item>Loại sân:  {field.type}</ListGroup.Item>
+                                                        <ListGroup.Item>Giá:  {field.price}</ListGroup.Item>
+                                                        <ListGroup.Item>Hình ảnh:  {field.image}</ListGroup.Item>
+                                                        <ListGroup.Item>Số điện thoại liên hệ:  {field.contactNumber}</ListGroup.Item>
+                                                        <ListGroup.Item>Giờ hoạt động:  {field.operatingHours}</ListGroup.Item>
+                                                        <ListGroup.Item className='d-flex justify-content-end'>
+                                                            <Button variant="primary" className='me-2' onClick={() => handleUpdateField(field.fieldId)}>Cập nhật</Button>
+                                                            <Button variant="danger" onClick={() => handleDeleteField(field.fieldId)}>Xóa</Button>
+                                                        </ListGroup.Item>
+                                                    </ListGroup>
+                                                </Accordion.Body>
+                                            </Accordion.Item>
+                                        </Accordion>
+
+                                    </Col>
+                                ))}
+                            </Row>
+                        </Col>
+                        <Col className="border-start">
+                            <h2 className="text-center">Danh sách trận đấu mở:</h2>
+                            <ul>
+                                {matches.map((match) => (
+                                    <li key={match.id}>
+                                        <p>Địa chỉ: {match.address}</p>
+                                        <p>Thời gian: {match.time}</p>
+                                        <p>Tên chủ sân: {match.ownerName}</p>
+                                        <p>Số lượng người chơi: {match.playerCount}</p>
+                                        <p>Ghi chú: {match.notes}</p>
+                                        <p>Câu hỏi: {match.questions}</p>
+                                        <button onClick={() => handleUpdateMatch(match.id)}>Cập nhật</button>
+                                        <button onClick={() => handleDeleteMatch(match.id)}>Xóa</button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </Col>
+                    </Row>
+
+
+                    <Container>
+                        <Row>
+                            <Col>
+                                <h2>Thêm sân mới:</h2>
+                                <Form onSubmit={handleAddField}>
+                                    <FormGroup>
+                                        <FormLabel>Tên sân</FormLabel>
+                                        <FormControl
+                                            type="text"
+                                            placeholder="Tên sân"
+                                            value={newField.name}
+                                            onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                                            required
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <FormLabel>Địa điểm</FormLabel>
+                                        <FormControl
+                                            type="text"
+                                            placeholder="Địa điểm"
+                                            value={newField.location}
+                                            onChange={(e) => setNewField({ ...newField, location: e.target.value })}
+                                            required
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <FormLabel>Loại sân</FormLabel>
+                                        <FormControl
+                                            as="select"
+                                            value={newField.type}
+                                            onChange={(e) => setNewField({ ...newField, type: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Chọn loại sân</option>
+                                            <option value="5 người">5 người</option>
+                                            <option value="7 người">7 người</option>
+                                            <option value="11 người">11 người</option>
+                                        </FormControl>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <FormLabel>Giá thuê (VNĐ/giờ)</FormLabel>
+                                        <FormControl
+                                            type="number"
+                                            placeholder="Giá thuê"
+                                            value={newField.price}
+                                            onChange={(e) => setNewField({ ...newField, price: e.target.value })}
+                                            required
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <FormLabel>Link ảnh sân</FormLabel>
+                                        <FormControl
+                                            type="text"
+                                            placeholder="Link ảnh"
+                                            value={newField.image}
+                                            onChange={(e) => setNewField({ ...newField, image: e.target.value })}
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <FormLabel>Số điện thoại liên hệ</FormLabel>
+                                        <FormControl
+                                            type="tel"
+                                            placeholder="Số điện thoại"
+                                            value={newField.contactNumber}
+                                            onChange={(e) => setNewField({ ...newField, contactNumber: e.target.value })}
+                                            required
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <FormLabel>Giờ hoạt động</FormLabel>
+                                        <FormControl
+                                            type="text"
+                                            placeholder="Giờ hoạt động"
+                                            value={newField.operatingHours}
+                                            onChange={(e) => setNewField({ ...newField, operatingHours: e.target.value })}
+                                            required
+                                        />
+                                    </FormGroup>
+                                    <Button variant="primary" type="submit">
+                                        Thêm sân
+                                    </Button>
+                                </Form>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <h2>Thêm trận đấu mở:</h2>
+                                <Form onSubmit={handleAddMatch}>
+                                    <FormGroup>
+                                        <FormLabel>Địa chỉ</FormLabel>
+                                        <FormControl
+                                            type="text"
+                                            placeholder="Địa chỉ"
+                                            value={newMatch.address}
+                                            onChange={(e) => setNewMatch({ ...newMatch, address: e.target.value })}
+                                            required
+                                        />
+                                    </FormGroup>
+                                    {/* Other form fields for newMatch */}
+                                    <Button variant="primary" type="submit">
+                                        Thêm trận đấu
+                                    </Button>
+                                </Form>
+                            </Col>
+                        </Row>
+                    </Container>
+                </Container>
             </MainLayout>
         </div>
 
