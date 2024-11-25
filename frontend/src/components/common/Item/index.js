@@ -22,17 +22,18 @@ const Item = ({ field, match }) => {
             <div className="col-4 border-end border-black"></div>
             <div className="col">
               <div className="row d-flex flex-row-reverse">
-                <div className="p-3">
-                  <Button variant="success" onClick={() => handleBookingClick()}>
-                    Booking
-                  </Button>
-                </div>
-                <h3>{field.name}</h3>
+                <h3 className="py-4">{field.name}</h3>
                 <h3>***</h3>
                 <p>Address: {field.location}</p>
                 <p>Ghi chú: {field.notes}</p>
                 <p>Đánh giá: {field.rating}</p>
               </div>
+                <Col className="px-4 py-4 d-flex justify-content-end">
+                  <Button variant="danger" className="px-4 py-2" onClick={() => handleBookingClick()}>
+                    <h4>Booking</h4>
+                  </Button>
+                </Col>
+              
             </div>
           </div>
         </div>
