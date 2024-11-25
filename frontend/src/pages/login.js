@@ -21,7 +21,7 @@ const Login = ({ setIsAuthenticated, setUserRole }) => {
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
                 localStorage.setItem('token', token);
-                localStorage.setItem('ownerId', userId);
+                localStorage.setItem('userId', userId);
 
                 if (userData.role === 'field_owner') {
                     navigate('/field-owner-dashboard');

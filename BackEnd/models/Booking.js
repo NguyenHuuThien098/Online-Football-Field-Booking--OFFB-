@@ -117,7 +117,8 @@ static async createBooking(fieldId, userId, date, startTime, endTime, numberOfPe
             return {
                 ...booking,
                 fieldName: field.name,
-                fieldLocation: field.location,
+                location: field.location, // Thêm địa chỉ sân vào dữ liệu trả về
+                // fieldLocation: field.location,
                 fieldPrice: field.price,
                 fieldType: field.type,
             };
