@@ -218,7 +218,7 @@ const FieldOwnerDashboard = () => {
     if (loading) {
         return (
             <MainLayout>
-                <p>Đang tải danh sách sân và trận đấu...</p>;
+                <h1>Đang tải danh sách sân và trận đấu...</h1>
             </MainLayout>
         );
 

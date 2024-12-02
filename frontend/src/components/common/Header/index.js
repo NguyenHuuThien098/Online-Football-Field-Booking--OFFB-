@@ -33,7 +33,7 @@ const Header = ({ role }) => {
 
   return (
     <div className="row border">
-      <div name="left" className="col-2 p-0 border-end d-flex align-items-center">
+      <div name="left" className="col-2 p-3 border-end d-flex align-items-center">
         <div className="row">
           <div className="col-4">
             {/* Thêm sự kiện onClick để reload */}
