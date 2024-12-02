@@ -42,6 +42,7 @@ exports.searchFields = async (req, res) => {
     }
 };
 
+// Đặt sân
 exports.bookField = async (req, res) => {
     const { fieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
@@ -117,6 +118,7 @@ exports.bookField = async (req, res) => {
         res.status(500).json({ message: 'Lỗi khi đặt sân', error: error.message });
     }
 };
+
 // Hủy đặt sân
 exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;

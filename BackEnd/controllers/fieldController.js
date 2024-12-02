@@ -3,7 +3,7 @@ const Field = require('../models/Field');
 // Lấy tất cả thông tin sân công khai (không cần đăng nhập)
 const getAllFieldsPublic = async (req, res) => {
     try {
-        const fields = await Field.getAllFields();
+        const fields = await Field.getAllLargeFields();
         res.status(200).json(fields);
     } catch (error) {
         console.error('Error fetching fields:', error); // Ghi log lỗi
