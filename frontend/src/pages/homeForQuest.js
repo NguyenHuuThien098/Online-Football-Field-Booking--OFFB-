@@ -4,6 +4,8 @@ import SearchTool from "../components/common/SearchTool";
 import Item from "../components/common/Item";
 import axios from "axios";
 import Compressor from 'compressorjs';
+import { Container, Row, Col } from 'react-bootstrap';
+
 const Home = () => {
   const [fields, setFields] = useState([]); // Danh sách sân
   const [matches, setMatches] = useState([]); // Danh sách trận đấu
@@ -85,36 +87,40 @@ const Home = () => {
       />
 
       {/* Fields Section */}
-      <h2>Danh sách sân:</h2>
-      {loadingFields ? (
-        <p>Đang tải danh sách sân...</p>
-      ) : errorFields ? (
-        <p style={{ color: "red" }}>{errorFields}</p>
-      ) : fields.length > 0 ? (
-        <ul>
-          {fields.map((field) => (
-            <Item key={field.fieldId} field={field} />
-          ))}
-        </ul>
-      ) : (
-        <p>Không tìm thấy sân nào.</p>
-      )}
+      <Container>
 
-      {/* Matches Section */}
-      <h2>Danh sách trận đấu mở:</h2>
-      {loadingMatches ? (
-        <p>Đang tải danh sách trận đấu...</p>
-      ) : errorMatches ? (
-        <p style={{ color: "red" }}>{errorMatches}</p>
-      ) : matches.length > 0 ? (
-        <ul>
-          {matches.map((match) => (
-            <Item key={match.id} match={match} />
-          ))}
-        </ul>
-      ) : (
-        <p>Không có trận đấu nào được mở.</p>
-      )}
+
+        <h2 className="text-center mt-5">Danh sách sân:</h2>
+        {loadingFields ? (
+          <p className="text-center">Đang tải danh sách sân...</p>
+        ) : errorFields ? (
+          <p style={{ color: "red" }} className="text-center">{errorFields}</p>
+        ) : fields.length > 0 ? (
+          <ul>
+            {fields.map((field) => (
+              <Item key={field.fieldId} field={field} />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-center">Không tìm thấy sân nào.</p>
+        )}
+
+        {/* Matches Section */}
+        <h2 className="text-center">Danh sách trận đấu mở:</h2>
+        {loadingMatches ? (
+          <p className="text-center">Đang tải danh sách trận đấu...</p>
+        ) : errorMatches ? (
+          <p style={{ color: "red" }} className="text-center">{errorMatches}</p>
+        ) : matches.length > 0 ? (
+          <ul>
+            {matches.map((match) => (
+              <Item key={match.id} match={match} />
+            ))}
+          </ul>
+        ) : (
+          <p className="text-center">Không có trận đấu nào được mở.</p>
+        )}
+      </Container>
     </MainLayout>
   );
 };

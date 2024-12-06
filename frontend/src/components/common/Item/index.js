@@ -89,8 +89,8 @@ const Item = ({ field, match }) => {
             <div className="col-4 border-end border-black">
               {match.image && (
                 <img
-                  src={match.image}
-                  alt={match.ownerName}
+                src={match.image ? match.image : 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'}
+                alt={match.ownerName}
                   className="img-fluid h-100 w-100"
                   style={{ objectFit: "cover", borderRadius: "10px" }}
                 />
