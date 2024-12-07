@@ -3,7 +3,7 @@ import logo from "../../../img/iconTraiBanh.png";
 import avatar from "../../../img/avatar.png";
 import style from "./Header.module.scss";
 
-const Header = ({ role }) => {
+const Header = () => {
   const [showMenu, setShowMenu] = useState(false); // Trạng thái hiển thị menu
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
 
@@ -31,6 +31,9 @@ const Header = ({ role }) => {
     window.location.href = "/"; // Chuyển hướng về trang login
   };
 
+  const role = localStorage.getItem('role');
+  // setRole("null");
+
   return (
     <div className="row border">
       <div name="left" className="col-2 p-3 border-end d-flex align-items-center">
@@ -51,7 +54,7 @@ const Header = ({ role }) => {
         </div>
       </div>
       <div name="middle" className="col-7 d-flex align-items-center">
-        <h1 name="role">{role}</h1>
+        <h1 name="role" className="bg-danger">{role} Đang làm</h1>
       </div>
       <div name="right" className="col border-start">
         <div className="row d-flex justify-content-evenly">

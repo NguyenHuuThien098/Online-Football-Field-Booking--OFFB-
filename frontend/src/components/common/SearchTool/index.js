@@ -1,110 +1,42 @@
-import style from "./SearchTool.module.scss";
-import React from "react";
-
-const SearchTool = ({ searchParams, setSearchParams, searchFields }) => {
-    const validTypes = ['5 người', '7 người', '11 người']; // Các loại sân hợp lệ
-
-    // Cập nhật giá trị input
-    const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        setSearchParams((prev) => ({ ...prev, [id]: value }));
-    };
-
-    // Thực hiện tìm kiếm khi nhấn Enter trong trường "name"
-    const handleKeyPress = (e) => {
-        if (e.key === "Enter") {
-            searchFields();
-        }
-    };
-
-    // Kiểm tra dữ liệu trước khi tìm kiếm
-    const handleSearch = () => {
-        if (!searchParams.name.trim() && !searchParams.date && !searchParams.type) {
-            alert("Vui lòng nhập ít nhất một tiêu chí tìm kiếm.");
-            return;
-        }
-        searchFields();
-    };
-
+import style from "./SearchTool.module.scss"
+const SearchTool = () => {
     return (
         <>
-            <div className={`${style.searchTool} row d-flex align-items-center`}>
+            <div className={style.height_10 + " row d-flex align-items-center"} >
                 <div className="col-4">
-                    <input
-                        type="text"
-                        id="name"
-                        value={searchParams.name || ""}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyPress}
-                        className={`${style.input} border border-black rounded-pill h-50 w-100 mx-4`}
-                        placeholder="🔎 Tìm kiếm tên sân"
-                    />
+                    <input type="text" className={style.height_50 + " vh-50 border border-black rounded-pill h-50 w-100 mx-4"} placeholder="  🔎 Search" />
                 </div>
                 <div className="col-1 text-center">
-                    <label htmlFor="date">Ngày</label>
+                    <label for="">Day</label>
                 </div>
                 <div className="col-1">
-                    <input
-                        type="date"
-                        id="date"
-                        value={searchParams.date || ""}
-                        onChange={handleInputChange}
-                        className="rounded h-50 w-75 border"
-                    />
+                    <input placeholder=" 10/10 ⏷" className="rounded h-50 w-75 border" type="text" onfocus="(this.type='date')" onblur="(this.type='text')" id="date" />
                 </div>
                 <div className="col text-center">
-                    <label htmlFor="startTime">Từ</label>
+                    <label for="">From</label>
                 </div>
                 <div className="col">
-                    <input
-                        type="time"
-                        id="startTime"
-                        value={searchParams.startTime || ""}
-                        onChange={handleInputChange}
-                        className="rounded h-50 w-75 border"
-                    />
+                    <input placeholder=" 5:00 PM ⏷" className="rounded h-50 w-75 border" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" id="time" />
                 </div>
                 <div className="col text-center">
-                    <label htmlFor="endTime">Đến</label>
+                    <label for="">To</label>
                 </div>
                 <div className="col">
-                    <input
-                        type="time"
-                        id="endTime"
-                        value={searchParams.endTime || ""}
-                        onChange={handleInputChange}
-                        className="rounded h-50 w-75 border"
-                    />
+                    <input placeholder=" 9:00 PM ⏷" className="rounded h-50 w-75 border" type="text" onfocus="(this.type='time')" onblur="(this.type='text')" id="time" />
                 </div>
                 <div className="col text-center">
-                    <label htmlFor="type">Loại sân</label>
+                    <label for="">Time</label>
                 </div>
                 <div className="col">
-                    <select
-                        id="type"
-                        value={searchParams.type || ""}
-                        onChange={handleInputChange}
-                        className="w-100 h-50 border rounded"
-                    >
-                        <option value="">Chọn loại sân</option>
-                        {validTypes.map((type) => (
-                            <option key={type} value={type}>
-                                {type}
-                            </option>
-                        ))}
-                    </select>
+                    <input placeholder="  1" type="number" className="w-50 h-50 border rounded" />
                 </div>
                 <div className="col">
-                    <button
-                        className="btn btn-primary w-100 h-50"
-                        onClick={handleSearch}
-                    >
-                        Tìm kiếm
-                    </button>
+                    <label for="">hours</label>
                 </div>
             </div>
-            <hr className="mx-5 my-0" />
+            <hr class="mx-5 my-0" />
         </>
+
     );
 };
 
