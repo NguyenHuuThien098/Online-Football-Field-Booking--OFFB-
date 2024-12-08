@@ -42,7 +42,7 @@ const FieldOwnerDashboard = () => {
                     setLoading(false);
                     return;
                 }
-
+                console.log('Token:', token);
                 // Fetch fields
                 const fieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
                     headers: {

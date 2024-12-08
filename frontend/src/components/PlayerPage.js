@@ -30,10 +30,12 @@ const PlayerPage = () => {
             setUserId(storedUserId);
             fetchBookings(storedUserId, token);
             fetchMatches(token);
+            console.log('Token:', token);
         } else {
             setError('Bạn chưa đăng nhập.');
         }
         fetchDefaultFields(token);
+        console.log('Token:', token);
     }, []);
 
     const fetchBookings = async (userId, token) => {

@@ -3,7 +3,7 @@ const serviceAccount = require('./online-football-field-booking-firebase-adminsd
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://online-football-field-booking-default-rtdb.firebaseio.com" // Thay thế bằng URL của bạn
+    databaseURL: "https://online-football-field-booking-default-rtdb.firebaseio.com/" // Thay thế bằng URL của bạn
 });
 
 module.exports = admin;

@@ -20,14 +20,16 @@ const googleLogin = async (req, res) => {
 
 // Thêm sân lớn mới
 const addLargeField = async (req, res) => {
-    const { address, phoneNumber, otherInfo, image, operatingHours, ownerId } = req.body;
+    const { name, address, phoneNumber, otherInfo, images, operatingHours } = req.body;
+    const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     try {
         const largeFieldData = {
+            name,
             address,
             phoneNumber,
             otherInfo,
-            image,
+            images: images || [], // Sử dụng danh sách ảnh
             operatingHours,
             ownerId
         };
@@ -43,7 +45,7 @@ const addLargeField = async (req, res) => {
 // Thêm sân nhỏ mới
 const addSmallField = async (req, res) => {
     const { largeFieldId } = req.params;
-    const { name, type, price, image, description } = req.body;
+    const { name, type, price, images, description } = req.body;
 
     // Kiểm tra loại sân hợp lệ
     const validTypes = ['5 người', '7 người', '11 người'];
@@ -56,7 +58,7 @@ const addSmallField = async (req, res) => {
             name,
             type,
             price,
-            image,
+            images: images || [], // Sử dụng danh sách ảnh
             description,
             isAvailable: true,
             bookingSlots: {}
@@ -79,7 +81,7 @@ const updateLargeField = async (req, res) => {
         // Cập nhật thông tin sân lớn
         await Field.updateLargeField(largeFieldId, data);
         const updatedField = await Field.getLargeFieldById(largeFieldId); // Lấy thông tin sân sau khi cập nhật
-        res.status(200).json({ message: 'Cập nhật sân lớn thành công', field: updatedField });
+        res.status(200).json({ message: 'Cập nhật sân lớn thành công', largeField: updatedField });
     } catch (error) {
         console.error('Error when updating large field:', error); // Ghi log lỗi
         res.status(500).json({ message: 'Lỗi khi cập nhật sân lớn', error: error.message });
@@ -103,7 +105,7 @@ const updateSmallField = async (req, res) => {
         // Cập nhật thông tin sân nhỏ
         await Field.updateSmallField(largeFieldId, smallFieldId, data);
         const updatedField = await Field.getSmallFieldById(largeFieldId, smallFieldId); // Lấy thông tin sân sau khi cập nhật
-        res.status(200).json({ message: 'Cập nhật sân nhỏ thành công', field: updatedField });
+        res.status(200).json({ message: 'Cập nhật sân nhỏ thành công', smallField: updatedField });
     } catch (error) {
         console.error('Error when updating small field:', error); // Ghi log lỗi
         res.status(500).json({ message: 'Lỗi khi cập nhật sân nhỏ', error: error.message });
@@ -152,6 +154,43 @@ const getOwnedFields = async (req, res) => {
     }
 };
 
+// Lấy thông tin sân lớn theo ID
+const getLargeFieldById = async (req, res) => {
+    const { largeFieldId } = req.params;
+
+    try {
+        const largeField = await Field.getLargeFieldById(largeFieldId);
+        res.status(200).json(largeField);
+    } catch (error) {
+        console.error('Error when fetching large field:', error);
+        res.status(500).json({ message: 'Lỗi khi lấy thông tin sân lớn', error: error.message });
+    }
+};
+
+// Lấy danh sách tất cả các sân lớn
+const getAllLargeFields = async (req, res) => {
+    try {
+        const largeFields = await Field.getAllLargeFields();
+        res.status(200).json(largeFields);
+    } catch (error) {
+        console.error('Error when fetching all large fields:', error);
+        res.status(500).json({ message: 'Lỗi khi lấy danh sách sân lớn', error: error.message });
+    }
+};
+
+// Lấy danh sách sân nhỏ thuộc sân lớn
+const getFieldsByLargeField = async (req, res) => {
+    const { largeFieldId } = req.params;
+
+    try {
+        const fields = await Field.getSmallFieldsByLargeField(largeFieldId);
+        res.status(200).json(fields);
+    } catch (error) {
+        console.error('Error when fetching fields by large field:', error);
+        res.status(500).json({ message: 'Lỗi khi lấy danh sách sân nhỏ', error: error.message });
+    }
+};
+
 // Trang chủ của Field Owner
 const fieldOwnerHome = (req, res) => {
     res.status(200).send('Đây là trang chủ của Field Owner');
@@ -167,5 +206,8 @@ module.exports = {
     deleteLargeField,
     deleteSmallField,
     getOwnedFields,
+    getLargeFieldById,
+    getAllLargeFields,
+    getFieldsByLargeField,
     fieldOwnerHome
 };

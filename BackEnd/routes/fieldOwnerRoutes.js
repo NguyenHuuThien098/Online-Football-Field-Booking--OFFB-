@@ -11,19 +11,28 @@ router.post('/large-field', authenticateUser, authorizeRole(['field_owner']), fi
 router.post('/large-field/:largeFieldId/small-field', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.addSmallField);
 
 // Route để cập nhật sân lớn
-router.put('/large-field/:fieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.updateLargeField);
+router.put('/large-field/:largeFieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.updateLargeField);
 
 // Route để cập nhật sân nhỏ
-router.put('/large-field/:largeFieldId/small-field/:fieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.updateSmallField);
+router.put('/large-field/:largeFieldId/small-field/:smallFieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.updateSmallField);
 
 // Route để xóa sân lớn
-router.delete('/large-field/:fieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.deleteLargeField);
+router.delete('/large-field/:largeFieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.deleteLargeField);
 
 // Route để xóa sân nhỏ
-router.delete('/large-field/:largeFieldId/small-field/:fieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.deleteSmallField);
+router.delete('/large-field/:largeFieldId/small-field/:smallFieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.deleteSmallField);
 
 // Route để lấy danh sách sân của Field Owner
 router.get('/fields/:ownerId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.getOwnedFields);
+
+// Route để lấy thông tin sân lớn theo ID
+router.get('/large-field/:largeFieldId', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.getLargeFieldById);
+
+// Route để lấy danh sách tất cả các sân lớn
+router.get('/large-fields', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.getAllLargeFields);
+
+// Route để lấy danh sách sân nhỏ thuộc sân lớn
+router.get('/large-field/:largeFieldId/fields', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.getFieldsByLargeField);
 
 // Trang chủ của Field Owner
 router.get('/home', authenticateUser, authorizeRole(['field_owner']), fieldOwnerController.fieldOwnerHome);
