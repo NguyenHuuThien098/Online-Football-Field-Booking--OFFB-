@@ -17,7 +17,7 @@ class Field {
         const bookingSlots = {};
 
         // Tạo các khung giờ từ 0:00 đến 23:00, mỗi khung cách nhau 1 tiếng
-        for (let hour = 0; hour < 24; hour++) {
+        for (let hour = 0; 24; hour++) {
             const start = `${hour.toString().padStart(2, '0')}:00`;
             const end = `${(hour + 1).toString().padStart(2, '0')}:00`;
             bookingSlots[`${start}-${end}`] = null; // Khởi tạo các khung giờ trống
@@ -160,7 +160,6 @@ class Field {
             throw new Error('Không thể lấy danh sách sân');
         }
     }
-
 }
 
 module.exports = Field;
