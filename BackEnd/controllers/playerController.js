@@ -3,118 +3,148 @@ const Booking = require('../models/Booking');
 const Field = require('../models/Field');
 const Notification = require('../models/Notification');
 const nodemailer = require('nodemailer');
-
+const admin = require('../firebase');
 // Đăng nhập bằng Google cho Player
 exports.googleLogin = async (req, res) => {
     const { token } = req.body;
     try {
         const user = await User.verifyGoogleToken(token);
+        console.log('User:', user);
         await User.setUserRole(user.uid, 'player');
         res.status(200).send({ message: 'Đăng nhập thành công với tư cách Player', uid: user.uid });
     } catch (error) {
         res.status(400).send({ error: error.message });
     }
 };
-
-// Tìm kiếm sân
 exports.searchFields = async (req, res) => {
     const { name, location, type, date, time } = req.query;
-    try {
-        const fields = await Field.getAllFields();
-        const filteredFields = fields.filter(field => {
-            const matchName = name ? field.name && field.name.toLowerCase().includes(name.toLowerCase()) : true;
-            const matchLocation = location ? field.location && field.location.toLowerCase().includes(location.toLowerCase()) : true;
-            const matchType = type ? field.type === type : true;
-            const isAvailable = date && time
-                ? field.bookingSlots && field.bookingSlots[date] && field.bookingSlots[date][time] === false
-                : true;
 
-            return matchName && matchLocation && matchType && isAvailable;
+    try {
+        // Lấy tất cả sân lớn
+        const largeFields = await Field.getAllLargeFields();
+
+        // Mảng chứa các sân (bao gồm cả sân lớn và nhỏ)
+        let allFields = [];
+
+        // Lọc các sân lớn
+        largeFields.forEach(largeField => {
+            // Lọc sân lớn dựa trên tên và địa chỉ
+            const matchName = name ? largeField.name.toLowerCase().includes(name.toLowerCase()) : true;
+            const matchLocation = location ? largeField.address.toLowerCase().includes(location.toLowerCase()) : true;
+
+            if (matchName && matchLocation) {
+                // Thêm sân lớn vào danh sách
+                allFields.push(largeField);
+
+                // Lọc các sân nhỏ (nếu có) của sân lớn này
+                if (largeField.smallFields && largeField.smallFields.length > 0) {
+                    largeField.smallFields.forEach(smallField => {
+                        const matchSmallFieldName = name ? smallField.name.toLowerCase().includes(name.toLowerCase()) : true;
+                        const matchSmallFieldType = type ? smallField.type.toLowerCase() === type.toLowerCase() : true;
+                        const matchSmallFieldLocation = location ? largeField.address.toLowerCase().includes(location.toLowerCase()) : true;
+                        
+                        // Kiểm tra tính khả dụng của sân nhỏ (nếu có tham số `date` và `time`)
+                        const isAvailable = date && time
+                            ? !(smallField.bookingSlots && smallField.bookingSlots[date] && smallField.bookingSlots[date][time])
+                            : smallField.isAvailable; // Kiểm tra availability nếu không có `date` và `time`
+
+                        // Nếu các điều kiện khớp, thêm sân nhỏ vào danh sách
+                        if (matchSmallFieldName && matchSmallFieldLocation && matchSmallFieldType && isAvailable) {
+                            allFields.push({
+                                ...smallField,
+                                largeFieldId: largeField.id, // Thêm thông tin sân lớn liên kết
+                            });
+                        }
+                    });
+                }
+            }
         });
 
-        if (filteredFields.length === 0) {
+        // Kiểm tra nếu không tìm thấy sân phù hợp
+        if (allFields.length === 0) {
             return res.status(404).json({ message: 'Không tìm thấy sân phù hợp.' });
         }
 
-        res.status(200).json(filteredFields);
+        // Trả về kết quả các sân
+        res.status(200).json({
+            fields: allFields,
+            totalFields: allFields.length,
+        });
     } catch (error) {
+        console.error('Error when searching fields:', error);
         res.status(500).json({ message: 'Lỗi khi tìm kiếm sân', error: error.message });
     }
 };
 
-// Đặt sân
+
+
 exports.bookField = async (req, res) => {
-    const { fieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
+    const { largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
     try {
-        console.log("bookField request received with body:", req.body); // Log request body
+        console.log("bookField request received with body:", req.body);
 
-        // Lấy thông tin sân
-        const field = await Field.getFieldById(fieldId);
-        if (!field) {
-            console.error("Field not found:", fieldId); // Log lỗi không tìm thấy sân
-            return res.status(404).json({ message: 'Sân không tồn tại.' });
+        const largeField = await Field.getLargeFieldById(largeFieldId);
+        let smallField = null;
+
+        if (smallFieldId) {
+            smallField = await Field.getSmallFieldsByLargeField(largeFieldId, smallFieldId);
         }
 
-        console.log("Field found:", field);
-
-        if (field.isAvailable === false) {
-            console.log("Field is not available"); // Log khi sân không khả dụng
-            return res.status(400).json({ message: 'Sân hiện không khả dụng.' });
-        }
-
+       
         const today = new Date();
         const selectedDate = new Date(date);
-        if (selectedDate < today.setHours(0, 0, 0, 0)) { // So sánh ngày mà không xét giờ
-            console.log("Selected date is in the past"); // Log nếu ngày trong quá khứ
+        if (selectedDate < new Date(today.setHours(0, 0, 0, 0))) {
             return res.status(400).json({ message: 'Không thể đặt sân trong ngày quá khứ.' });
         }
 
-        // Kiểm tra xung đột thời gian
-        const conflictResult = Booking.isTimeConflicting(field.bookingSlots, date, startTime, endTime);
+        if (!largeField.bookingSlots) {
+            largeField.bookingSlots = {};
+        }
+        if (smallField && !smallField.bookingSlots) {
+            smallField.bookingSlots = {};
+        }
+
+        if (!largeField.bookingSlots[date]) {
+            largeField.bookingSlots[date] = {};
+        }
+        if (smallField && !smallField.bookingSlots[date]) {
+            smallField.bookingSlots[date] = {};
+        }
+
+        // Check for time conflicts for the selected field
+        const conflictResult = Booking.isTimeConflicting(smallField ? smallField.bookingSlots : largeField.bookingSlots, date, startTime, endTime);
         if (conflictResult === true) {
-            console.log("Time conflict detected for field:", fieldId);
-
-            // Lấy danh sách khung giờ còn trống
-            const availableSlots = Booking.getAvailableTimeSlots(field.bookingSlots, date, parseInt(startTime), parseInt(endTime));
-            console.log("Available slots:", availableSlots);
-
+            // Get available time slots in case of conflict
+            const availableSlots = Booking.getAvailableTimeSlots(smallField ? smallField.bookingSlots : largeField.bookingSlots, date, parseInt(startTime), parseInt(endTime));
             return res.status(400).json({
                 message: 'Khoảng thời gian đã được đặt.',
                 availableSlots: availableSlots.length ? availableSlots : 'Không có khung giờ nào khả dụng trong ngày này.'
             });
         }
 
-        // Tạo booking
-        const booking = await Booking.createBooking(fieldId, userId, date, startTime, endTime, numberOfPeople);
-        console.log("Booking created:", booking);
+        // Create the booking
+        const booking = await Booking.createBooking(largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople);
 
-        // Cập nhật bookingSlots của sân
-        if (!field.bookingSlots) {
-            field.bookingSlots = {};
+        // Update the booking slots
+        if (smallField) {
+            smallField.bookingSlots[date][`${startTime}-${endTime}`] = true;
         }
-        if (!field.bookingSlots[date]) {
-            field.bookingSlots[date] = {};
-        }
-        field.bookingSlots[date][`${startTime}-${endTime}`] = true;
-        await Field.updateField(fieldId, { bookingSlots: field.bookingSlots });
+        largeField.bookingSlots[date][`${startTime}-${endTime}`] = true;
 
-        // Thông báo cho chủ sân
         const notificationData = {
-            message: `Player đã đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
+            message: `Player đã yêu cầu đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
-            fieldId,
-            bookingId: booking.id,
+            smallFieldId,
         };
-        await Notification.notifyFieldOwner(field.ownerId, notificationData);
+        await Notification.notifyFieldOwner(largeField.ownerId, notificationData);
 
-        // Gửi email thông báo
-        const ownerEmail = await getFieldOwnerEmail(field.ownerId);
+        const ownerEmail = await getFieldOwnerEmail(largeField.ownerId);
         await sendEmailNotification(ownerEmail, notificationData);
 
         res.status(201).json({ message: 'Đặt sân thành công', booking });
     } catch (error) {
-        console.error("Error in bookField:", error); // Log lỗi chi tiết
+        console.error("Error in bookField:", error);
         res.status(500).json({ message: 'Lỗi khi đặt sân', error: error.message });
     }
 };

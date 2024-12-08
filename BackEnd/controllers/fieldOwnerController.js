@@ -79,7 +79,7 @@ const updateLargeField = async (req, res) => {
         // Cập nhật thông tin sân lớn
         await Field.updateLargeField(largeFieldId, data);
         const updatedField = await Field.getLargeFieldById(largeFieldId); // Lấy thông tin sân sau khi cập nhật
-        res.status(200).json({ message: 'Cập nhật sân lớn thành công', field: updatedField });
+        res.status(200).json({ message: 'Cập nhật sân lớn thành công', largeFieldId: updatedField });
     } catch (error) {
         console.error('Error when updating large field:', error); // Ghi log lỗi
         res.status(500).json({ message: 'Lỗi khi cập nhật sân lớn', error: error.message });
@@ -103,7 +103,7 @@ const updateSmallField = async (req, res) => {
         // Cập nhật thông tin sân nhỏ
         await Field.updateSmallField(largeFieldId, smallFieldId, data);
         const updatedField = await Field.getSmallFieldById(largeFieldId, smallFieldId); // Lấy thông tin sân sau khi cập nhật
-        res.status(200).json({ message: 'Cập nhật sân nhỏ thành công', field: updatedField });
+        res.status(200).json({ message: 'Cập nhật sân nhỏ thành công', smallFieldId: updatedField });
     } catch (error) {
         console.error('Error when updating small field:', error); // Ghi log lỗi
         res.status(500).json({ message: 'Lỗi khi cập nhật sân nhỏ', error: error.message });

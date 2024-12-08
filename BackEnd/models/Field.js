@@ -5,7 +5,7 @@ class Field {
     static async createLargeField(fieldData) {
         try {
             const newFieldRef = await admin.database().ref('largeFields').push(fieldData);
-            return { fieldId: newFieldRef.key, ...fieldData }; // Trả về fieldId
+            return { largeFieldId: newFieldRef.key, ...fieldData }; // Trả về largeFieldId
         } catch (error) {
             console.error('Error creating large field:', error.message);
             throw new Error('Không thể tạo sân lớn mới');
@@ -29,7 +29,7 @@ class Field {
                 bookingSlots
             });
 
-            return { fieldId: newFieldRef.key, ...smallFieldData }; // Trả về fieldId
+            return { smallFieldId: newFieldRef.key, ...smallFieldData }; // Trả về smallFieldId
         } catch (error) {
             console.error('Error creating small field:', error.message);
             throw new Error('Không thể tạo sân nhỏ mới');
@@ -37,9 +37,9 @@ class Field {
     }
 
     // Cập nhật sân lớn hiện có
-    static async updateLargeField(fieldId, data) {
+    static async updateLargeField(largeFieldId, data) {
         try {
-            await admin.database().ref(`largeFields/${fieldId}`).update(data);
+            await admin.database().ref(`largeFields/${largeFieldId}`).update(data);
         } catch (error) {
             console.error('Error updating large field:', error.message);
             throw new Error('Không thể cập nhật sân lớn');
@@ -47,9 +47,9 @@ class Field {
     }
 
     // Cập nhật sân nhỏ hiện có
-    static async updateSmallField(largeFieldId, fieldId, data) {
+    static async updateSmallField(largeFieldId, smallFieldId, data) {
         try {
-            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${fieldId}`).update(data);
+            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).update(data);
         } catch (error) {
             console.error('Error updating small field:', error.message);
             throw new Error('Không thể cập nhật sân nhỏ');
@@ -57,9 +57,9 @@ class Field {
     }
 
     // Xóa sân lớn theo ID
-    static async deleteLargeField(fieldId) {
+    static async deleteLargeField(largeFieldId) {
         try {
-            await admin.database().ref(`largeFields/${fieldId}`).remove();
+            await admin.database().ref(`largeFields/${largeFieldId}`).remove();
         } catch (error) {
             console.error('Error deleting large field:', error.message);
             throw new Error('Không thể xóa sân lớn');
@@ -67,9 +67,9 @@ class Field {
     }
 
     // Xóa sân nhỏ theo ID
-    static async deleteSmallField(largeFieldId, fieldId) {
+    static async deleteSmallField(largeFieldId, smallFieldId) {
         try {
-            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${fieldId}`).remove();
+            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).remove();
         } catch (error) {
             console.error('Error deleting small field:', error.message);
             throw new Error('Không thể xóa sân nhỏ');
@@ -77,13 +77,13 @@ class Field {
     }
 
     // Lấy thông tin một sân lớn theo ID
-    static async getLargeFieldById(fieldId) {
+    static async getLargeFieldById(largeFieldId) {
         try {
-            const snapshot = await admin.database().ref(`largeFields/${fieldId}`).once('value');
+            const snapshot = await admin.database().ref(`largeFields/${largeFieldId}`).once('value');
             if (!snapshot.exists()) {
                 throw new Error('Sân lớn không tồn tại');
             }
-            return { fieldId: fieldId, ...snapshot.val() }; // Trả về fieldId cùng dữ liệu sân
+            return { largeFieldId, ...snapshot.val() }; // Trả về largeFieldId cùng dữ liệu sân lớn
         } catch (error) {
             console.error('Error fetching large field by ID:', error.message);
             throw error; // Ném lại lỗi để có thể xử lý ở nơi gọi
@@ -91,16 +91,16 @@ class Field {
     }
 
     // Lấy thông tin một sân nhỏ theo ID
-    static async getSmallFieldById(largeFieldId, fieldId) {
+    static async getSmallFieldById(largeFieldId, smallFieldId) {
         try {
-            const snapshot = await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${fieldId}`).once('value');
+            const snapshot = await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).once('value');
             if (!snapshot.exists()) {
-                throw new Error('Sân nhỏ không tồn tại');
+                throw new Error(`Sân nhỏ với ID ${smallFieldId} không tồn tại trong sân lớn ${largeFieldId}`);
             }
-            return { fieldId: fieldId, ...snapshot.val() }; // Trả về fieldId cùng dữ liệu sân
+            return { smallFieldId, ...snapshot.val() };
         } catch (error) {
-            console.error('Error fetching small field by ID:', error.message);
-            throw error; // Ném lại lỗi để có thể xử lý ở nơi gọi
+            console.error('Lỗi khi lấy sân nhỏ theo ID:', error.message);
+            throw new Error(`Lỗi khi lấy dữ liệu sân nhỏ: ${error.message}`);
         }
     }
 
@@ -109,7 +109,7 @@ class Field {
         try {
             const snapshot = await admin.database().ref(`largeFields/${largeFieldId}/smallFields`).once('value');
             const fields = snapshot.val() || {};
-            return Object.keys(fields).map(key => ({ fieldId: key, ...fields[key] })); // Trả về fieldId
+            return Object.keys(fields).map(key => ({ smallFieldId: key, ...fields[key] })); // Trả về smallFieldId
         } catch (error) {
             console.error('Error fetching small fields by large field:', error.message);
             throw new Error('Không thể lấy danh sách sân nhỏ');
@@ -128,7 +128,7 @@ class Field {
             const snapshot = await query.once('value');
             const fields = snapshot.val() || {};
 
-            return Object.keys(fields).map(key => ({ fieldId: key, ...fields[key] })); // Trả về fieldId
+            return Object.keys(fields).map(key => ({ largeFieldId: key, ...fields[key] })); // Trả về largeFieldId
         } catch (error) {
             console.error('Error fetching all large fields:', error.message);
             throw new Error('Không thể lấy danh sách tất cả các sân lớn');
@@ -136,9 +136,9 @@ class Field {
     }
 
     // Lấy các khung giờ có thể đặt của sân nhỏ
-    static async getAvailableTimeSlots(largeFieldId, fieldId, date) {
+    static async getAvailableTimeSlots(largeFieldId, smallFieldId, date) {
         try {
-            const snapshot = await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${fieldId}/bookingSlots/${date}`).once('value');
+            const snapshot = await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}/bookingSlots/${date}`).once('value');
             const slots = snapshot.val() || {};
 
             // Trả về danh sách các khung giờ còn trống
@@ -154,13 +154,12 @@ class Field {
         try {
             const snapshot = await admin.database().ref('largeFields').orderByChild('ownerId').equalTo(ownerId).once('value');
             const fields = snapshot.val() || {};
-            return Object.keys(fields).map(key => ({ fieldId: key, ...fields[key] })); // Trả về fieldId
+            return Object.keys(fields).map(key => ({ largeFieldId: key, ...fields[key] })); // Trả về largeFieldId
         } catch (error) {
             console.error('Error fetching fields by owner:', error.message);
             throw new Error('Không thể lấy danh sách sân');
         }
     }
-
 }
 
 module.exports = Field;
