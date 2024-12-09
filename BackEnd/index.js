@@ -11,7 +11,7 @@ const historyRoutes = require('./routes/histotyRoutes'); // Sửa lại tên fil
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const matchRoutes = require('./routes/matchRoutes'); // Thêm import cho matchRoutes
-const confirmdenyRouter = require('./routes/confirmdenyRouter')
+const confirmdenyRouter = require('./routes/confirmdenyRouter');
 
 // Middleware để log các yêu cầu
 app.use((req, res, next) => {

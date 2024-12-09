@@ -15,11 +15,12 @@ exports.getAllMatchesPublic = async (req, res) => {
 };
 // Hàm tạo trận đấu
 exports.createMatch = async (req, res) => {
-    const { address, time, ownerName, playerCount, notes, questions, ownerId } = req.body;
+    const { largeFieldAddress, smallFieldAddress, time, ownerName, playerCount, notes, questions, images } = req.body;
+    const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     // Kiểm tra dữ liệu đầu vào
-    if (!address || !time || !ownerName || !playerCount || !ownerId) {
-        return res.status(400).json({ error: 'Tất cả các trường address, time, ownerName, playerCount và ownerId là bắt buộc!' });
+    if (!largeFieldAddress || !smallFieldAddress || !time || !ownerName || !playerCount || !ownerId) {
+        return res.status(400).json({ error: 'Tất cả các trường largeFieldAddress, smallFieldAddress, time, ownerName, playerCount và ownerId là bắt buộc!' });
     }
 
     if (isNaN(playerCount) || playerCount <= 0) {
@@ -27,13 +28,16 @@ exports.createMatch = async (req, res) => {
     }
 
     const matchData = {
-        address,
+        largeFieldAddress,
+        smallFieldAddress,
         time,
         ownerName,
         playerCount,
+        remainingPlayerCount: playerCount, // Số lượng còn lại player có thể join vào open match
         notes,
         questions,
         ownerId, // Lưu ownerId cùng với dữ liệu trận đấu
+        images, // Danh sách hình ảnh
         createdAt: new Date().toISOString()
     };
 
@@ -44,6 +48,69 @@ exports.createMatch = async (req, res) => {
     } catch (error) {
         console.error('Error creating match:', error);
         res.status(500).json({ error: 'Có lỗi xảy ra khi tạo trận đấu!' });
+    }
+};
+
+// Hàm để player join vào trận đấu
+exports.joinMatch = async (req, res) => {
+    const { matchId, playerId } = req.body;
+
+    try {
+        const matchRef = admin.database().ref(`matches/${matchId}`);
+        const snapshot = await matchRef.once('value');
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({ error: 'Match not found' });
+        }
+
+        const matchData = snapshot.val();
+        if (matchData.remainingPlayerCount <= 0) {
+            return res.status(400).json({ error: 'No remaining slots for players' });
+        }
+
+        // Cập nhật số lượng player còn lại
+        matchData.remainingPlayerCount -= 1;
+        await matchRef.update(matchData);
+
+        // Gửi thông báo cho field owner
+        const ownerNotificationRef = admin.database().ref(`notifications/${matchData.ownerId}`).push();
+        await ownerNotificationRef.set({
+            message: `Player ${playerId} has joined your match.`,
+            matchId,
+            timestamp: new Date().toISOString()
+        });
+
+        res.status(200).json({ message: 'Joined match successfully', match: matchData });
+    } catch (error) {
+        console.error('Error joining match:', error);
+        res.status(500).json({ error: 'Could not join match' });
+    }
+};
+
+// Hàm để field owner chấp nhận player tham gia trận đấu
+exports.acceptPlayer = async (req, res) => {
+    const { matchId, playerId } = req.body;
+
+    try {
+        const matchRef = admin.database().ref(`matches/${matchId}`);
+        const snapshot = await matchRef.once('value');
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({ error: 'Match not found' });
+        }
+
+        // Gửi thông báo cho player
+        const playerNotificationRef = admin.database().ref(`notifications/${playerId}`).push();
+        await playerNotificationRef.set({
+            message: `You have been accepted to join the match ${matchId}.`,
+            matchId,
+            timestamp: new Date().toISOString()
+        });
+
+        res.status(200).json({ message: 'Player accepted successfully' });
+    } catch (error) {
+        console.error('Error accepting player:', error);
+        res.status(500).json({ error: 'Could not accept player' });
     }
 };
 
@@ -86,9 +153,21 @@ exports.getMatchById = async (req, res) => {
 exports.editMatch = async (req, res) => {
     const matchId = req.params.id;
     const updatedData = req.body; // Dữ liệu mới từ yêu cầu
+    const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     try {
         const matchRef = admin.database().ref(`matches/${matchId}`);
+        const snapshot = await matchRef.once('value');
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({ error: 'Match not found' });
+        }
+
+        const matchData = snapshot.val();
+        if (matchData.ownerId !== ownerId) {
+            return res.status(403).json({ error: 'You are not authorized to edit this match' });
+        }
+
         await matchRef.update(updatedData); // Cập nhật dữ liệu trận đấu
 
         res.status(200).json({ message: 'Match updated successfully', match: { id: matchId, ...updatedData } });
@@ -101,9 +180,21 @@ exports.editMatch = async (req, res) => {
 // Hàm xóa trận đấu
 exports.removeMatch = async (req, res) => {
     const matchId = req.params.id;
+    const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     try {
         const matchRef = admin.database().ref(`matches/${matchId}`);
+        const snapshot = await matchRef.once('value');
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({ error: 'Match not found' });
+        }
+
+        const matchData = snapshot.val();
+        if (matchData.ownerId !== ownerId) {
+            return res.status(403).json({ error: 'You are not authorized to remove this match' });
+        }
+
         await matchRef.remove(); // Xóa trận đấu
 
         res.status(200).json({ message: 'Match removed successfully' });
