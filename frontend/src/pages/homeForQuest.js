@@ -32,7 +32,7 @@ const Home = () => {
     setErrorFields("");
 
     try {
-      const response = await axios.get("http://localhost:5000/api/guest/fields");
+      const response = await axios.get("http://localhost:3001/api/guest/fields");
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching default fields:", error);
@@ -48,7 +48,7 @@ const Home = () => {
     setErrorMatches("");
 
     try {
-      const response = await axios.get("http://localhost:5000/api/matches/all");
+      const response = await axios.get("http://localhost:3001/api/matches/all");
       setMatches(response.data);
     } catch (error) {
       console.error("Error fetching matches:", error);
@@ -65,7 +65,7 @@ const Home = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/guest/search",
+        "http://localhost:3001/api/guest/search",
         { params: searchParams }
       );
       setFields(response.data); // Hiển thị kết quả tìm kiếm
@@ -76,7 +76,6 @@ const Home = () => {
       setLoadingFields(false);
     }
   };
-
   return (
     <MainLayout>
       {/* Search Tool */}
@@ -87,40 +86,36 @@ const Home = () => {
       />
 
       {/* Fields Section */}
-      <Container>
+      <h2>Danh sách sân:</h2>
+      {loadingFields ? (
+        <p>Đang tải danh sách sân...</p>
+      ) : errorFields ? (
+        <p style={{ color: "red" }}>{errorFields}</p>
+      ) : fields.length > 0 ? fields.map((field) => (
+        <Item key={field.fieldId} field={field} />
+      )) : (
+        <p>Không tìm thấy sân nào.</p>
+      )}
 
+      {/* Matches Section */}
+      <h2>Danh sách trận đấu mở:</h2>
+      {loadingMatches ? (
+        <p>Đang tải danh sách trận đấu...</p>
+      ) : errorMatches ? (
+        <p style={{ color: "red" }}>{errorMatches}</p>
+      ) : matches.length > 0 ?
+        <div className="d-flex" style={{
+          flexFlow: "wrap",
+          justifyContent: "space-between"
+        }}>
+          {matches.map((match) => (
+            <Item key={match.id} match={match} />
+          ))}
+        </div>
 
-        <h2 className="text-center mt-5">Danh sách sân:</h2>
-        {loadingFields ? (
-          <p className="text-center">Đang tải danh sách sân...</p>
-        ) : errorFields ? (
-          <p style={{ color: "red" }} className="text-center">{errorFields}</p>
-        ) : fields.length > 0 ? (
-          <ul>
-            {fields.map((field) => (
-              <Item key={field.fieldId} field={field} />
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center">Không tìm thấy sân nào.</p>
+        : (
+          <p>Không có trận đấu nào được mở.</p>
         )}
-
-        {/* Matches Section */}
-        <h2 className="text-center">Danh sách trận đấu mở:</h2>
-        {loadingMatches ? (
-          <p className="text-center">Đang tải danh sách trận đấu...</p>
-        ) : errorMatches ? (
-          <p style={{ color: "red" }} className="text-center">{errorMatches}</p>
-        ) : matches.length > 0 ? (
-          <ul>
-            {matches.map((match) => (
-              <Item key={match.id} match={match} />
-            ))}
-          </ul>
-        ) : (
-          <p className="text-center">Không có trận đấu nào được mở.</p>
-        )}
-      </Container>
     </MainLayout>
   );
 };

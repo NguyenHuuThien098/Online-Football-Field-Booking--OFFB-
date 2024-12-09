@@ -1,5 +1,4 @@
 import Header from "../components/common/Header";
-import Sidebar from "../components/common/Sidebar";
 import styles from "./MainLayout.module.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -9,11 +8,15 @@ const MainLayout = ({ children, role }) => {
       <div name="header">
         <Header role={role} />
       </div>
-      <div name="body" class="row">
-        <div name="sidebar" class="col-2 vh-100 p-0">
-          <Sidebar />
-        </div>
-        <div name="content" className="col p-0 border-start">{children}</div>  
+      <div name="body" class="row" style={{
+        backgroundColor: "#FAFBFF",
+      }}>
+        <div className='page-content' style={{
+          paddingTop: 90,
+          width: "90%",
+          margin: "auto",
+          maxWidth: 1200,
+        }}>{children}</div>
       </div>
     </div>
   );

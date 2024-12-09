@@ -1,5 +1,15 @@
-import style from "./SearchTool.module.scss";
 import React from "react";
+import TextField from '@mui/material/TextField';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import InputLabel from '@mui/material/InputLabel';
+import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+
 
 const SearchTool = ({ searchParams, setSearchParams, searchFields }) => {
     const validTypes = ['5 người', '7 người', '11 người']; // Các loại sân hợp lệ
@@ -27,8 +37,86 @@ const SearchTool = ({ searchParams, setSearchParams, searchFields }) => {
     };
 
     return (
-        <>
-            <div className={`${style.searchTool} row d-flex align-items-center`}>
+        <div style={{
+            display: 'flex',
+            gap: '10px',
+            justifyContent: 'space-between',
+        }}>
+            <TextField id="name" label="🔎 Tìm kiếm tên sân" variant="outlined"
+                value={searchParams.name || ""}
+                onChange={handleInputChange} />
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                    id="date"
+                    onKeyDown={handleKeyPress}
+                    label="Ngày"
+                    value={searchParams.date || null}
+                    onChange={(newValue) => setSearchParams({
+                        ...searchParams,
+                        date: newValue
+                    })}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            size="small"
+                        />
+                    )}
+                />
+            </LocalizationProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <TimePicker
+                    label="Giờ bắt đầu"
+                    value={searchParams.date || null}
+                    onChange={(newValue) => setSearchParams({
+                        ...searchParams,
+                        startTime: newValue
+                    })}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            size="small"
+                        />
+                    )}
+                />
+            </LocalizationProvider>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <TimePicker
+                    label="Giờ kết thúc"
+                    value={searchParams.date || null}
+                    onChange={(newValue) => setSearchParams({
+                        ...searchParams,
+                        endTime: newValue
+                    })}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            size="small"
+                        />
+                    )}
+                />
+            </LocalizationProvider>
+            <FormControl sx={{ minWidth: 120 }}>
+                <InputLabel id="demo-simple-select-label">Loại sân</InputLabel>
+                <Select
+                    labelId="demo-simple-select-label"
+                    id="type"
+                    value={searchParams.type || ""}
+                    label="Loại sân"
+                    onChange={(e) => setSearchParams({
+                        ...searchParams,
+                        type: e.target.value
+                    })}
+                >
+                    {
+                        validTypes.map((type) => (
+                            <MenuItem key={type} value={type}>{type}</MenuItem>
+                        ))
+                    }
+                </Select>
+            </FormControl>
+            <Button variant="contained" onClick={handleSearch}>Tìm</Button>
+            {/* <div className={`${style.searchTool} row d-flex align-items-center`}>
                 <div className="col-4">
                     <input
                         type="text"
@@ -103,8 +191,8 @@ const SearchTool = ({ searchParams, setSearchParams, searchFields }) => {
                     </button>
                 </div>
             </div>
-            <hr className="mx-5 my-0" />
-        </>
+            <hr className="mx-5 my-0" /> */}
+        </div>
     );
 };
 
