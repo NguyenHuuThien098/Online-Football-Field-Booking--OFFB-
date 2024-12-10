@@ -10,9 +10,9 @@ import { Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 
+
 const Hover = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
-  border: '0.1px solid #ccc',
   display: 'flex',
   transition: 'transform 0.3s linear',
   '&:active': {
