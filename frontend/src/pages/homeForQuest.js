@@ -14,11 +14,12 @@ const Hover = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
   border: '0.1px solid #ccc',
   display: 'flex',
-  transition: 'transform 0.3s ease-in-out',
-  '&:hover': {
-    transform: 'scale(1.02)', // Subtle hover scale effect
+  transition: 'transform 0.3s linear',
+  '&:active': {
+    transform: 'scale(0.99)', // Subtle hover scale effect
     boxShadow: theme.shadows[5], // Áp dụng hiệu ứng đổ bóng từ theme
   },
+
 }));
 
 const Home = () => {
@@ -95,37 +96,40 @@ const Home = () => {
   return (
     <MainLayout>
       {/* Search Tool */}
-      <SearchTool
-        searchParams={searchParams}
-        setSearchParams={setSearchParams}
-        searchFields={searchFields}
-      />
       <div className="bg-light p-3">
+        <Hover>
+          <SearchTool
+            searchParams={searchParams}
+            setSearchParams={setSearchParams}
+            searchFields={searchFields}
+          />
+        </Hover>
+
 
         {/* Fields Section */}
 
-        <Container 
-          className="shadow p-4 mt-4" 
-          style={{ background: "white", borderRadius: '50px' }} 
+        <Container
+          className="shadow p-4 mt-5 border-top border-primary"
+          style={{ background: "white", borderRadius: '50px' }}
           sx={{
-            
+
           }}
         >
 
-            <Paper
-              className="w-100 mt-2"
-              elevation={3}
-              sx={{
-                borderRadius: '4px',
-                textAlign: 'center',
-                backgroundColor: '#1976d2', // Đặt màu nền tại đây
-                // border: "2px solid gray"
-              }}
-            >
-              <Typography variant="h2" component="h2" color="white">
-                Danh sách sân bóng
-              </Typography>
-            </Paper>
+          <Paper
+            className="w-100 mt-2"
+            elevation={3}
+            sx={{
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: '#1976d2', // Đặt màu nền tại đây
+              // border: "2px solid gray"
+            }}
+          >
+            <Typography variant="h2" component="h2" color="white">
+              Danh sách sân bóng
+            </Typography>
+          </Paper>
 
           {loadingFields ? (
             <p className="text-center">Đang tải danh sách sân...</p>
@@ -143,23 +147,23 @@ const Home = () => {
 
           {/* Matches Section */}
 
-            <Paper
-              className="w-100"
-              elevation={3}
-              sx={{
-                borderRadius: '16px',
-                textAlign: 'center',
-                backgroundColor: '#1976d2', // Đặt màu nền tại đây
-                // border: "1px solid gray"
-              }}
-            >
+          <Paper
+            className="w-100"
+            elevation={3}
+            sx={{
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: '#1976d2', // Đặt màu nền tại đây
+              // border: "1px solid gray"
+            }}
+          >
 
-              <Typography variant="h2" component="h2" color="white">
-                Danh sách trận đấu mở
-              </Typography>
-            </Paper>
+            <Typography variant="h2" component="h2" color="white">
+              Danh sách trận đấu mở
+            </Typography>
+          </Paper>
 
-          
+
           {loadingMatches ? (
             <p className="text-center">Đang tải danh sách trận đấu...</p>
           ) : errorMatches ? (
@@ -175,6 +179,8 @@ const Home = () => {
           )}
         </Container>
       </div>
+
+
     </MainLayout>
   );
 };

@@ -1,110 +1,127 @@
-import style from "./SearchTool.module.scss";
 import React from "react";
+import { TextField, Stack, Box, Divider, InputAdornment, Typography } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 
-const SearchTool = ({ searchParams, setSearchParams, searchFields }) => {
-    const validTypes = ['5 người', '7 người', '11 người']; // Các loại sân hợp lệ
-
-    // Cập nhật giá trị input
-    const handleInputChange = (e) => {
-        const { id, value } = e.target;
-        setSearchParams((prev) => ({ ...prev, [id]: value }));
-    };
-
-    // Thực hiện tìm kiếm khi nhấn Enter trong trường "name"
-    const handleKeyPress = (e) => {
-        if (e.key === "Enter") {
-            searchFields();
-        }
-    };
-
-    // Kiểm tra dữ liệu trước khi tìm kiếm
-    const handleSearch = () => {
-        if (!searchParams.name.trim() && !searchParams.date && !searchParams.type) {
-            alert("Vui lòng nhập ít nhất một tiêu chí tìm kiếm.");
-            return;
-        }
-        searchFields();
-    };
-
+const SearchTool = () => {
     return (
-        <>
-            <div className={`${style.searchTool} row d-flex align-items-center`}>
-                <div className="col-4">
-                    <input
-                        type="text"
-                        id="name"
-                        value={searchParams.name || ""}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyPress}
-                        className={`${style.input} border border-black rounded-pill h-50 w-100 mx-4`}
-                        placeholder="🔎 Tìm kiếm tên sân"
-                    />
-                </div>
-                <div className="col-1 text-center">
-                    <label htmlFor="date">Ngày</label>
-                </div>
-                <div className="col-1">
-                    <input
+        <Box className="w-100">
+            { /* Divider */}
+            <Divider sx={{ mx: 2, borderColor: "gray" }} />
+            <Stack
+                className="shadow-sm"
+                direction="row"
+                alignItems="center"
+                spacing={0}
+                sx={{
+                    px: 0,
+                    py: 3,
+                    backgroundColor: 'white'
+                }}
+            >
+                {/* Day Selector */}
+                {/* Day Selector */}
+                <Box sx={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    px: 1
+
+                }}>
+                    <Typography variant="body1" sx={{ minWidth: "50px" }}>Day</Typography>
+                    <TextField
+                        fullWidth
                         type="date"
-                        id="date"
-                        value={searchParams.date || ""}
-                        onChange={handleInputChange}
-                        className="rounded h-50 w-75 border"
+                        variant="outlined"
+                        InputProps={{
+                            sx: {
+                                borderRadius: 10,
+                                height: 40,
+                            },
+                        }}
                     />
-                </div>
-                <div className="col text-center">
-                    <label htmlFor="startTime">Từ</label>
-                </div>
-                <div className="col">
-                    <input
+                </Box>
+
+                {/* From Selector */}
+                <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", px: 2 }}>
+                    <Typography variant="body1" sx={{ minWidth: "50px" }}>From</Typography>
+                    <TextField
+                        fullWidth
                         type="time"
-                        id="startTime"
-                        value={searchParams.startTime || ""}
-                        onChange={handleInputChange}
-                        className="rounded h-50 w-75 border"
+                        variant="outlined"
+                        InputProps={{
+                            sx: {
+                                borderRadius: 10,
+                                height: 40,
+                            },
+                        }}
                     />
-                </div>
-                <div className="col text-center">
-                    <label htmlFor="endTime">Đến</label>
-                </div>
-                <div className="col">
-                    <input
+                </Box>
+
+                {/* To Selector */}
+                <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", px: 2 }}>
+                    <Typography variant="body1" sx={{ minWidth: "50px" }}>To</Typography>
+                    <TextField
+                        fullWidth
                         type="time"
-                        id="endTime"
-                        value={searchParams.endTime || ""}
-                        onChange={handleInputChange}
-                        className="rounded h-50 w-75 border"
+                        variant="outlined"
+                        InputProps={{
+                            sx: {
+                                borderRadius: 10,
+                                height: 40,
+                            },
+                        }}
                     />
-                </div>
-                <div className="col text-center">
-                    <label htmlFor="type">Loại sân</label>
-                </div>
-                <div className="col">
-                    <select
-                        id="type"
-                        value={searchParams.type || ""}
-                        onChange={handleInputChange}
-                        className="w-100 h-50 border rounded"
-                    >
-                        <option value="">Chọn loại sân</option>
-                        {validTypes.map((type) => (
-                            <option key={type} value={type}>
-                                {type}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col">
-                    <button
-                        className="btn btn-primary w-100 h-50"
-                        onClick={handleSearch}
-                    >
-                        Tìm kiếm
-                    </button>
-                </div>
-            </div>
-            <hr className="mx-5 my-0" />
-        </>
+                </Box>
+
+
+                {/* Duration */}
+                <Box sx={{ flex: 1, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Typography variant="body1" sx={{ mr: 1 }}>
+                        Time
+                    </Typography>
+                    <TextField
+                        type="number" // Correct type for numeric input
+                        placeholder="1"
+                        variant="outlined"
+                        InputProps={{
+                            sx: {
+                                borderRadius: 10,
+                                height: 40,
+                                width: "60px", // Đặt chiều rộng cố định để cân đối
+                            },
+                        }}
+                    />
+                    <Typography variant="body1" sx={{ ml: 1 }}>
+                        Hours
+                    </Typography>
+                </Box>
+
+
+                {/* Search Input */}
+                <Box sx={{ px: 5, flex: 4 }}>
+                    <TextField
+                        fullWidth
+                        variant="outlined"
+                        placeholder="Search"
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <SearchIcon />
+                                </InputAdornment>
+                            ),
+                            sx: {
+                                borderRadius: 50,
+                                height: 50,
+                            },
+                        }}
+                    />
+                </Box>
+            </Stack>
+
+            {/* Divider */}
+            <Divider sx={{ mx: 2, borderColor: "gray" }} />
+        </Box>
     );
 };
 

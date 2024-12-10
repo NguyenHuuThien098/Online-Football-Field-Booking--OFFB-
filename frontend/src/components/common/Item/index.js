@@ -96,7 +96,7 @@ const Item = ({ field, match }) => {
 
   if (match) {
     return (
-      <StyledCard className="mt-4 mx-3"
+      <StyledCard className="mt-4 mx-3 border-primary"
       sx={{
         width: 600,
         height: 300
@@ -113,7 +113,7 @@ const Item = ({ field, match }) => {
             sx={{
               width: 300,
               height: 300,
-              borderRadius: '10px',
+              borderRadius: '16px',
               border: '0.1px solid #ccc',
             }}
             image={match.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'}
