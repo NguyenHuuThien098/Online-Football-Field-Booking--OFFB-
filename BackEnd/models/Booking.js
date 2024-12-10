@@ -54,47 +54,28 @@ class Booking {
         return availableSlots; // Trả về các khung giờ còn trống
     }
 
-   
     static async createBooking(largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople) {
         if (![5, 7, 11].includes(numberOfPeople)) {
             throw new Error('Invalid number of people');
         }
     
+        // Lấy thông tin sân lớn và sân nhỏ (nếu có)
         const largeField = await Field.getLargeFieldById(largeFieldId);
         let smallField = null;
-
         if (smallFieldId) {
-            smallField = await Field.getSmallFieldsByLargeField(largeFieldId, smallFieldId);
+            smallField = await Field.getSmallFieldById(largeFieldId, smallFieldId);
         }
     
         const playerName = await getPlayerName(userId); // Lấy tên người chơi
     
-        // Khởi tạo bookingSlots nếu chưa có
-        if (!largeField.bookingSlots) {
-            largeField.bookingSlots = {};
-        }
-        if (smallField && !smallField.bookingSlots) {
-            smallField.bookingSlots = {};
-        }
-    
-        // Khởi tạo bookingSlots cho ngày đã chọn nếu chưa có
-        if (!largeField.bookingSlots[date]) {
-            largeField.bookingSlots[date] = {};
-        }
-        if (smallField && !smallField.bookingSlots[date]) {
-            smallField.bookingSlots[date] = {};
-        }
-    
-        // Kiểm tra xung đột thời gian
-        const conflictResult = Booking.isTimeConflicting(smallField?.bookingSlots, date, startTime, endTime);
-        if (conflictResult === true) {
-            throw new Error('Time slot is already booked');
-        }
-    
-        // Kiểm tra các khung giờ còn trống
-        const availableSlots = Booking.getAvailableTimeSlots(smallField?.bookingSlots, date, parseInt(startTime), parseInt(endTime));
-        if (availableSlots.length === 0) {
-            throw new Error('No available time slots');
+        // Khởi tạo bookingSlots cho sân nhỏ nếu có
+        if (smallField) {
+            if (!smallField.bookingSlots) {
+                smallField.bookingSlots = {}; // Đảm bảo bookingSlots tồn tại cho smallField
+            }
+            if (!smallField.bookingSlots[date]) {
+                smallField.bookingSlots[date] = {}; // Tạo bookingSlots cho ngày nếu chưa có
+            }
         }
     
         // Chuẩn bị dữ liệu đặt sân
@@ -106,7 +87,7 @@ class Booking {
             startTime,
             endTime,
             numberOfPeople,
-            status: 'pending', // Trạng thái mặc định là pending
+            status: '0', // Đang chờ xác nhận
             createdAt: new Date().toISOString(),
             playerName,
             bookingTime: new Date().toISOString(), // Thời gian tạo booking
@@ -116,26 +97,25 @@ class Booking {
         const newBookingRef = admin.database().ref('bookings').push();
         await newBookingRef.set(bookingData);
     
-        // Cập nhật bookingSlots cho sân lớn và sân nhỏ
+        // Cập nhật bookingSlots cho sân nhỏ (nếu có)
         if (smallField) {
             smallField.bookingSlots[date][`${startTime}-${endTime}`] = true;
-        }
-        largeField.bookingSlots[date][`${startTime}-${endTime}`] = true;
     
-        // Cập nhật lại dữ liệu sân trong Firebase
-        await admin.database().ref(`largeFields/${largeFieldId}`).update({ bookingSlots: largeField.bookingSlots });
-        if (smallField) {
-            await admin.database().ref(`smallFields/${smallFieldId}`).update({ bookingSlots: smallField.bookingSlots });
+            // Cập nhật vào Firebase cho smallField
+            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).update({ bookingSlots: smallField.bookingSlots });
         }
     
         // Thông báo cho chủ sân
         await Notification.notifyFieldOwner(largeField.ownerId, {
-            message: `Sân của bạn đã được người chơi yêu câuf đặt vào ${date} lúc ${startTime}-${endTime} bởi ${playerName}`,
-            bookingId: newBookingRef.key,  // Sử dụng `key` làm ID duy nhất
+            message: `Sân của bạn đã được người chơi yêu cầu đặt vào ${date} lúc ${startTime}-${endTime} bởi ${playerName}`,
+            bookingId: newBookingRef.key, // Sử dụng `key` làm ID duy nhất
         });
     
-      
+        // Trả về dữ liệu booking sau khi tạo
+        return bookingData;
     }
+    
+    
     
     // Xác nhận booking
     static async confirmBooking(bookingId) {
@@ -147,22 +127,17 @@ class Booking {
             throw new Error('Booking not found');
         }
 
-        if (booking.status !== 'pending') {
+        if (booking.status !== '0') {
             throw new Error('Booking already confirmed or rejected');
         }
 
         // Cập nhật trạng thái booking thành 'confirmed'
         await bookingRef.update({
-            status: 'confirmed',
+            status: '1',//xác nhận
             confirmedAt: new Date().toISOString(), // Thời gian xác nhận
         });
 
-        // // Gửi thông báo cho người chơi về việc xác nhận booking
-        // const field = await Field.getFieldById(booking.fieldId);
-        // await Notification.notifyUser(booking.userId, {
-        //     message: `Đặt sân của bạn vào ngày ${booking.date} lúc ${booking.startTime}-${booking.endTime} đã được xác nhận.`,
-        //     bookingId: bookingId,
-        // });
+    
 
         return { ...booking, status: 'confirmed' };
     }
@@ -177,22 +152,16 @@ class Booking {
             throw new Error('Booking not found');
         }
 
-        if (booking.status !== 'pending') {
+        if (booking.status !== '0') {
             throw new Error('Booking already confirmed or rejected');
         }
 
         // Cập nhật trạng thái booking thành 'rejected'
         await bookingRef.update({
-            status: 'rejected',
+            status: '2',//từ chối
             rejectedAt: new Date().toISOString(), // Thời gian từ chối
         });
 
-        // // Gửi thông báo cho người chơi về việc từ chối booking
-        // const field = await Field.getFieldById(booking.fieldId);
-        // await Notification.notifyUser(booking.userId, {
-        //     message: `Đặt sân của bạn vào ngày ${booking.date} lúc ${booking.startTime}-${booking.endTime} đã bị từ chối.`,
-        //     bookingId: bookingId,
-        // });
 
         return { ...booking, status: 'rejected' };
     }
@@ -207,7 +176,7 @@ class Booking {
             throw new Error('Booking not found');
         }
 
-        if (booking.status !== 'confirmed') {
+        if (booking.status !== '1') {
             throw new Error('Only confirmed bookings can be deleted');
         }
 

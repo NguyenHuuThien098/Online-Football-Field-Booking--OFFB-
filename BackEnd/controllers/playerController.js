@@ -16,66 +16,42 @@ exports.googleLogin = async (req, res) => {
         res.status(400).send({ error: error.message });
     }
 };
+
+// Tìm kiếm sân
 exports.searchFields = async (req, res) => {
     const { name, location, type, date, time } = req.query;
 
     try {
-        // Lấy tất cả sân lớn
-        const largeFields = await Field.getAllLargeFields();
+        // Lấy tất cả sân từ Firebase (bao gồm cả sân lớn và sân nhỏ)
+        const allFields = await Field.getAllFields();  // Lấy tất cả sân lớn và sân nhỏ
 
-        // Mảng chứa các sân (bao gồm cả sân lớn và nhỏ)
-        let allFields = [];
+        let filteredFields = allFields.filter(field => {
+            // Lọc các sân lớn và sân nhỏ theo tên và địa chỉ
+            const matchName = name ? field.name.toLowerCase().includes(name.toLowerCase()) : true;
+            const matchLocation = location ? field.address.toLowerCase().includes(location.toLowerCase()) : true;
 
-        // Lọc các sân lớn
-        largeFields.forEach(largeField => {
-            // Lọc sân lớn dựa trên tên và địa chỉ
-            const matchName = name ? largeField.name.toLowerCase().includes(name.toLowerCase()) : true;
-            const matchLocation = location ? largeField.address.toLowerCase().includes(location.toLowerCase()) : true;
+            if (!matchName || !matchLocation) return false; // Nếu không khớp, bỏ qua
 
-            if (matchName && matchLocation) {
-                // Thêm sân lớn vào danh sách
-                allFields.push(largeField);
+            // Kiểm tra tính khả dụng của sân (cả sân lớn và sân nhỏ)
+            const isAvailable = date && time
+                ? !(field.bookingSlots && field.bookingSlots[date] && field.bookingSlots[date][time] === false)
+                : true;
 
-                // Lọc các sân nhỏ (nếu có) của sân lớn này
-                if (largeField.smallFields && largeField.smallFields.length > 0) {
-                    largeField.smallFields.forEach(smallField => {
-                        const matchSmallFieldName = name ? smallField.name.toLowerCase().includes(name.toLowerCase()) : true;
-                        const matchSmallFieldType = type ? smallField.type.toLowerCase() === type.toLowerCase() : true;
-                        const matchSmallFieldLocation = location ? largeField.address.toLowerCase().includes(location.toLowerCase()) : true;
-                        
-                        // Kiểm tra tính khả dụng của sân nhỏ (nếu có tham số `date` và `time`)
-                        const isAvailable = date && time
-                            ? !(smallField.bookingSlots && smallField.bookingSlots[date] && smallField.bookingSlots[date][time])
-                            : smallField.isAvailable; // Kiểm tra availability nếu không có `date` và `time`
-
-                        // Nếu các điều kiện khớp, thêm sân nhỏ vào danh sách
-                        if (matchSmallFieldName && matchSmallFieldLocation && matchSmallFieldType && isAvailable) {
-                            allFields.push({
-                                ...smallField,
-                                largeFieldId: largeField.id, // Thêm thông tin sân lớn liên kết
-                            });
-                        }
-                    });
-                }
-            }
+            return isAvailable;
         });
 
-        // Kiểm tra nếu không tìm thấy sân phù hợp
-        if (allFields.length === 0) {
+        // Nếu không có sân nào phù hợp
+        if (filteredFields.length === 0) {
             return res.status(404).json({ message: 'Không tìm thấy sân phù hợp.' });
         }
 
-        // Trả về kết quả các sân
-        res.status(200).json({
-            fields: allFields,
-            totalFields: allFields.length,
-        });
+        // Trả về danh sách các sân đã lọc
+        res.status(200).json(filteredFields);
     } catch (error) {
-        console.error('Error when searching fields:', error);
+        // Nếu có lỗi trong quá trình tìm kiếm
         res.status(500).json({ message: 'Lỗi khi tìm kiếm sân', error: error.message });
     }
-};
-
+}
 
 
 exports.bookField = async (req, res) => {
@@ -84,54 +60,54 @@ exports.bookField = async (req, res) => {
     try {
         console.log("bookField request received with body:", req.body);
 
+        // Lấy thông tin sân lớn và sân nhỏ (nếu có)
         const largeField = await Field.getLargeFieldById(largeFieldId);
         let smallField = null;
-
         if (smallFieldId) {
-            smallField = await Field.getSmallFieldsByLargeField(largeFieldId, smallFieldId);
+            smallField = await Field.getSmallFieldById(largeFieldId, smallFieldId);
         }
 
-       
         const today = new Date();
         const selectedDate = new Date(date);
+        
+        // Kiểm tra ngày đã chọn có phải là quá khứ hay không
         if (selectedDate < new Date(today.setHours(0, 0, 0, 0))) {
             return res.status(400).json({ message: 'Không thể đặt sân trong ngày quá khứ.' });
         }
 
-        if (!largeField.bookingSlots) {
-            largeField.bookingSlots = {};
-        }
-        if (smallField && !smallField.bookingSlots) {
-            smallField.bookingSlots = {};
+        // Kiểm tra sự trùng lịch cho sân nhỏ nếu có
+        if (smallField) {
+            // Kiểm tra và khởi tạo bookingSlots cho smallField nếu chưa có
+            if (!smallField.bookingSlots) {
+                smallField.bookingSlots = {}; // Đảm bảo bookingSlots tồn tại cho smallField
+            }
+            if (!smallField.bookingSlots[date]) {
+                smallField.bookingSlots[date] = {}; // Tạo bookingSlots cho ngày nếu chưa có
+            }
+
+            // Kiểm tra sự trùng lịch cho sân nhỏ
+            const conflictResult = Booking.isTimeConflicting(smallField.bookingSlots, date, startTime, endTime);
+            if (conflictResult === true) {
+                const availableSlots = Booking.getAvailableTimeSlots(smallField.bookingSlots, date, parseInt(startTime), parseInt(endTime));
+                return res.status(400).json({
+                    message: 'Khoảng thời gian đã được đặt.',
+                    availableSlots: availableSlots.length ? availableSlots : 'Không có khung giờ nào khả dụng trong ngày này.'
+                });
+            }
         }
 
-        if (!largeField.bookingSlots[date]) {
-            largeField.bookingSlots[date] = {};
-        }
-        if (smallField && !smallField.bookingSlots[date]) {
-            smallField.bookingSlots[date] = {};
-        }
-
-        // Check for time conflicts for the selected field
-        const conflictResult = Booking.isTimeConflicting(smallField ? smallField.bookingSlots : largeField.bookingSlots, date, startTime, endTime);
-        if (conflictResult === true) {
-            // Get available time slots in case of conflict
-            const availableSlots = Booking.getAvailableTimeSlots(smallField ? smallField.bookingSlots : largeField.bookingSlots, date, parseInt(startTime), parseInt(endTime));
-            return res.status(400).json({
-                message: 'Khoảng thời gian đã được đặt.',
-                availableSlots: availableSlots.length ? availableSlots : 'Không có khung giờ nào khả dụng trong ngày này.'
-            });
-        }
-
-        // Create the booking
+        // Tạo booking mới
         const booking = await Booking.createBooking(largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople);
 
-        // Update the booking slots
+        // Cập nhật bookingSlots cho sân nhỏ nếu có
         if (smallField) {
             smallField.bookingSlots[date][`${startTime}-${endTime}`] = true;
-        }
-        largeField.bookingSlots[date][`${startTime}-${endTime}`] = true;
 
+            // Cập nhật Firebase cho smallField
+            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).update({ bookingSlots: smallField.bookingSlots });
+        }
+
+        // Thông báo cho chủ sân
         const notificationData = {
             message: `Player đã yêu cầu đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
@@ -139,9 +115,11 @@ exports.bookField = async (req, res) => {
         };
         await Notification.notifyFieldOwner(largeField.ownerId, notificationData);
 
+        // Gửi email thông báo cho chủ sân
         const ownerEmail = await getFieldOwnerEmail(largeField.ownerId);
         await sendEmailNotification(ownerEmail, notificationData);
 
+        // Trả về kết quả thành công
         res.status(201).json({ message: 'Đặt sân thành công', booking });
     } catch (error) {
         console.error("Error in bookField:", error);
@@ -149,63 +127,73 @@ exports.bookField = async (req, res) => {
     }
 };
 
-// Hủy đặt sân
+
 exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;
 
     try {
-        // Lấy thông tin đặt sân theo bookingId
-        const booking = await Booking.getBookingById(bookingId);
+        console.log("Cancel booking request received for bookingId:", bookingId);
+
+        // Lấy thông tin đặt sân từ Firebase
+        const bookingRef = admin.database().ref('bookings').child(bookingId);
+        const snapshot = await bookingRef.once('value');
+        const booking = snapshot.val();
 
         if (!booking) {
             return res.status(404).json({ message: 'Không tìm thấy đặt sân.' });
         }
 
-        const { fieldId, userId, date, startTime, endTime } = booking;
+        const { largeFieldId, smallFieldId, userId, date, startTime, endTime } = booking;
 
-        // Lấy tên người chơi
+        // Lấy thông tin sân lớn
+        const largeField = await Field.getLargeFieldById(largeFieldId);
+        let smallField = smallFieldId ? await Field.getSmallFieldById(largeFieldId, smallFieldId) : null;
+
+        // Nếu có sân nhỏ, cập nhật bookingSlots cho sân nhỏ
+        if (smallField && smallField.bookingSlots && smallField.bookingSlots[date]) {
+            // Xóa trạng thái đã đặt cho khung giờ trên sân nhỏ
+            delete smallField.bookingSlots[date][`${startTime}-${endTime}`];
+
+            // Nếu không còn khung giờ nào được đặt cho sân nhỏ, xóa bookingSlots cho ngày
+            if (Object.keys(smallField.bookingSlots[date]).length === 0) {
+                delete smallField.bookingSlots[date];
+            }
+
+            // Cập nhật lại vào Firebase cho smallField
+            await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).update({ bookingSlots: smallField.bookingSlots });
+        }
+
+        // Xóa booking khỏi danh sách đặt sân trong Firebase
+        await bookingRef.remove();
+
+        // Lấy tên người chơi (player)
         const playerName = await getPlayerName(userId);
 
-        // Cập nhật lại trạng thái bookingSlots của sân
-        const field = await Field.getFieldById(fieldId);
-        if (!field) {
-            return res.status(404).json({ message: 'Không tìm thấy sân.' });
-        }
-
-        // Kiểm tra xem sân có bookingSlots không, nếu không thì tạo mới
-        if (!field.bookingSlots) {
-            field.bookingSlots = {};
-        }
-
-        // Nếu có ngày và thời gian đã đặt, đặt lại bookingSlots thành false
-        if (field.bookingSlots[date] && field.bookingSlots[date][`${startTime}-${endTime}`]) {
-            field.bookingSlots[date][`${startTime}-${endTime}`] = false;
-            await Field.updateField(fieldId, { bookingSlots: field.bookingSlots });
-        }
-
-        // Xóa booking
-        await Booking.deleteBooking(bookingId);
-
-        // Thông báo cho chủ sân khi hủy đặt sân
+        // Thông báo cho chủ sân về việc hủy đặt sân
         const notificationData = {
-            message: `${playerName} đã hủy đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,  // Thông báo với tên người chơi
+            message: `${playerName} đã hủy đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
-            fieldId,
-            bookingId,
+            smallFieldId,
         };
-        
-        const ownerId = field.ownerId;  // Lấy ownerId của sân
-        await Notification.notifyFieldOwner(ownerId, notificationData);
 
-        const ownerEmail = await getFieldOwnerEmail(ownerId);
+        await Notification.notifyFieldOwner(largeField.ownerId, notificationData);
+
+        // Gửi email thông báo cho chủ sân
+        const ownerEmail = await getFieldOwnerEmail(largeField.ownerId);
         await sendEmailNotification(ownerEmail, notificationData);
 
+        // Trả về kết quả thành công
         res.status(200).json({ message: 'Hủy đặt sân thành công.' });
     } catch (error) {
-        console.error("Error during booking cancellation:", error);
+        console.error("Error in cancelBooking:", error);
         res.status(500).json({ message: 'Lỗi khi hủy đặt sân', error: error.message });
     }
 };
+
+
+
+
+
 
 // Lấy lịch sử đặt sân của Player
 exports.getUserBookings = async (req, res) => {

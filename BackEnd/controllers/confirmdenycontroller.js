@@ -29,7 +29,7 @@ class FieldController {
                     return {
                         smallFieldId,
                         smallFieldName: smallField.name,
-                        bookings: bookings.filter(booking => booking.status === 'pending') // Chỉ lấy các booking đang chờ xác nhận
+                        bookings: bookings.filter(booking => booking.status === '0') // Chỉ lấy các booking đang chờ xác nhận
                     };
                 });
 
