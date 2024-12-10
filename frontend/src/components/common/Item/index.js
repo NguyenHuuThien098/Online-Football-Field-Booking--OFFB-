@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from "react";
 import style from "./Item.module.scss";
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Box, Card, CardContent, CardMedia, Typography, Button, CardActionArea } from '@mui/material';
 import { getDatabase, ref, get } from "firebase/database"; // Import Firebase functions
 import { Col } from "react-bootstrap";
+import { styled } from '@mui/material/styles';
+
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  borderRadius: '16px',
+  border: '0.1px solid #ccc',
+  display: 'flex',
+  transition: 'transform 0.3s ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.02)', // Subtle hover scale effect
+    boxShadow: theme.shadows[5], // Áp dụng hiệu ứng đổ bóng từ theme
+  },
+}));
 
 const Item = ({ field, match }) => {
   const [ownerName, setOwnerName] = useState(null); // State để lưu tên chủ sân
@@ -53,7 +66,7 @@ const Item = ({ field, match }) => {
                   src={field.image}
                   alt={field.name}
                   className={style.br50 + " img-fluid h-100 w-100"}
-                  style={{ objectFit: "cover", borderRadius: "49px"}}
+                  style={{ objectFit: "cover", borderRadius: "49px" }}
                 />
               )}
             </div>
@@ -71,8 +84,8 @@ const Item = ({ field, match }) => {
                 <p>Ghi chú: {field.notes}</p>
                 <p>Đánh giá: {field.rating}</p>
               </div>
-               
-              
+
+
             </div>
           </div>
         </div>
@@ -83,36 +96,54 @@ const Item = ({ field, match }) => {
 
   if (match) {
     return (
-      <div className="m-5">
-        <div className={style.br50 + " border border-black h-50 w-100"}>
-          <div className="row h-100">
-            <div className="col-4 border-end border-black">
-              {match.image && (
-                <img
-                  src={match.image}
-                  alt={match.ownerName}
-                  className="img-fluid h-100 w-100"
-                  style={{ objectFit: "cover", borderRadius: "10px" }}
-                />
-              )}
-            </div>
-            <div className="col">
-              <div className="row d-flex flex-row-reverse">
-                <a href="MatchInformation-view.html" className="btn btn-primary m-5 h-100 w-auto">
-                  Join
-                </a>
-                <h3>{match.ownerName}</h3>
-                <p>Địa chỉ: {match.address}</p>
-                <p>Thời gian: {match.time}</p>
-                <p>Số lượng người chơi: {match.playerCount}</p>
-                <p>Ghi chú: {match.notes}</p>
-                <p>Câu hỏi: {match.questions}</p>
-              </div>
-            </div>
+      <StyledCard className="mt-4 mx-3"
+      sx={{
+        width: 600,
+        height: 300
+      }}
+      >
+        <CardActionArea
+          sx={{
+            width: 300,
+            height: 300
+          }}
+        >
+          <CardMedia
+            component="img"
+            sx={{
+              width: 300,
+              height: 300,
+              borderRadius: '10px',
+              border: '0.1px solid #ccc',
+            }}
+            image={match.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'}
+            alt="green iguana"
+          />
+        </CardActionArea>
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, p: 5 }}>
+          <Typography variant="h5" component="div">
+            {match.ownerName}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Địa chỉ: {match.address}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Thời gian: {match.time}
+          </Typography>
+          <Typography variant="body2" color="success" fontSize={24}>
+            Giá: 200k/h
+          </Typography>
+          <div>
+
           </div>
-        </div>
-        <hr className={style.hr} />
-      </div>
+          <Box sx={{ mt: 2 }}>
+            <Button variant="contained" sx={{ width: 150, height: 40 }}>
+              Tham gia
+            </Button>
+          </Box>
+        </CardContent>
+      </StyledCard>
+
     );
   }
 
