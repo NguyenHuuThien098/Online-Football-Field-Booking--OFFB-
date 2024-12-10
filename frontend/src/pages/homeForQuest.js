@@ -48,7 +48,7 @@ const Home = () => {
     setErrorMatches("");
 
     try {
-      const response = await axios.get("http://localhost:3001/api/matches/all");
+      const response = await axios.get("http://localhost:5000/api/matches/all");
       setMatches(response.data);
     } catch (error) {
       console.error("Error fetching matches:", error);
