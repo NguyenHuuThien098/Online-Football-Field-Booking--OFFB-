@@ -19,4 +19,6 @@ router.post('/accept',authenticateUser, authorizeRole(['field_owner']), joinmatc
 
 // Định tuyến cho chủ sân từ chối player tham gia
 router.post('/reject',authenticateUser, authorizeRole(['field_owner']), joinmatchController.rejectPlayer);
+
+router.get('/:matchId/join-requests', authenticateUser, authorizeRole(['field_owner']),joinmatchController.getJoinRequests);
 module.exports = router;
