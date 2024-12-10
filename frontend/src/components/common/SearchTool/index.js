@@ -4,9 +4,8 @@ import SearchIcon from "@mui/icons-material/Search";
 
 const SearchTool = () => {
     return (
-        <Box className="w-100">
+        <Box className="w-100 border-top border-bottom border-primary">
             { /* Divider */}
-            <Divider sx={{ mx: 2, borderColor: "gray" }} />
             <Stack
                 className="shadow-sm"
                 direction="row"
@@ -120,7 +119,7 @@ const SearchTool = () => {
             </Stack>
 
             {/* Divider */}
-            <Divider sx={{ mx: 2, borderColor: "gray" }} />
+            {/* <Divider sx={{ mx: 2, borderColor: "gray" }} /> */}
         </Box>
     );
 };

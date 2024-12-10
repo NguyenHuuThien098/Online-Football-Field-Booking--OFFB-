@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const MainLayout = ({ children, role }) => {
   return (
-    <div name="container" className={styles.container}>
+    <div name="container" className={"w-100"}>
       {/* Header */}
       <div name="header">    <Header role={role} />      </div>
       
