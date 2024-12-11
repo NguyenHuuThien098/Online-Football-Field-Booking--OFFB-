@@ -4,63 +4,79 @@ const Notification = require('../models/Notification');
 const admin = require('../firebase');
 class FieldController {
 
-    // Lấy danh sách các sân của chủ sở hữu và các yêu cầu đặt sân của họ
-    static async getBookingsForOwner(req, res) {
-        try {
-            const ownerId = req.params.ownerId; // Lấy ownerId từ params
+  // Lấy danh sách các sân của chủ sở hữu và các yêu cầu đặt sân của họ
+static async getBookingsForOwner(req, res) {
+    try {
+        const ownerId = req.params.ownerId; // Lấy ownerId từ params
 
-            // Lấy danh sách các sân lớn (largeFields) của chủ sở hữu
-            const largeFieldsSnapshot = await admin.database().ref('largeFields').orderByChild('ownerId').equalTo(ownerId).once('value');
-            const largeFields = largeFieldsSnapshot.val() || {};
+        // Lấy danh sách các sân lớn (largeFields) của chủ sở hữu
+        const largeFieldsSnapshot = await admin.database().ref('largeFields').orderByChild('ownerId').equalTo(ownerId).once('value');
+        const largeFields = largeFieldsSnapshot.val() || {};
 
-            const bookingsPromises = Object.keys(largeFields).map(async (largeFieldId) => {
-                const largeField = largeFields[largeFieldId];
+        const bookingsPromises = Object.keys(largeFields).map(async (largeFieldId) => {
+            const largeField = largeFields[largeFieldId];
 
-                // Lấy danh sách các smallFields của sân lớn
-                const smallFieldsSnapshot = await admin.database().ref('smallFields').orderByChild('largeFieldId').equalTo(largeFieldId).once('value');
-                const smallFields = smallFieldsSnapshot.val() || {};
+            // Lấy danh sách các smallFields của sân lớn
+            const smallFieldsSnapshot = await admin.database().ref('smallFields').orderByChild('largeFieldId').equalTo(largeFieldId).once('value');
+            const smallFields = smallFieldsSnapshot.val() || {};
 
-                const bookingsPromisesForFields = Object.keys(smallFields).map(async (smallFieldId) => {
-                    const smallField = smallFields[smallFieldId];
+            // Truy vấn tất cả bookings từ Firebase và lọc những booking có trạng thái '0'
+            const bookingsSnapshot = await admin.database().ref('bookings')
+                .orderByChild('largeFieldId')
+                .equalTo(largeFieldId) // Lọc theo largeFieldId
+                .once('value');
+            
+            const allBookings = bookingsSnapshot.val() || {};
 
-                    // Lấy danh sách các booking của từng smallField
-                    const bookings = await Booking.getBookingsByFieldOwner(smallField.ownerId);
-
+            // Lọc các booking có trạng thái là '0' (đang chờ xác nhận)
+            const pendingBookings = Object.keys(allBookings).map(key => {
+                const booking = allBookings[key];
+                if (booking.status === '0') {
                     return {
-                        smallFieldId,
-                        smallFieldName: smallField.name,
-                        bookings: bookings.filter(booking => booking.status === '0') // Chỉ lấy các booking đang chờ xác nhận
+                        bookingId: key,
+                        bookingTime: booking.bookingTime,
+                        createdAt: booking.createdAt,
+                        date: booking.date,
+                        startTime: booking.startTime,
+                        endTime: booking.endTime,
+                        numberOfPeople: booking.numberOfPeople,
+                        playerName: booking.playerName,
+                        largeFieldId: booking.largeFieldId,
+                        smallFieldId: booking.smallFieldId,
+                        userId: booking.userId,
+                        status: booking.status
                     };
-                });
+                }
+                return null;
+            }).filter(booking => booking !== null); // Lọc bỏ các booking không phải trạng thái '0'
 
-                // Chờ tất cả các Promise để lấy danh sách booking cho các smallFields
-                const bookingsForSmallFields = await Promise.all(bookingsPromisesForFields);
+            return {
+                largeFieldId,
+                largeFieldName: largeField.name,
+                bookings: pendingBookings // Chỉ trả về các booking đang chờ xác nhận
+            };
+        });
 
-                return {
-                    largeFieldId,
-                    largeFieldName: largeField.name,
-                    bookings: bookingsForSmallFields.flatMap(bookingsForSmallField => bookingsForSmallField.bookings) // Gộp tất cả các booking lại
-                };
-            });
+        // Chờ tất cả các Promise để lấy danh sách booking cho các largeField
+        const result = await Promise.all(bookingsPromises);
 
-            // Chờ tất cả các Promise để lấy danh sách booking cho các largeField
-            const result = await Promise.all(bookingsPromises);
+        return res.status(200).json({
+            success: true,
+            message: 'Fetched bookings for owner successfully',
+            data: result
+        });
 
-            return res.status(200).json({
-                success: true,
-                message: 'Fetched bookings for owner successfully',
-                data: result
-            });
-
-        } catch (error) {
-            console.error('Error fetching bookings for owner:', error.message);
-            return res.status(500).json({
-                success: false,
-                message: 'Failed to fetch bookings for owner',
-                error: error.message
-            });
-        }
+    } catch (error) {
+        console.error('Error fetching bookings for owner:', error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to fetch bookings for owner',
+            error: error.message
+        });
     }
+}
+
+
 
     // Xác nhận yêu cầu đặt sân
     static async confirmBooking(req, res) {
