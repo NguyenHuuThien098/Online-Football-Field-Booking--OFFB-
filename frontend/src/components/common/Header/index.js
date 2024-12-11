@@ -1,36 +1,7 @@
-import React, { useState, useEffect } from "react";
 import logo from "../../../img/iconTraiBanh.png";
 import avatar from "../../../img/avatar.png";
 import style from "./Header.module.scss";
-
-const Header = ({ role }) => {
-  const [showMenu, setShowMenu] = useState(false); // Trạng thái hiển thị menu
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
-
-  useEffect(() => {
-    // Kiểm tra trạng thái đăng nhập từ localStorage
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Nếu có token, người dùng đang đăng nhập
-  }, []);
-
-  const handleLogoClick = () => {
-    window.location.reload(); // Reload lại trang
-  };
-
-  const toggleMenu = () => {
-    setShowMenu((prev) => !prev); // Đổi trạng thái hiển thị menu
-  };
-
-  const handleLogout = () => {
-    // Xử lý logout
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("role");
-    setIsLoggedIn(false);
-    setShowMenu(false); // Ẩn menu sau khi logout
-    window.location.href = "/"; // Chuyển hướng về trang login
-  };
-
+const Header = () => {
   return (
     <div className="row border">
       <div name="left" className="col-2 p-3 border-end d-flex align-items-center">

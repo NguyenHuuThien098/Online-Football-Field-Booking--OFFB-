@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { Collapse } from 'react-bootstrap';
 import style from "./Sidebar.module.scss";
@@ -7,10 +8,30 @@ import style from "./Sidebar.module.scss";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+ 
+  const styles = {
+    link: {
+      fontWeight: 'bold',  
+      textDecoration: 'none',
+      padding: '10px 15px',
+      color: '#000',  
+    },
+    accordionHeader: {
+      fontWeight: 'bold', 
+    },
+  };
+  
+  const role = localStorage.getItem('role'); 
+
+  
+  const availableFieldLink = role === 'player' ? '/player-page' : '/field-owner-dashboard';
+
   return (
     <nav className="nav flex-column">
-      <a className="btn" href="/">Available Field</a>
-      <a className="btn">Open Match</a>
+      <a className="btn" href={availableFieldLink} style={styles.link}>
+        Available Field
+      </a>
+      <a className="btn" style={styles.link}>Open Match</a>
       <hr />
       <a className="btn" href="Personal">Personal</a>
       <a className="btn" onClick={() => setIsOpen(!isOpen)}>

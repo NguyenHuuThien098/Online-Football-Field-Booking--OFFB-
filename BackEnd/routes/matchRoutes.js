@@ -9,6 +9,12 @@ router.get('/all', matchController.getAllMatchesPublic);
 // Route để tạo trận đấu
 router.post('/', authenticateUser, authorizeRole(['field_owner']), matchController.createMatch);
 
+// Route để player join vào trận đấu
+router.post('/join', authenticateUser, authorizeRole(['player']), matchController.joinMatch);
+
+// Route để field owner chấp nhận player tham gia trận đấu
+router.post('/accept', authenticateUser, authorizeRole(['field_owner']), matchController.acceptPlayer);
+
 // Route để lấy danh sách trận đấu
 router.get('/owner/:ownerId', authenticateUser, authorizeRole(['field_owner']), matchController.getMatchesByOwner);
 

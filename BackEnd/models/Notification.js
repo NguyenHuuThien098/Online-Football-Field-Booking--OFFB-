@@ -7,6 +7,10 @@ class Notification {
         return { id: notificationRef.key, ...notificationData };
     }
 
+    static async notifyPlayer(playerId, notificationData) {
+        const notificationRef = await admin.database().ref(`notifications/${playerId}`).push(notificationData);
+        return { id: notificationRef.key, ...notificationData };
+    }
 
     static async getNotificationsForOwner(ownerId) {
         const snapshot = await admin.database().ref(`notifications/${ownerId}`).once('value');

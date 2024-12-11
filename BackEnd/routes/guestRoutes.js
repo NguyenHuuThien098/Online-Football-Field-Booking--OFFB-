@@ -13,8 +13,8 @@ router.get('/fields', fieldController.getAllFieldsPublic);
 router.get('/search', guestController.searchFields);
 
 
-// Route đặt sân cho guest (chuyển đến player)
-router.post('/book', guestController.bookField);
+// // Route đặt sân cho guest (chuyển đến player)
+// router.post('/book', guestController.bookField);
 
 
 module.exports = router;

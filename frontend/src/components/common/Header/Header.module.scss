@@ -1,5 +1,26 @@
-.icon{
+* {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden; /* Ẩn thanh cuộn ngang cho toàn bộ trang */
+}
+
+.row {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.col-2, .col-7, .col {
+    padding: 0;
+}
+
+.icon {
     width: 50px;
     height: auto;
-    // background: red;
+    max-width: 100%; 
+}
+
+.parent {
+    overflow-x: hidden;
 }

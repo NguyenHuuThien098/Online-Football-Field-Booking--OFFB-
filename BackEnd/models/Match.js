@@ -40,6 +40,149 @@ class Match {
             throw new Error('Could not fetch match');
         }
     }
+
+    static joinMatch = async (req, res) => {
+        const { matchId, playerId } = req.body;
+    
+        try {
+            const matchRef = admin.database().ref(`matches/${matchId}`);
+            const snapshot = await matchRef.once('value');
+    
+            if (!snapshot.exists()) {
+                return res.status(404).json({ error: 'Match not found' });
+            }
+    
+            const matchData = snapshot.val();
+    
+            // Kiểm tra nếu player đã trong danh sách chờ hoặc danh sách chính
+            if ((matchData.players && matchData.players.includes(playerId)) ||
+                (matchData.waitingList && matchData.waitingList.includes(playerId))) {
+                return res.status(400).json({ error: 'Player is already part of this match' });
+            }
+    
+            // Nếu cần phê duyệt, thêm vào danh sách chờ
+            if (matchData.requiresApproval) {
+                if (!matchData.waitingList) {
+                    matchData.waitingList = [];
+                }
+    
+                matchData.waitingList.push(playerId);
+                await matchRef.update(matchData);
+    
+                return res.status(200).json({ message: 'Added to waiting list', match: matchData });
+            }
+    
+            // Nếu không cần phê duyệt, thêm trực tiếp vào danh sách
+            if (!matchData.players) {
+                matchData.players = [];
+            }
+    
+            matchData.players.push(playerId);
+            matchData.remainingPlayerCount -= 1;
+            await matchRef.update(matchData);
+    
+            // Gửi thông báo cho chủ sân
+            const ownerNotificationRef = admin.database().ref(`notifications/${matchData.ownerId}`).push();
+            await ownerNotificationRef.set({
+                message: `Player ${playerId} has joined your match.`,
+                matchId,
+                timestamp: new Date().toISOString()
+            });
+    
+            res.status(200).json({ message: 'Joined match successfully', match: matchData });
+        } catch (error) {
+            console.error('Error joining match:', error);
+            res.status(500).json({ error: 'Could not join match' });
+        }
+    };
+    
+    // Hàm để chủ sân chấp nhận player tham gia
+    static acceptPlayer = async (req, res) => {
+    const { matchId, playerId } = req.body;
+
+    try {
+        const matchRef = admin.database().ref(`matches/${matchId}`);
+        const snapshot = await matchRef.once('value');
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({ error: 'Match not found' });
+        }
+
+        const matchData = snapshot.val();
+
+        // Kiểm tra xem player có trong waiting list không
+        matchData.waitingList = matchData.waitingList || [];
+        if (!matchData.waitingList.includes(playerId)) {
+            return res.status(400).json({ error: 'Player not found in waiting list' });
+        }
+
+        // Xóa player khỏi waiting list và thêm vào danh sách players
+        matchData.waitingList = matchData.waitingList.filter(player => player !== playerId);
+        matchData.players = matchData.players || [];
+        matchData.players.push(playerId);
+
+        // Cập nhật số lượng slot còn lại
+        matchData.remainingPlayerCount -= 1;
+        await matchRef.update({
+            waitingList: matchData.waitingList,
+            players: matchData.players,
+            remainingPlayerCount: matchData.remainingPlayerCount,
+        });
+
+        // Gửi thông báo cho player
+        const playerNotificationRef = admin.database().ref(`notifications/${playerId}`).push();
+        await playerNotificationRef.set({
+            message: `You have been accepted to join match ${matchId}.`,
+            matchId,
+            timestamp: new Date().toISOString(),
+        });
+
+        res.status(200).json({ message: 'Player accepted successfully', matchId });
+    } catch (error) {
+        console.error('Error in acceptPlayer:', error);
+        res.status(500).json({ error: 'Could not accept player' });
+    }
+};
+
+// Hàm để chủ sân từ chối player tham gia
+static rejectPlayer = async (req, res) => {
+    const { matchId, playerId } = req.body;
+
+    try {
+        const matchRef = admin.database().ref(`matches/${matchId}`);
+        const snapshot = await matchRef.once('value');
+
+        if (!snapshot.exists()) {
+            return res.status(404).json({ error: 'Match not found' });
+        }
+
+        const matchData = snapshot.val();
+
+        // Kiểm tra xem player có trong waiting list không
+        matchData.waitingList = matchData.waitingList || [];
+        if (!matchData.waitingList.includes(playerId)) {
+            return res.status(400).json({ error: 'Player not found in waiting list' });
+        }
+
+        // Xóa player khỏi waiting list
+        matchData.waitingList = matchData.waitingList.filter(player => player !== playerId);
+        await matchRef.update({ waitingList: matchData.waitingList });
+
+        // Gửi thông báo cho player
+        const playerNotificationRef = admin.database().ref(`notifications/${playerId}`).push();
+        await playerNotificationRef.set({
+            message: `You have been rejected from joining match ${matchId}.`,
+            matchId,
+            timestamp: new Date().toISOString(),
+        });
+
+        res.status(200).json({ message: 'Player rejected successfully', matchId });
+    } catch (error) {
+        console.error('Error in rejectPlayer:', error);
+        res.status(500).json({ error: 'Could not reject player' });
+    }
+};
+
 }
 
 module.exports = Match;
