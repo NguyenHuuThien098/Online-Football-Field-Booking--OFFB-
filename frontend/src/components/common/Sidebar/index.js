@@ -11,7 +11,6 @@ const Sidebar = () => {
  
   const styles = {
     link: {
-      fontWeight: 'bold',  
       textDecoration: 'none',
       padding: '10px 15px',
       color: '#000',  
