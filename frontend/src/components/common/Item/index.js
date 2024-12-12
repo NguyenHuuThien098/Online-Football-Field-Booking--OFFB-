@@ -80,8 +80,8 @@ const Item = ({ field, match }) => {
                 <h3>{field.name}</h3>
                 <p>Chủ sân: {ownerName || "Đang tải..."}</p>
                 <p>Số điện thoại: {ownerPhone || "Đang tải..."}</p>
-                <p>Địa chỉ: {field.location}</p>
-                <p>Ghi chú: {field.notes}</p>
+                <p>Địa chỉ: {field.largeFieldAddress}</p>
+                <p>Ghi chú: {field.description}</p>
                 <p>Đánh giá: {field.rating}</p>
               </div>
 
