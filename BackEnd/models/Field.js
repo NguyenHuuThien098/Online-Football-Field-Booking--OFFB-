@@ -24,18 +24,30 @@ class Field {
         }
 
         try {
-            const newFieldRef = await admin.database().ref(`largeFields/${largeFieldId}/smallFields`).push({
-                ...smallFieldData,
-                bookingSlots
-            });
+            // Lấy thông tin sân lớn
+            const largeFieldSnapshot = await admin.database().ref(`largeFields/${largeFieldId}`).once('value');
+            if (!largeFieldSnapshot.exists()) {
+                throw new Error('Sân lớn không tồn tại');
+            }
+            const largeFieldData = largeFieldSnapshot.val();
 
-            return { smallFieldId: newFieldRef.key, ...smallFieldData }; // Trả về smallFieldId
+            // Thêm thông tin sân lớn vào dữ liệu sân nhỏ
+            const newSmallFieldData = {
+                ...smallFieldData,
+                bookingSlots,
+                largeFieldName: largeFieldData.name,
+                largeFieldAddress: largeFieldData.address
+            };
+
+            const newFieldRef = await admin.database().ref(`largeFields/${largeFieldId}/smallFields`).push(newSmallFieldData);
+
+            return { smallFieldId: newFieldRef.key, ...newSmallFieldData }; // Trả về smallFieldId
         } catch (error) {
             console.error('Error creating small field:', error.message);
             throw new Error('Không thể tạo sân nhỏ mới');
         }
     }
-
+    
     // Cập nhật sân lớn hiện có
     static async updateLargeField(largeFieldId, data) {
         try {
@@ -136,64 +148,53 @@ class Field {
         }
     }
 
-  // Lấy tất cả các sân lớn và sân nhỏ hiện có với phân trang
-static async getAllFields(limit = 10, startAfter = null) {
-    try {
-        let query = admin.database().ref('largeFields').limitToFirst(limit);
+    // Lấy tất cả các sân nhỏ hiện có
+    static async getAllSmallFields(limit = 10, startAfter = null) {
+        try {
+            let query = admin.database().ref('largeFields').limitToFirst(limit);
 
-        if (startAfter) {
-            query = query.startAfter(startAfter);
-        }
+            if (startAfter) {
+                query = query.startAfter(startAfter);
+            }
 
-        const snapshot = await query.once('value');
-        const fields = snapshot.val() || {};
+            const snapshot = await query.once('value');
+            const fields = snapshot.val() || {};
 
-        // Lấy tất cả sân lớn và sân nhỏ
-        const allFields = [];
+            // Lấy tất cả sân nhỏ
+            const allSmallFields = [];
 
-        // Lặp qua các sân lớn
-        for (let fieldId in fields) {
-            const largeField = fields[fieldId];
+            // Lặp qua các sân lớn
+            for (let fieldId in fields) {
+                const largeField = fields[fieldId];
 
-            // Thêm sân lớn vào danh sách
-            allFields.push({
-                id: fieldId, // Lưu id của sân lớn
-                name: largeField.name,
-                address: largeField.address,
-                phoneNumber: largeField.phoneNumber,
-                otherInfo: largeField.otherInfo,
-                operatingHours: largeField.operatingHours,
-                ownerId: largeField.ownerId,
-                images: largeField.image,  // Sử dụng 'image' thay vì 'images'
-                smallFields: largeField.smallFields || []  // Thêm sân nhỏ vào trường này
-            });
+                // Nếu có sân nhỏ, lưu thông tin sân nhỏ
+                if (largeField.smallFields) {
+                    for (let smallFieldId in largeField.smallFields) {
+                        const smallField = largeField.smallFields[smallFieldId];
 
-            // Nếu có sân nhỏ, tiếp tục lưu thông tin sân nhỏ
-            if (largeField.smallFields) {
-                for (let smallFieldId in largeField.smallFields) {
-                    const smallField = largeField.smallFields[smallFieldId];
-
-                    allFields.push({
-                        id: smallFieldId, // ID của sân nhỏ
-                        name: smallField.name,
-                        type: smallField.type,
-                        price: smallField.price,
-                        description: smallField.description,
-                        isAvailable: smallField.isAvailable,
-                        bookingSlots: smallField.bookingSlots,
-                        largeFieldId: fieldId, // Liên kết với sân lớn
-                        images: smallField.image,  // Sử dụng 'image' thay vì 'images'
-                    });
+                        allSmallFields.push({
+                            id: smallFieldId, // ID của sân nhỏ
+                            name: smallField.name,
+                            type: smallField.type,
+                            price: smallField.price,
+                            description: smallField.description,
+                            isAvailable: smallField.isAvailable,
+                            bookingSlots: smallField.bookingSlots,
+                            largeFieldId: fieldId, // Liên kết với sân lớn
+                            largeFieldName: largeField.name, // Tên sân lớn
+                            largeFieldAddress: largeField.address, // Địa chỉ sân lớn
+                            images: smallField.image,  // Sử dụng 'image' thay vì 'images'
+                        });
+                    }
                 }
             }
-        }
 
-        return allFields;  // Trả về danh sách tất cả các sân (bao gồm sân lớn và sân nhỏ)
-    } catch (error) {
-        console.error('Error fetching all fields:', error.message);
-        throw new Error('Không thể lấy danh sách tất cả các sân');
+            return allSmallFields;
+        } catch (error) {
+            console.error('Error fetching small fields:', error);
+            throw new Error('Could not fetch small fields');
+        }
     }
-}
 
 
 
