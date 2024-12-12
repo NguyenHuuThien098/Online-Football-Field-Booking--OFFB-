@@ -6,7 +6,7 @@ const router = express.Router();
 const fieldController = require('../controllers/fieldController');
 
 // Route để lấy tất cả thông tin sân công khai
-router.get('/fields', fieldController.getAllFieldsPublic);
+router.get('/fields', fieldController.getAllSmallFieldsPublic);
 
 
 // Route tìm sân cho guest
