@@ -1,160 +1,204 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import MainLayout from "../layouts/MainLayout";
-import Item from "../components/common/Item";
 import SearchTool from "../components/common/SearchTool";
-import Container from "react-bootstrap/Container";
+import axios from "axios";
+import { Container, Paper, Typography } from '@mui/material';
+import { Card } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import Compressor from 'compressorjs';
+
+import Item from "../components/common/Item";
+const Hover = styled(Card)(({ theme }) => ({
+  borderRadius: '16px',
+  display: 'flex',
+  transition: 'transform 0.3s linear',
+  '&:active': {
+    transform: 'scale(0.99)', // Subtle hover scale effect
+    boxShadow: theme.shadows[5], // Áp dụng hiệu ứng đổ bóng từ theme
+  },
+}));
+
 const PlayerPage = () => {
-    const [fields, setFields] = useState([]);
-    const [matches, setMatches] = useState([]);
-    const [bookings, setBookings] = useState([]);
-    const [searchParams, setSearchParams] = useState({
-        name: '',
-        location: '',
-        type: '',
-        date: '',
-        startTime: '',
-        endTime: '',
-    });
-    const [userId, setUserId] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
+  const [fields, setFields] = useState([]); // Danh sách sân
+  const [matches, setMatches] = useState([]); // Danh sách trận đấu
+  const [searchParams, setSearchParams] = useState({
+    name: "",
+    date: "",
+    startTime: "",
+    endTime: "",
+    type: "",
+  });
+  const [loadingFields, setLoadingFields] = useState(false);
+  const [loadingMatches, setLoadingMatches] = useState(false);
+  const [errorFields, setErrorFields] = useState("");
+  const [errorMatches, setErrorMatches] = useState("");
+  const [userId, setUserId] = useState("");
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        const storedUserId = localStorage.getItem('userId');
-        if (token && storedUserId) {
-            setUserId(storedUserId);
-            fetchBookings(storedUserId, token);
-            fetchMatches(token);
-            console.log('Token:', token);
-        } else {
-            setError('Bạn chưa đăng nhập.');
-        }
-        fetchDefaultFields(token);
-        console.log('Token:', token);
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
 
-    const fetchBookings = async (userId, token) => {
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/api/player/bookings/${userId}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setBookings(response.data);
-        } catch (err) {
-            console.error(err);
-            setError('Không thể lấy lịch sử đặt sân.');
-        }
-    };
+    if (token && storedUserId) {
+      setUserId(storedUserId);
+      fetchDefaultFields(token); // Tải danh sách sân
+      fetchMatches(token);
+      console.log('Token:', token); // Tải danh sách trận đấu
+    } else {
+      navigate("/login"); // Chuyển hướng đến trang đăng nhập nếu không có token
+    }
+  }, [navigate]);
 
-    const fetchDefaultFields = async (token) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/api/player/fields`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setFields(response.data);
-        } catch (err) {
-            console.error("Error fetching default fields:", err);
-            setError("Không thể tải danh sách sân.");
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Lấy danh sách sân mặc định
+  const fetchDefaultFields = async (token) => {
+    setLoadingFields(true);
+    setErrorFields("");
 
-    const fetchMatches = async (token) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/api/matches/all`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            setMatches(response.data);
-        } catch (err) {
-            console.error("Error fetching matches:", err);
-            setError("Không thể tải danh sách trận đấu.");
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+      const response = await axios.get("http://localhost:5000/api/guest/fields", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFields(response.data);
+    } catch (error) {
+      console.error("Error fetching fields:", error);
+      setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");
+    } finally {
+      setLoadingFields(false);
+    }
+  };
 
-    const searchFields = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            setError("Bạn cần đăng nhập để tìm kiếm.");
-            return;
-        }
-        setLoading(true);
-        try {
-            const response = await axios.get(
-                `http://localhost:5000/api/player/fields`,
-                { headers: { Authorization: `Bearer ${token}` }, params: searchParams }
-            );
-            setFields(response.data);
-            setError(response.data.length === 0 ? "Không tìm thấy sân nào phù hợp." : "");
-        } catch (err) {
-            console.error("Error searching fields:", err);
-            setError("Có lỗi khi tìm kiếm sân.");
-        } finally {
-            setLoading(false);
-        }
-    };
+  // Lấy danh sách trận đấu
+  const fetchMatches = async (token) => {
+    setLoadingMatches(true);
+    setErrorMatches("");
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        navigate('/'); 
-    };
+    try {
+      const response = await axios.get("http://localhost:5000/api/matches/all", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMatches(response.data);
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+      setErrorMatches("Có lỗi xảy ra khi tải danh sách trận đấu.");
+    } finally {
+      setLoadingMatches(false);
+    }
+  };
 
-    return (
-        <MainLayout>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h1>Trang Người Chơi</h1>
-               
+  // Tìm kiếm sân
+  const searchFields = async () => {
+    setLoadingFields(true);
+    setErrorFields("");
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorFields("Bạn cần đăng nhập để tìm kiếm.");
+        return;
+      }
+
+      const response = await axios.get("http://localhost:5000/api/guest/search", {
+        params: searchParams,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFields(response.data);
+    } catch (error) {
+      console.error("Error searching fields:", error);
+      setErrorFields("Có lỗi xảy ra khi tìm kiếm sân.");
+    } finally {
+      setLoadingFields(false);
+    }
+  };
+  return (
+    <MainLayout>
+      {/* Search Tool */}
+      <div className="bg-light p-3">
+        <Hover>
+          <SearchTool
+            searchParams={searchParams}
+            setSearchParams={setSearchParams}
+            searchFields={searchFields}
+          />
+        </Hover>
+
+
+        {/* Fields Section */}
+
+        <Container
+          className="shadow p-4 mt-5 border-top border-primary"
+          style={{ background: "white", borderRadius: '50px' }}
+          sx={{
+
+          }}
+        >
+
+          <Paper
+            className="w-100 mt-2"
+            elevation={3}
+            sx={{
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: '#1976d2', // Đặt màu nền tại đây
+              // border: "2px solid gray"
+            }}
+          >
+            <Typography variant="h2" component="h2" color="white">
+              Danh sách sân bóng
+            </Typography>
+          </Paper>
+
+          {loadingFields ? (
+            <p className="text-center">Đang tải danh sách sân...</p>
+          ) : errorFields ? (
+            <p style={{ color: "red" }} className="text-center">{errorFields}</p>
+          ) : fields.length > 0 ? (
+            <ul>
+              {fields.map((field) => (
+                <Item key={field.fieldId} field={field} />
+              ))}
+            </ul>
+          ) : (
+            <p className="text-center">Không tìm thấy sân nào.</p>
+          )}
+
+          {/* Matches Section */}
+
+          <Paper
+            className="w-100"
+            elevation={3}
+            sx={{
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: '#1976d2', // Đặt màu nền tại đây
+              // border: "1px solid gray"
+            }}
+          >
+
+            <Typography variant="h2" component="h2" color="white">
+              Danh sách trận đấu mở
+            </Typography>
+          </Paper>
+
+
+          {loadingMatches ? (
+            <p className="text-center">Đang tải danh sách trận đấu...</p>
+          ) : errorMatches ? (
+            <p style={{ color: "red" }} className="text-center">{errorMatches}</p>
+          ) : matches.length > 0 ? (
+            <div className="d-flex flex-wrap justify-content-center">
+              {matches.map((match) => (
+                <Item key={match.id} match={match} />
+              ))}
             </div>
+          ) : (
+            <p className="text-center">Không có trận đấu nào được mở.</p>
+          )}
+        </Container>
+      </div>
 
-            <SearchTool
-                searchParams={searchParams}
-                setSearchParams={setSearchParams}
-                searchFields={searchFields}
-            />
 
-            <h2>Danh sách sân:</h2>
-            {loading ? (
-                <p>Đang tải danh sách sân và trận đấu...</p>
-            ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-            ) : fields.length > 0 ? (
-                <ul>
-                    {fields.map((field) => (
-                        <Item key={field.fieldId} field={field} />
-                    ))}
-                </ul>
-            ) : (
-                <p>Không tìm thấy sân nào.</p>
-            )}
-
-            <h2>Danh sách trận đấu mở:</h2>
-            {loading ? (
-                <p>Đang tải danh sách sân và trận đấu...</p>
-            ) : error ? (
-                <p style={{ color: "red" }}>{error}</p>
-            ) : matches.length > 0 ? (
-                <ul>
-                    {matches.map((match) => (
-                        <Item key={match.id} match={match} />
-                    ))}
-                </ul>
-            ) : (
-                <p>Không có trận đấu nào được mở.</p>
-            )}
-        </MainLayout>
-    );
+    </MainLayout>
+  );
 };
 
 export default PlayerPage;

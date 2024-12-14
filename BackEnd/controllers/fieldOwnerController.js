@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const Field = require('../models/Field');
+const admin = require('../firebase');
 
 // Đăng nhập bằng Google cho Field Owner
 const googleLogin = async (req, res) => {
@@ -20,18 +21,28 @@ const googleLogin = async (req, res) => {
 
 // Thêm sân lớn mới
 const addLargeField = async (req, res) => {
-    const { name, address, phoneNumber, otherInfo, images, operatingHours } = req.body;
+    const { name, address, otherInfo, images, operatingHours } = req.body;
     const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     try {
+        // Lấy thông tin người dùng từ Firebase
+        const userSnapshot = await admin.database().ref(`users/${ownerId}`).once('value');
+        if (!userSnapshot.exists()) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+        const userData = userSnapshot.val();
+        const ownerName = userData.fullName || 'Không rõ'; // Lấy tên chủ sân từ thông tin người dùng
+        const ownerPhone = userData.phoneNumber || 'Không có'; // Lấy số điện thoại chủ sân từ thông tin người dùng
+
         const largeFieldData = {
             name,
             address,
-            phoneNumber,
             otherInfo,
             images: images || [], // Sử dụng danh sách ảnh
             operatingHours,
-            ownerId
+            ownerId,
+            ownerName, // Thêm tên chủ sân
+            ownerPhone  // Thêm số điện thoại chủ sân
         };
 
         const newLargeField = await Field.createLargeField(largeFieldData);
@@ -46,14 +57,32 @@ const addLargeField = async (req, res) => {
 const addSmallField = async (req, res) => {
     const { largeFieldId } = req.params;
     const { name, type, price, images, description } = req.body;
-
-    // Kiểm tra loại sân hợp lệ
-    const validTypes = ['5 người', '7 người', '11 người'];
-    if (!validTypes.includes(type)) {
-        return res.status(400).json({ message: 'Loại sân không hợp lệ. Vui lòng chọn từ 5 người, 7 người, hoặc 11 người.' });
-    }
+    const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     try {
+        // Lấy thông tin người dùng từ Firebase
+        const userSnapshot = await admin.database().ref(`users/${ownerId}`).once('value');
+        if (!userSnapshot.exists()) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+        const userData = userSnapshot.val();
+        const ownerName = userData.fullName || 'Không rõ'; // Lấy tên chủ sân từ thông tin người dùng
+        const ownerPhone = userData.phoneNumber || 'Không có'; // Lấy số điện thoại chủ sân từ thông tin người dùng
+
+        // Lấy thông tin sân lớn từ Firebase
+        const largeFieldSnapshot = await admin.database().ref(`largeFields/${largeFieldId}`).once('value');
+        if (!largeFieldSnapshot.exists()) {
+            return res.status(404).json({ message: 'Sân lớn không tồn tại' });
+        }
+        const largeFieldData = largeFieldSnapshot.val();
+        const largeFieldAddress = largeFieldData.address; // Lấy địa chỉ sân lớn
+
+        // Kiểm tra loại sân hợp lệ
+        const validTypes = ['5 người', '7 người', '11 người'];
+        if (!validTypes.includes(type)) {
+            return res.status(400).json({ message: 'Loại sân không hợp lệ. Vui lòng chọn từ 5 người, 7 người, hoặc 11 người.' });
+        }
+
         const smallFieldData = {
             name,
             type,
@@ -61,7 +90,10 @@ const addSmallField = async (req, res) => {
             images: images || [], // Sử dụng danh sách ảnh
             description,
             isAvailable: true,
-            bookingSlots: {}
+            bookingSlots: {},
+            ownerName, // Thêm tên chủ sân
+            ownerPhone, // Thêm số điện thoại chủ sân
+            largeFieldAddress // Thêm địa chỉ sân lớn
         };
 
         const newSmallField = await Field.createSmallField(largeFieldId, smallFieldData);
@@ -92,18 +124,35 @@ const updateLargeField = async (req, res) => {
 const updateSmallField = async (req, res) => {
     const { largeFieldId, smallFieldId } = req.params;
     const data = req.body;
-
-    // Kiểm tra loại sân hợp lệ nếu có
-    if (data.type) {
-        const validTypes = ['5 người', '7 người', '11 người'];
-        if (!validTypes.includes(data.type)) {
-            return res.status(400).json({ message: 'Loại sân không hợp lệ. Vui lòng chọn từ 5 người, 7 người, hoặc 11 người.' });
-        }
-    }
+    const ownerId = req.user.uid; // Lấy ownerId từ thông tin người dùng đã xác thực
 
     try {
+        // Lấy thông tin người dùng từ Firebase
+        const userSnapshot = await admin.database().ref(`users/${ownerId}`).once('value');
+        if (!userSnapshot.exists()) {
+            return res.status(404).json({ message: 'Người dùng không tồn tại' });
+        }
+        const userData = userSnapshot.val();
+        const ownerName = userData.fullName || 'Không rõ'; // Lấy tên chủ sân từ thông tin người dùng
+        const ownerPhone = userData.phoneNumber || 'Không có'; // Lấy số điện thoại chủ sân từ thông tin người dùng
+
+        // Lấy thông tin sân nhỏ hiện tại
+        const smallFieldSnapshot = await admin.database().ref(`largeFields/${largeFieldId}/smallFields/${smallFieldId}`).once('value');
+        if (!smallFieldSnapshot.exists()) {
+            return res.status(404).json({ message: 'Sân nhỏ không tồn tại' });
+        }
+        const smallFieldData = smallFieldSnapshot.val();
+
+        // Cập nhật thông tin sân nhỏ với dữ liệu mới và thông tin chủ sân
+        const updatedSmallFieldData = {
+            ...smallFieldData,
+            ...data,
+            ownerName, // Cập nhật tên chủ sân
+            ownerPhone // Cập nhật số điện thoại chủ sân
+        };
+
         // Cập nhật thông tin sân nhỏ
-        await Field.updateSmallField(largeFieldId, smallFieldId, data);
+        await Field.updateSmallField(largeFieldId, smallFieldId, updatedSmallFieldData);
         const updatedField = await Field.getSmallFieldById(largeFieldId, smallFieldId); // Lấy thông tin sân sau khi cập nhật
         res.status(200).json({ message: 'Cập nhật sân nhỏ thành công', smallField: updatedField });
     } catch (error) {

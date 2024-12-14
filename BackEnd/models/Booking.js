@@ -117,8 +117,15 @@ class Booking {
     
     
     
-    // Xác nhận booking
-    static async confirmBooking(bookingId) {
+   // Xác nhận booking
+   static async confirmBooking(bookingId) {
+    try {
+        // Kiểm tra xem bookingId có hợp lệ không
+        if (!bookingId) {
+            throw new Error('Booking ID is missing');
+        }
+
+        // Truy vấn Firebase để lấy thông tin booking
         const bookingRef = admin.database().ref(`bookings/${bookingId}`);
         const snapshot = await bookingRef.once('value');
         const booking = snapshot.val();
@@ -127,23 +134,34 @@ class Booking {
             throw new Error('Booking not found');
         }
 
+        // Kiểm tra trạng thái booking trước khi xác nhận
         if (booking.status !== '0') {
             throw new Error('Booking already confirmed or rejected');
         }
 
         // Cập nhật trạng thái booking thành 'confirmed'
         await bookingRef.update({
-            status: '1',//xác nhận
+            status: '1', // xác nhận
             confirmedAt: new Date().toISOString(), // Thời gian xác nhận
         });
 
-    
-
+        // Trả về thông tin booking đã cập nhật
         return { ...booking, status: 'confirmed' };
+    } catch (error) {
+        console.error('Error confirming booking:', error);
+        throw new Error(error.message);
     }
+}
 
-    // Từ chối booking (Chỉ được từ chối khi trạng thái là 'pending')
-    static async rejectBooking(bookingId) {
+// Từ chối booking (Chỉ được từ chối khi trạng thái là 'pending')
+static async rejectBooking(bookingId) {
+    try {
+        // Kiểm tra xem bookingId có hợp lệ không
+        if (!bookingId) {
+            throw new Error('Booking ID is missing');
+        }
+
+        // Truy vấn Firebase để lấy thông tin booking
         const bookingRef = admin.database().ref(`bookings/${bookingId}`);
         const snapshot = await bookingRef.once('value');
         const booking = snapshot.val();
@@ -152,19 +170,24 @@ class Booking {
             throw new Error('Booking not found');
         }
 
+        // Kiểm tra trạng thái booking trước khi từ chối
         if (booking.status !== '0') {
             throw new Error('Booking already confirmed or rejected');
         }
 
         // Cập nhật trạng thái booking thành 'rejected'
         await bookingRef.update({
-            status: '2',//từ chối
+            status: '2', // từ chối
             rejectedAt: new Date().toISOString(), // Thời gian từ chối
         });
 
-
+        // Trả về thông tin booking đã cập nhật
         return { ...booking, status: 'rejected' };
+    } catch (error) {
+        console.error('Error rejecting booking:', error);
+        throw new Error(error.message);
     }
+}
 
     // Xóa booking (Chỉ có thể xóa nếu booking đã được xác nhận)
     static async deleteBooking(bookingId) {
