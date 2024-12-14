@@ -63,7 +63,7 @@ const Item = ({ field, match }) => {
             <div className="col-4 border-end border-black">
               {field.image && (
                 <img
-                  src={field.image}
+                  src={field.image || 'https://www.tinhphuqui.vn/uploads/supply/2023/10/24/14.jpg'}
                   alt={field.name}
                   className={style.br50 + " img-fluid h-100 w-100"}
                   style={{ objectFit: "cover", borderRadius: "49px" }}
