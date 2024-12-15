@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const FieldBooked = () => {
-    const { largeFieldId, smallFieldId } = useParams(); // Lấy ID sân lớn và sân nhỏ từ URL
+    const location = useLocation();  // Nhận dữ liệu từ state
     const navigate = useNavigate();
+
+    const { field } = location.state || {};  // Lấy field từ state
 
     const [userId, setUserId] = useState('');
     const [token, setToken] = useState('');
+    const [largeFieldId, setLargeFieldId] = useState('');
+    const [smallFieldId, setSmallFieldId] = useState('');
 
     const [bookingDetails, setBookingDetails] = useState({
         date: '',
@@ -21,7 +25,6 @@ const FieldBooked = () => {
     const [availableSlots, setAvailableSlots] = useState([]);
     const [showModal, setShowModal] = useState(false);
 
-    // Kiểm tra và lấy dữ liệu từ localStorage
     useEffect(() => {
         const storedUserId = localStorage.getItem('userId');
         const storedToken = localStorage.getItem('token');
@@ -35,12 +38,14 @@ const FieldBooked = () => {
         setUserId(storedUserId);
         setToken(storedToken);
 
-        if (!largeFieldId) {
-            setError('Dữ liệu sân lớn không khả dụng. Vui lòng thử lại.');
+        if (!field) {
+            setError('Dữ liệu sân không khả dụng. Vui lòng thử lại.');
         }
-    }, [navigate, largeFieldId]);
 
-    // Cập nhật giá trị khi người dùng nhập liệu
+        setLargeFieldId(field?.largeFieldId || '');
+        setSmallFieldId(field?.smallFieldId || '');
+    }, [navigate, field]);
+
     const handleBookingChange = (key, value) => {
         setBookingDetails((prev) => ({
             ...prev,
@@ -48,11 +53,9 @@ const FieldBooked = () => {
         }));
     };
 
-    // Xử lý đặt sân
     const handleBookField = async (selectedSlot = null) => {
-        // Kiểm tra nếu thiếu ID sân lớn hoặc người dùng
-        if (!largeFieldId) {
-            setError('Thiếu ID sân lớn. Vui lòng thử lại.');
+        if (!field?.id) {
+            setError('Thiếu ID sân. Vui lòng thử lại.');
             return;
         }
         if (!userId) {
@@ -68,7 +71,6 @@ const FieldBooked = () => {
               }
             : bookingDetails;
 
-        // Kiểm tra thông tin nhập vào
         if (!details.date || !details.startTime || !details.endTime) {
             const missingFields = [];
             if (!details.date) missingFields.push("Ngày");
@@ -85,18 +87,19 @@ const FieldBooked = () => {
             await axios.post(
                 `http://localhost:5000/api/player/book-field`,
                 {
-                    largeFieldId, // ID sân lớn được lấy tự động từ URL
-                    smallFieldId: smallFieldId || null, // ID sân nhỏ (nếu có)
-                    userId, // ID người dùng từ localStorage
-                    date: details.date, // Người dùng nhập
-                    startTime: details.startTime, // Người dùng nhập
-                    endTime: details.endTime, // Người dùng nhập
-                    numberOfPeople: details.numberOfPeople, // Người dùng nhập
-                    status: '0', // Đang chờ xác nhận
+                    fieldId: field.id,
+                    largeFieldId,
+                    smallFieldId: smallFieldId || null,
+                    userId,
+                    date: details.date,
+                    startTime: details.startTime,
+                    endTime: details.endTime,
+                    numberOfPeople: details.numberOfPeople,
+                    status: '0',
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Đặt sân thành công!');
+            alert('Đã gửi yêu cầu đặt sân thành công!');
             navigate('/player-page');
         } catch (error) {
             console.error('Lỗi đặt sân:', error);
@@ -105,7 +108,13 @@ const FieldBooked = () => {
                 const { message, availableSlots } = error.response.data;
                 setError(message);
                 setAvailableSlots(availableSlots || []);
-                setShowModal(true);
+                setShowModal(true);  // Show modal with available slots
+            } else if (error.response && error.response.status === 409) {
+                // Handle time conflict
+                const { availableSlots } = error.response.data;
+                setError('Lịch đặt trùng với một lịch đã có. Vui lòng chọn lại khung giờ.');
+                setAvailableSlots(availableSlots || []); // Show available time slots
+                setShowModal(true);  // Show modal with available slots
             } else {
                 setError('Có lỗi xảy ra khi đặt sân.');
             }
@@ -121,8 +130,7 @@ const FieldBooked = () => {
     return (
         <div style={{ padding: '20px', margin: 'auto', maxWidth: '400px' }}>
             <h3>Đặt Sân</h3>
-            <p>Sân lớn: {largeFieldId || 'Không xác định'}</p>
-            {smallFieldId && <p>Sân nhỏ: {smallFieldId}</p>}
+            <p>Sân: {field?.name || 'Không xác định'}</p>
 
             <label>Ngày:</label>
             <input
@@ -175,7 +183,6 @@ const FieldBooked = () => {
 
             {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
 
-            {/* Modal hiển thị khung giờ còn trống */}
             {showModal && (
                 <div
                     style={{
