@@ -57,40 +57,53 @@ const Item = ({ field, match }) => {
 
   if (field) {
     return (
-      <div>
-        <div className={style.br50 + " border border-black h-50 w-100"}>
-          <div className="row h-100">
-            <div className="col-4 border-end border-black">
-              {field.image && (
-                <img
-                  src={field.image || 'https://www.tinhphuqui.vn/uploads/supply/2023/10/24/14.jpg'}
-                  alt={field.name}
-                  className={style.br50 + " img-fluid h-100 w-100"}
-                  style={{ objectFit: "cover", borderRadius: "49px" }}
-                />
-              )}
-            </div>
-            <div className="col">
-              <div className="row d-flex flex-row-reverse">
-                <div className="p-3">
-                  <Button variant="success" onClick={handleBookingClick}>
-                    Booking
-                  </Button>
-                </div>
-                <h3>{field.name}</h3>
-                <p>Chủ sân: {ownerName || "Đang tải..."}</p>
-                <p>Số điện thoại: {ownerPhone || "Đang tải..."}</p>
-                <p>Địa chỉ: {field.largeFieldAddress}</p>
-                <p>Ghi chú: {field.description}</p>
-                <p>Đánh giá: {field.rating}</p>
-              </div>
+<StyledCard className="mt-4 mx-3 border-primary"
+        sx={{
+          width: 600,
+          height: 300
+        }}
+      >
+        <CardActionArea
+          sx={{
+            width: 300,
+            height: 300
+          }}
+        >
+          <CardMedia
+            component="img"
+            sx={{
+              width: 300,
+              height: 300,
+              borderRadius: '16px',
+              border: '0.1px solid #ccc',
+            }}
+            image={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'}
+            alt="green iguana"
+          />
+        </CardActionArea>
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, p: 5 }}>
+          <Typography variant="h5" component="div">
+            {field.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Địa chỉ: {field.largeFieldAddress}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Thời gian: {field.time}
+          </Typography>
+          <Typography variant="body2" color="success" fontSize={24}>
+            Giá: 200k/h
+          </Typography>
+          <div>
 
-
-            </div>
           </div>
-        </div>
-        <hr className={style.hr} />
-      </div>
+          <Box sx={{ mt: 2 }}>
+            <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleBookingClick}>
+              Đặt sân
+            </Button>
+          </Box>
+        </CardContent>
+      </StyledCard>
     );
   }
 

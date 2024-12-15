@@ -136,11 +136,11 @@ const Home = () => {
           ) : errorFields ? (
             <p style={{ color: "red" }} className="text-center">{errorFields}</p>
           ) : fields.length > 0 ? (
-            <ul>
+            <div className="d-flex flex-wrap justify-content-center">
               {fields.map((field) => (
                 <Item key={field.fieldId} field={field} />
               ))}
-            </ul>
+            </div>
           ) : (
             <p className="text-center">Không tìm thấy sân nào.</p>
           )}
@@ -158,7 +158,7 @@ const Home = () => {
             }}
           >
 
-            <Typography variant="h2" component="h2" color="white">
+            <Typography variant="h2" component="h2" color="white" className="mt-4">
               Danh sách trận đấu mở
             </Typography>
           </Paper>
