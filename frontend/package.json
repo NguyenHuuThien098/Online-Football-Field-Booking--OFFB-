@@ -23,6 +23,7 @@
     "compressorjs": "^1.2.1",
     "dotenv": "^16.4.5",
     "firebase": "^10.13.1",
+    "node-sass": "^9.0.0",
     "nth-check": "^2.1.1",
     "postcss": "^8.4.47",
     "react": "^18.3.1",

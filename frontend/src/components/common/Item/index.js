@@ -3,8 +3,9 @@ import style from "./Item.module.scss";
 import { useNavigate } from "react-router-dom";
 import { Box, Card, CardContent, CardMedia, Typography, Button, CardActionArea } from '@mui/material';
 import { getDatabase, ref, get } from "firebase/database"; // Import Firebase functions
-import { Col } from "react-bootstrap";
 import { styled } from '@mui/material/styles';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -18,10 +19,12 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 
+
 const Item = ({ field, match }) => {
   const [ownerName, setOwnerName] = useState(null); // State để lưu tên chủ sân
   const [ownerPhone, setOwnerPhone] = useState(null); // State để lưu số điện thoại
   const navigate = useNavigate();
+
 
   useEffect(() => {
     if (field?.ownerId) {
@@ -55,48 +58,80 @@ const Item = ({ field, match }) => {
     }
   };
 
+  const availableTimeSlots = () => {
+    const today = new Date().toISOString().slice(0, 10); // Get today's date
+    const availableSlots = [];
+
+    for (const date in field.bookingSlots) {
+      if (date >= today && field.bookingSlots[date]["15:00-16:00"]) {
+        availableSlots.push(date);
+      }
+    }
+
+    if (availableSlots.length > 0) {
+      return (
+        <div>
+          <Typography variant="h6" color="primary">
+            Available on:
+          </Typography>
+          <div sx={{ display: 'flex', flexWrap: 'wrap' }}>
+            {availableSlots.map((date) => (
+              <Chip key={date} label={date} sx={{ marginRight: 1 }} />
+            ))}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <Typography variant="h6" color="#f44336">
+          Currently unavailable
+        </Typography>
+      );
+    }
+  };
+
   if (field) {
     return (
-<StyledCard className="mt-4 mx-3 border-primary"
-        sx={{
-          width: 600,
-          height: 300
-        }}
+      <StyledCard className={`mt-4 mx-3 border-primary `}
+        sx={{ width: 600, height: 300 }}
       >
-        <CardActionArea
-          sx={{
-            width: 300,
-            height: 300
-          }}
-        >
+        <CardActionArea sx={{ width: 300, height: 300 }}>
           <CardMedia
             component="img"
-            sx={{
-              width: 300,
-              height: 300,
-              borderRadius: '16px',
-              border: '0.1px solid #ccc',
-            }}
-            image={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'}
-            alt="green iguana"
+            sx={{ width: 300, height: 300, borderRadius: '16px', border: '0.1px solid #ccc' }}
+            image={field.images || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'}
+            alt="Football field"
           />
         </CardActionArea>
-        <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, p: 5 }}>
+        <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, px: 5, py: 2 }}>
           <Typography variant="h5" component="div">
             {field.name}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Địa chỉ: {field.largeFieldAddress}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Thời gian: {field.time}
-          </Typography>
-          <Typography variant="body2" color="success" fontSize={24}>
-            Giá: 200k/h
-          </Typography>
-          <div>
-
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems:"center"}}>
+            <Typography variant="body2" color="text.secondary">
+              Địa chỉ: {field.largeFieldAddress}
+            </Typography>
+            <Chip label={field.type}
+              className="text-secondary my-2"
+              sx={{
+                backgroundColor: '#FCE0D3',
+                fontSize: '13px',
+                width: '70px',
+                height: '20px',
+              }}
+            />
           </div>
+
+          <Typography variant="body2">
+            {availableTimeSlots()}
+          </Typography>
+
+          {/* <Typography variant="body2" color="text.secondary">
+            Mô tả: {field.description}
+          </Typography> */}
+          <Typography variant="body2" color="success" fontSize={24}>
+            Giá: {field.price}k/h
+          </Typography>
           <Box sx={{ mt: 2 }}>
             <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleBookingClick}>
               Đặt sân
@@ -110,10 +145,10 @@ const Item = ({ field, match }) => {
   if (match) {
     return (
       <StyledCard className="mt-4 mx-3 border-primary"
-      sx={{
-        width: 600,
-        height: 300
-      }}
+        sx={{
+          width: 600,
+          height: 300
+        }}
       >
         <CardActionArea
           sx={{

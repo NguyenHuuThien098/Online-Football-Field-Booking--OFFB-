@@ -50,6 +50,7 @@ const Home = () => {
     try {
       const response = await axios.get("http://localhost:5000/api/guest/fields");
       setFields(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching default fields:", error);
       setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");

@@ -1,3 +1,4 @@
+import React from 'react';
 import logo from "../../../img/iconTraiBanh.png";
 import avatar from "../../../img/avatar.png";
 import style from "./Header.module.scss";
