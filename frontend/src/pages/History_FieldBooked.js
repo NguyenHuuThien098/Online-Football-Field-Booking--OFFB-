@@ -86,11 +86,12 @@ const History_FieldBooked = () => {
                             const largeField = largeFieldsData[booking.largeFieldId] || {};
                             const userInfo = usersData[booking.userId] || {};
     
-                            const fieldName = smallField.name || largeField.name || 'Tên sân chưa lấy được';
-    
+                            const fieldNamelarg  = smallField.name || largeField.name || 'Tên sân chưa lấy được';
+                            const fieldNamesmall = smallField.largeFieldName ;             
                             return {
                                 bookingId: key,
-                                fieldName: fieldName,
+                                fieldNamelarg: fieldNamelarg,
+                                fieldNamesmall: fieldNamesmall,
                                 location: smallField.largeFieldAddress || largeField.address || 'Địa chỉ không có',
                                 date: booking.date,
                                 startTime: booking.startTime,
@@ -199,7 +200,7 @@ const History_FieldBooked = () => {
     return (
         <MainLayout>
             <div className="container mt-5">
-                <h1 className="text-center mb-4">{isOwner ? 'Yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</h1>
+                <h1 className="text-center mb-4">{isOwner ? 'Quản lý yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</h1>
                 {error && (
                     <div className="alert alert-danger" role="alert">
                         {error}
@@ -228,7 +229,8 @@ const History_FieldBooked = () => {
                             <table className="table table-striped table-bordered table-hover">
                                 <thead className="thead-dark">
                                     <tr>
-                                        <th scope="col">Tên sân</th>
+                                        <th scope="col">Sân lớn</th>
+                                        <th scope="col">Tên sân nhỏ</th>
                                         <th scope="col">Địa chỉ</th>
                                         <th scope="col">Ngày</th>
                                         <th scope="col">Giờ</th>
@@ -243,7 +245,8 @@ const History_FieldBooked = () => {
                                     {filteredBookings.length > 0 ? (
                                         filteredBookings.map((booking) => (
                                             <tr key={booking.bookingId}>
-                                                <td>{booking.fieldName}</td>
+                                                <td>{booking.fieldNamelarg}</td>
+                                                <td> {booking.fieldNamesmall}</td>
                                                 <td>{booking.location}</td>
                                                 <td>{booking.date}</td>
                                                 <td>{`${booking.startTime} - ${booking.endTime}`}</td>
@@ -251,8 +254,8 @@ const History_FieldBooked = () => {
                                                 <td>{booking.playerName}</td>
                                                 <td>{booking.phoneNumber}</td>
                                                 <td>
-                                                    {booking.status === '0' ? 'Chờ xác nhận' :
-                                                     booking.status === '1' ? 'Đã xác nhận' : 'Đã hủy'}
+                                                    {booking.status === '0' ? 'Chờ chủ sân xác nhận' :
+                                                     booking.status === '1' ? 'Chủ sân đã xác nhận yêu cầu' : 'Chủ sân từ đã từ chối yêu cầu'}
                                                 </td>
                                                 <td>
                                                     {booking.status === '0' && isOwner ? (

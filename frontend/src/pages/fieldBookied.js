@@ -63,13 +63,15 @@ const FieldBooked = () => {
             return;
         }
 
-        const details = selectedSlot
-            ? {
+        const details = selectedSlot ? {
                   ...bookingDetails,
                   startTime: selectedSlot.split('-')[0],
                   endTime: selectedSlot.split('-')[1],
               }
             : bookingDetails;
+
+        // console.log(details);
+        // return;
 
         if (!details.date || !details.startTime || !details.endTime) {
             const missingFields = [];
@@ -87,9 +89,9 @@ const FieldBooked = () => {
             await axios.post(
                 `http://localhost:5000/api/player/book-field`,
                 {
-                    fieldId: field.id,
+                    smallFieldId: field.id,
                     largeFieldId,
-                    smallFieldId: smallFieldId || null,
+                    // smallFieldId: smallFieldId || null,
                     userId,
                     date: details.date,
                     startTime: details.startTime,
@@ -220,6 +222,7 @@ const FieldBooked = () => {
                                         background: '#f0f0f0',
                                         cursor: 'pointer',
                                     }}
+                                    disabled={isLoading}
                                     onClick={() => handleBookField(slot)}
                                 >
                                     {slot}
