@@ -3,7 +3,7 @@ import { signInWithGoogle, database } from '../firebase';
 import { ref, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+// import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import Login from '../components/Login';
 const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
