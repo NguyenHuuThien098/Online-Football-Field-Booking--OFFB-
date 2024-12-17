@@ -26,9 +26,9 @@ const Card = styled.div`
     transition: all 0.3s ease;
 
     &:hover {
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4); /* Đổ bóng đậm hơn khi hover */
-        border: 2px solid #6a5acd; /* Màu khung khi hover */
-        transform: translateY(-5px); /* Khung nổi lên */
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.4);
+        border: 2px solid #6a5acd;
+        transform: translateY(-5px);
     }
 `;
 
@@ -78,7 +78,7 @@ const SubmitButton = styled.button`
 
     &:hover {
         background-color: #0056b3;
-        transform: scale(1.05); /* Phóng to nhẹ khi hover */
+        transform: scale(1.05);
     }
 `;
 
@@ -104,6 +104,21 @@ const UpdateButton = styled.button`
     &:hover {
         background-color: #218838;
         transform: scale(1.05);
+    }
+`;
+
+const CancelButton = styled.button`
+    background: none;
+    border: none;
+    color: #dc3545;
+    font-size: 1.2rem;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    &:hover {
+        color: #c82333;
     }
 `;
 
@@ -192,6 +207,11 @@ const UserProfile = () => {
         }
     };
 
+    const handleCancel = () => {
+        setIsNewUser(false); // Hide the update form and return to info view
+        setMessage(''); // Reset any messages
+    };
+
     return (
         <MainLayout>
             <ProfileContainer>
@@ -204,6 +224,7 @@ const UserProfile = () => {
                     {message && <p style={{ color: "green" }}>{message}</p>}
                     {isNewUser ? (
                         <>
+                            <CancelButton onClick={handleCancel}>X</CancelButton>
                             <WelcomeMessage>Chào mừng bạn, vui lòng cập nhật thông tin!</WelcomeMessage>
                             <FormContainer onSubmit={handleSubmit}>
                                 <FormField>
@@ -211,9 +232,27 @@ const UserProfile = () => {
                                     <Input type="text" name="fullName" value={userData.fullName} onChange={handleChange} required />
                                 </FormField>
                                 <FormField>
-                                    <Label>Số điện thoại</Label>
-                                    <Input type="text" name="phoneNumber" value={userData.phoneNumber} onChange={handleChange} required />
-                                </FormField>
+    <Label>Số điện thoại</Label>
+    <Input
+        type="text"
+        name="phoneNumber"
+        value={userData.phoneNumber}
+        onChange={handleChange}
+        required
+        pattern="^\d{10}$"
+        title="Số điện thoại phải gồm 10 chữ số"
+        inputMode="numeric"  // Chỉ cho phép nhập số
+        maxLength="10" // Giới hạn số ký tự là 10
+        onInvalid={(e) => e.target.setCustomValidity('Số điện thoại phải là dãy 10 chữ số')}
+        onInput={(e) => {
+            // Xóa thông báo lỗi khi nhập hợp lệ
+            e.target.setCustomValidity('');
+            // Chỉ cho phép nhập các ký tự số
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');  // Loại bỏ ký tự không phải số
+        }}
+    />
+</FormField>
+
                                 <FormField>
                                     <Label>Ngày sinh</Label>
                                     <Input type="date" name="birthDate" value={userData.birthDate} onChange={handleChange} required />
