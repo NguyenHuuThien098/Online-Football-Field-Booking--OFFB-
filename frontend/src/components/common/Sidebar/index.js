@@ -1,51 +1,88 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Collapse } from 'react-bootstrap';
+import { Link, useLocation } from 'react-router-dom';
 import style from "./Sidebar.module.scss";
-
-
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
- 
   const styles = {
     link: {
       textDecoration: 'none',
       padding: '10px 15px',
-      color: '#000',  
+      color: '#000',
+    },
+    activeLink: {
+      textDecoration: 'none',
+      padding: '10px 15px',
+      color: '#fff',
+      backgroundColor: '#007bff',
+      borderBottom: '5px solid #007bff',
+      transition: 'all 0.3s ease',
     },
     accordionHeader: {
-      fontWeight: 'bold', 
+      fontWeight: 'bold',
     },
   };
-  
-  const role = localStorage.getItem('role'); 
 
-  
+  const role = localStorage.getItem('role');
   const availableFieldLink = role === 'player' ? '/player-page' : '/field-owner-dashboard';
 
   return (
     <nav className="nav flex-column">
-      {/* <a className="btn" href={availableFieldLink} style={styles.link}> */}
-      <a className="btn" href={'/'} style={styles.link}>
+      <Link
+        className="btn"
+        to="/"
+        style={location.pathname === '/' ? styles.activeLink : styles.link}
+      >
         Available Field
-      </a>
-      <a className="btn" style={styles.link}>Open Match</a>
+      </Link>
+      <Link
+        className="btn"
+        to="/"
+        style={location.pathname === '/home' ? styles.activeLink : styles.link}
+      >
+        Open Match
+      </Link>
       <hr />
-      <a className="btn" href="Personal">Personal</a>
-      <a className="btn" onClick={() => setIsOpen(!isOpen)}>
+      <Link
+        className="btn"
+        to="/personal"
+        style={location.pathname === '/personal' ? styles.activeLink : styles.link}
+      >
+        Personal
+      </Link>
+      <button className="btn" onClick={() => setIsOpen(!isOpen)}>
         History
-      </a>
+      </button>
       <Collapse in={isOpen}>
         <div>
           <div className="nav flex-column">
-            <a className="btn" href="History_FieldBooked">Field booked</a>
-            <a className="btn" href="History_Matchjoined">Match joined</a>
+            <Link
+              className="btn"
+              to="/History_FieldBooked"
+              style={location.pathname === '/History_FieldBooked' ? styles.activeLink : styles.link}
+            >
+              Field booked
+            </Link>
+            <Link
+              className="btn"
+              to="/History_MatchJoined"
+              style={location.pathname === '/History_MatchJoined' ? styles.activeLink : styles.link}
+            >
+              Match joined
+            </Link>
           </div>
         </div>
       </Collapse>
-      <a className="btn" href='/field-owner-dashboard'>Field managerment</a>
+      <Link
+        className="btn"
+        to="/field-owner-dashboard"
+        style={location.pathname === '/field-owner-dashboard' ? styles.activeLink : styles.link}
+      >
+        Field management
+      </Link>
     </nav>
   );
 };

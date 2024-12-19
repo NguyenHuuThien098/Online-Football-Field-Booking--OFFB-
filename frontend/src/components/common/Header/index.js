@@ -53,7 +53,7 @@ const Header = () => {
                 <div className="row d-flex justify-content-evenly">
                     <div className="col"></div>
                     <div className="col"></div>
-                    <div className="col">
+                    <div className="col d-flex flex-column align-items-center justify-content-center">
                         <div name="avatar">
                             <img src={avatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" />
                         </div>
