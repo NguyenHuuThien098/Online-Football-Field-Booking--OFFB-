@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import MainLayout from "../layouts/MainLayout";
 import { Container, Button, Row, Col, ListGroup, Accordion, Form, FormGroup, FormControl, FormLabel } from 'react-bootstrap';
 
 
@@ -216,18 +215,14 @@ const FieldOwnerDashboard = () => {
 
     if (loading) {
         return (
-            <MainLayout>
                 <h1>Đang tải danh sách sân và trận đấu...</h1>
-            </MainLayout>
         );
 
     }
 
     if (error) {
         return (
-            <MainLayout>
                 <p style={{ color: 'red' }}>{error}</p>
-            </MainLayout>
         );
     }
 
@@ -235,7 +230,6 @@ const FieldOwnerDashboard = () => {
 
     return (
         <div>
-            <MainLayout role={role}>
                 <Container fluid className="p-5">
 
                     <h1>Field Owner Dashboard</h1>
@@ -403,7 +397,6 @@ const FieldOwnerDashboard = () => {
                         </Row>
                     </Container>
                 </Container>
-            </MainLayout>
         </div>
 
     );

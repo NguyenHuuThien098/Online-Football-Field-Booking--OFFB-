@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
 import axios from "axios";
 import { Container, Paper, Typography } from '@mui/material';
@@ -109,8 +108,6 @@ const PlayerPage = () => {
     }
   };
   return (
-    <MainLayout>
-      {/* Search Tool */}
       <div className="bg-light p-3">
         <Hover>
           <SearchTool
@@ -194,9 +191,6 @@ const PlayerPage = () => {
           )}
         </Container>
       </div>
-
-
-    </MainLayout>
   );
 };
 

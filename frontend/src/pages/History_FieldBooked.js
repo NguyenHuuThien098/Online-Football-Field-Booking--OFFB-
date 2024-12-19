@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "bootstrap/dist/css/bootstrap.min.css";
-import MainLayout from "../layouts/MainLayout";
 import { getDatabase, ref, get } from 'firebase/database';
 
 const History_FieldBooked = () => {
@@ -197,7 +196,6 @@ const History_FieldBooked = () => {
     });
 
     return (
-        <MainLayout>
             <div className="container mt-5">
                 <h1 className="text-center mb-4">{isOwner ? 'Yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</h1>
                 {error && (
@@ -301,7 +299,6 @@ const History_FieldBooked = () => {
                     </>
                 )}
             </div>
-        </MainLayout>
     );
 };
 

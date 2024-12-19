@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
 import Item from "../components/common/Item";
 import axios from "axios";
@@ -101,11 +100,7 @@ const Home = () => {
     }
   };
 
-  return (
-    <MainLayout>
-
-      {/* Search Tool */}
-      
+  return (      
       <div className="bg-light p-3">
         <Hover>
           <SearchTool
@@ -189,9 +184,6 @@ const Home = () => {
           )}
         </Container>
       </div>
-
-
-    </MainLayout>
   );
 };
 

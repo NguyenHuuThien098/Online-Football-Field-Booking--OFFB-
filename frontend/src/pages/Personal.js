@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import MainLayout from "../layouts/MainLayout";
 import Compressor from 'compressorjs';
 
 const UserProfile = () => {
@@ -124,7 +123,6 @@ const UserProfile = () => {
     };
 
     return (
-        <MainLayout>
             <div style={{ padding: "20px" }}>
                 <h2>Thông tin người dùng</h2>
                 {message && <p style={{ color: "green" }}>{message}</p>}
@@ -198,7 +196,6 @@ const UserProfile = () => {
                     </div>
                 )}
             </div>
-        </MainLayout>
     );
 };
 
