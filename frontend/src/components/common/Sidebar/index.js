@@ -27,7 +27,8 @@ const Sidebar = () => {
 
   return (
     <nav className="nav flex-column">
-      <a className="btn" href={availableFieldLink} style={styles.link}>
+      {/* <a className="btn" href={availableFieldLink} style={styles.link}> */}
+      <a className="btn" href={'/'} style={styles.link}>
         Available Field
       </a>
       <a className="btn" style={styles.link}>Open Match</a>

@@ -8,7 +8,7 @@ import {
 import PlayerPage from "./components/PlayerPage";
 import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
 import Register from "./components/Register";
-import Home from "./pages/homeForQuest";
+import Home from "./pages/homePage";
 import History_MatchJoined from "./pages/History_Matchjoined";
 import History_FieldBooked from "./pages/History_FieldBooked";
 import Login from "./pages/login";

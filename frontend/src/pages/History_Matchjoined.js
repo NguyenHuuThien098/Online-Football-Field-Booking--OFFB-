@@ -6,9 +6,9 @@ const History_Matchjoined = () => {
     return (
         <MainLayout>
             
-            <div class="container mt-5">
+            <div className="container mt-5">
                 <h1>Field booked</h1>
-                <table class="table table-striped table-hover">
+                <table className="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>

@@ -37,6 +37,8 @@ const Home = () => {
   const [errorFields, setErrorFields] = useState("");
   const [errorMatches, setErrorMatches] = useState("");
 
+  const role = localStorage.getItem("userRole");
+  
   useEffect(() => {
     fetchDefaultFields(); // Tải danh sách sân mặc định
     fetchMatches(); // Tải danh sách trận đấu
@@ -50,7 +52,6 @@ const Home = () => {
     try {
       const response = await axios.get("http://localhost:5000/api/guest/fields");
       setFields(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching default fields:", error);
       setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");
@@ -75,17 +76,23 @@ const Home = () => {
     }
   };
 
-  // Tìm kiếm sân
+// Tìm kiếm sân
   const searchFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
 
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/guest/search",
-        { params: searchParams }
-      );
-      setFields(response.data); // Hiển thị kết quả tìm kiếm
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorFields("Bạn cần đăng nhập để tìm kiếm.");
+        return;
+      }
+
+      const response = await axios.get("http://localhost:5000/api/guest/search", {
+        params: searchParams,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFields(response.data);
     } catch (error) {
       console.error("Error searching fields:", error);
       setErrorFields("Có lỗi xảy ra khi tìm kiếm sân.");
@@ -96,7 +103,9 @@ const Home = () => {
 
   return (
     <MainLayout>
+
       {/* Search Tool */}
+      
       <div className="bg-light p-3">
         <Hover>
           <SearchTool

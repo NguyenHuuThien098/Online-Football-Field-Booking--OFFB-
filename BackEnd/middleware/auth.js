@@ -22,9 +22,6 @@ exports.authenticateUser = async (req, res, next) => {
             console.error('User data not found in Realtime Database');
             return res.status(403).json({ error: 'Forbidden: User data not found' });
         }
-
-        console.log('User authenticated:', req.user.uid);
-        console.log('User details:', req.user); // Log thông tin người dùng
         next();
     } catch (error) {
         console.error('Error during token verification:', error.message);
@@ -43,7 +40,6 @@ exports.authorizeRole = (roles) => {
             return res.status(403).json({ error: 'Forbidden: Access denied' });
         }
 
-        console.log(`User role: ${userRole}, Allowed roles: ${roles}`); // Log vai trò người dùng và vai trò cho phép
         next();
     };
 };

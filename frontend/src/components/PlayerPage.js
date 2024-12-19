@@ -43,7 +43,6 @@ const PlayerPage = () => {
       setUserId(storedUserId);
       fetchDefaultFields(token); // Tải danh sách sân
       fetchMatches(token);
-      console.log('Token:', token); // Tải danh sách trận đấu
     } else {
       navigate("/login"); // Chuyển hướng đến trang đăng nhập nếu không có token
     }

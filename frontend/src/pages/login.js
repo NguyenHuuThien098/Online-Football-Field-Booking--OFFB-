@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { signInWithGoogle, database } from '../firebase';
 import { ref, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import Login from '../components/Login';
 const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
@@ -13,7 +11,6 @@ const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
         try {
             const user = await signInWithGoogle();
             const userId = user.uid;
-
             const token = await user.getIdToken();
             const userRef = ref(database, 'users/' + userId);
             const snapshot = await get(userRef);
@@ -27,8 +24,6 @@ const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
 
                 if (userData.role === 'field_owner') {
                     navigate('/field-owner-dashboard');
-                } else if (userData.role === 'player') {
-                    navigate('/player-page');
                 } else {
                     navigate('/');
                 }
