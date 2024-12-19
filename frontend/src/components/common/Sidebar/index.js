@@ -40,8 +40,8 @@ const Sidebar = () => {
       </Link>
       <Link
         className="btn"
-        to="/"
-        style={location.pathname === '/home' ? styles.activeLink : styles.link}
+        to="/openMatch"
+        style={location.pathname === '/openMatch' ? styles.activeLink : styles.link}
       >
         Open Match
       </Link>

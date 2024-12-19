@@ -8,7 +8,8 @@ import {
 import PlayerPage from "./components/PlayerPage";
 import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
 import Register from "./components/Register";
-import Home from "./pages/homePage";
+import AvailableField from "./pages/availableField";
+import OpenMatch from "./pages/openMatch";
 import History_MatchJoined from "./pages/History_Matchjoined";
 import History_FieldBooked from "./pages/History_FieldBooked";
 import Login from "./pages/login";
@@ -47,7 +48,18 @@ const App = () => {
           path="/"
           element={
             <MainLayout>
-              <Home
+              <AvailableField
+                setIsAuthenticated={setIsAuthenticated}
+                setUserRole={setUserRole}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/openMatch"
+          element={
+            <MainLayout>
+              <OpenMatch
                 setIsAuthenticated={setIsAuthenticated}
                 setUserRole={setUserRole}
               />
