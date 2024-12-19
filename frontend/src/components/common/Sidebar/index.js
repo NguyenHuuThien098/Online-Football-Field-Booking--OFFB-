@@ -16,8 +16,8 @@ const Sidebar = () => {
     activeLink: {
       textDecoration:  'none',
       padding: '10px 15px',
-      color: '#000', // Black text color for active links
-      backgroundColor: '#d0e7f9', // Lighter gray with more blue
+      color: '#fff',
+      backgroundColor: '#80bfff', // Lighter blue background color
       borderLeft: '20px solid #007bff',
       transition: 'all 0.3s ease',
     },

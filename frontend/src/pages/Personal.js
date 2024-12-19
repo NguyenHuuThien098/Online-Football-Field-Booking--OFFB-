@@ -24,7 +24,7 @@ const UserProfile = () => {
             const token = localStorage.getItem('token');
 
             if (!token) {
-                const confirm = window.confirm('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
+                const confirm = window.confirm('You are not logged in. Please log in to continue.');
                 if (confirm) {
                     navigate('/login');
                 }
@@ -45,8 +45,8 @@ const UserProfile = () => {
                 setUserData(response.data);
                 setIsLoading(false);
             } catch (error) {
-                console.error('Lỗi khi lấy thông tin người dùng:', error);
-                alert('Lỗi khi tải thông tin người dùng. Vui lòng thử lại.');
+                console.error('Error fetching user data:', error);
+                alert('Error loading user data. Please try again.');
                 setIsLoading(false);
             }
         };
@@ -66,13 +66,13 @@ const UserProfile = () => {
         const maxSize = 2 * 1024 * 1024; // 2MB
 
         if (file && file.size > maxSize) {
-            alert('Kích thước ảnh không được vượt quá 2MB');
+            alert('Image size must not exceed 2MB');
             return;
         }
 
         if (file) {
             new Compressor(file, {
-                quality: 0.6, // Giảm chất lượng ảnh xuống 60%
+                quality: 0.6, // Reduce image quality to 60%
                 success: (compressedFile) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
@@ -97,12 +97,12 @@ const UserProfile = () => {
         const birthDate = new Date(userData.birthDate);
 
         if (birthDate > currentDate) {
-            alert('Ngày sinh không thể lớn hơn ngày hiện tại.');
+            alert('Birth date cannot be later than the current date.');
             return;
         }
 
         if (!/^[0-9]{10,15}$/.test(userData.phoneNumber)) {
-            alert('Số điện thoại không hợp lệ');
+            alert('Invalid phone number');
             return;
         }
 
@@ -118,38 +118,50 @@ const UserProfile = () => {
             setMessage(response.data.message);
             setIsNewUser(false);
         } catch (error) {
-            console.error('Lỗi khi cập nhật thông tin:', error);
-            alert('Cập nhật thông tin thất bại. Vui lòng thử lại.');
+            console.error('Error updating information:', error);
+            alert('Failed to update information. Please try again.');
+        }
+    };
+
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        return new Date(dateString).toLocaleDateString('en-GB', options);
+    };
+
+    const getRoleDisplay = (role) => {
+        switch (role) {
+            case 'field_owner':
+                return 'Field Owner';
+            case 'player':
+                return 'Player';
+            default:
+                return role;
         }
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 5 }}>
+        <div maxWidth="lg" sx={{ mt: 5 }}>
             <Card sx={{ padding: 3 }}>
-                <CardHeader title="Thông tin người dùng" sx={{ backgroundColor: 'primary.main', color: 'white', fontSize: '1.5rem' }} />
+                <CardHeader 
+                    title={
+                        <Typography variant="h3" sx={{ textAlign: 'center' }}>
+                            Personal
+                        </Typography>
+                    }
+                    sx={{ 
+                        backgroundColor: 'primary.main', 
+                        color: 'white', 
+                        textAlign: 'center' 
+                    }} 
+                />
                 <CardContent>
                     {message && <Alert severity="success" sx={{ fontSize: '1.2rem' }}>{message}</Alert>}
                     {isNewUser ? (
                         <div>
-                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.2rem' }}>Chào mừng bạn, vui lòng cập nhật thông tin của bạn!</Typography>
+                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.2rem' }}>Welcome, please update your information!</Typography>
                             <form onSubmit={handleSubmit}>
-                                {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 120, height: 120, mb: 2, mx: 'auto' }} />}
-                                <Button
-                                    variant="contained"
-                                    component="label"
-                                    fullWidth
-                                    sx={{ mb: 2, fontSize: '1.2rem' }}
-                                >
-                                    Tải ảnh lên
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        hidden
-                                        onChange={handleImageChange}
-                                    />
-                                </Button>
                                 <TextField
-                                    label="Họ và tên"
+                                    label="Full Name"
                                     name="fullName"
                                     value={userData.fullName}
                                     onChange={handleChange}
@@ -160,7 +172,7 @@ const UserProfile = () => {
                                     InputLabelProps={{ style: { fontSize: '1.2rem' } }}
                                 />
                                 <TextField
-                                    label="Số điện thoại"
+                                    label="Phone Number"
                                     name="phoneNumber"
                                     value={userData.phoneNumber}
                                     onChange={handleChange}
@@ -171,7 +183,7 @@ const UserProfile = () => {
                                     InputLabelProps={{ style: { fontSize: '1.2rem' } }}
                                 />
                                 <TextField
-                                    label="Ngày sinh"
+                                    label="Birth Date"
                                     name="birthDate"
                                     type="date"
                                     value={userData.birthDate}
@@ -183,7 +195,7 @@ const UserProfile = () => {
                                     required
                                 />
                                 <TextField
-                                    label="Địa chỉ"
+                                    label="Address"
                                     name="address"
                                     value={userData.address}
                                     onChange={handleChange}
@@ -194,72 +206,68 @@ const UserProfile = () => {
                                     InputLabelProps={{ style: { fontSize: '1.2rem' } }}
                                 />
                                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem' }}>
-                                    Cập nhật thông tin
+                                    Update Information
                                 </Button>
                             </form>
                         </div>
                     ) : (
                         <div>
                             <Typography variant="h4" gutterBottom sx={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', mb: 3, color: 'primary.main' }}>
-                                Thông tin của bạn
+                                Your Information
                             </Typography>
-                            {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 120, height: 120, mb: 2, mx: 'auto' }} />}
                             <Grid container spacing={2} alignItems="center">
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Họ và tên:</Typography>
+                                <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
+                                    {userData.image && <Avatar src={userData.image} alt="User Image" sx={{ width: 300, height: 300, mb: 2, boxShadow: 3 }} />}
                                 </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.fullName}</Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Số điện thoại:</Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.phoneNumber}</Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Ngày sinh:</Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.birthDate}</Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Địa chỉ:</Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.address}</Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Email:</Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.email}</Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Vai trò:</Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.role}</Typography>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Ảnh:</Typography>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    {userData.image ? (
-                                        <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 120, height: 120, mt: 1 }} />
-                                    ) : (
-                                        <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>Không có ảnh.</Typography>
-                                    )}
+                                <Grid item xs={8} sx={{ backgroundColor: '#f0f0f0', padding: 2 }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={4}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Full Name:</Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.fullName}</Typography>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Phone Number:</Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.phoneNumber}</Typography>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Birth Date:</Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{formatDate(userData.birthDate)}</Typography>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Address:</Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.address}</Typography>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Email:</Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.email}</Typography>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Role:</Typography>
+                                        </Grid>
+                                        <Grid item xs={8}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{getRoleDisplay(userData.role)}</Typography>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                             <Button variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem' }} onClick={() => setIsNewUser(true)}>
-                                Cập nhật thông tin
+                                Update Information
                             </Button>
                         </div>
                     )}
                 </CardContent>
             </Card>
-        </Container>
+        </div>
     );
 };
 
