@@ -90,6 +90,11 @@ const Item = ({ field, match }) => {
     }
   };
 
+  const formatDateTime = (dateTimeString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateTimeString).toLocaleDateString('en-GB', options);
+  };
+
   if (field) {
     return (
       <StyledCard className={`mt-4 mx-3 border-primary `}
@@ -121,6 +126,10 @@ const Item = ({ field, match }) => {
               }}
             />
           </div>
+
+          <Typography variant="body2" color="text.secondary">
+              Tên sân lớn: {field.largeFieldName}
+            </Typography>
 
           <Typography variant="body2">
             {availableTimeSlots()}
@@ -176,10 +185,7 @@ const Item = ({ field, match }) => {
             Địa chỉ: {match.address}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Thời gian: {match.time}
-          </Typography>
-          <Typography variant="body2" color="success" fontSize={24}>
-            Giá: 200k/h
+            Thời gian: {formatDateTime(match.time)}
           </Typography>
           <div>
 

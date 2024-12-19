@@ -141,10 +141,10 @@ const UserProfile = () => {
 
     return (
         <div maxWidth="lg" sx={{ mt: 5 }}>
-            <Card sx={{ padding: 3 }}>
+            <Card sx={{ padding: 3, fontFamily: 'Helvetica, sans-serif' }}>
                 <CardHeader 
                     title={
-                        <Typography variant="h3" sx={{ textAlign: 'center' }}>
+                        <Typography variant="h3" sx={{ textAlign: 'center', fontFamily: 'Helvetica, sans-serif' }}>
                             Personal
                         </Typography>
                     }
@@ -155,10 +155,10 @@ const UserProfile = () => {
                     }} 
                 />
                 <CardContent>
-                    {message && <Alert severity="success" sx={{ fontSize: '1.2rem' }}>{message}</Alert>}
+                    {message && <Alert severity="success" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{message}</Alert>}
                     {isNewUser ? (
                         <div>
-                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.2rem' }}>Welcome, please update your information!</Typography>
+                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Welcome, please update your information!</Typography>
                             <form onSubmit={handleSubmit}>
                                 <TextField
                                     label="Full Name"
@@ -168,8 +168,8 @@ const UserProfile = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputProps={{ style: { fontSize: '1.2rem' } }}
-                                    InputLabelProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
                                 />
                                 <TextField
                                     label="Phone Number"
@@ -179,8 +179,8 @@ const UserProfile = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputProps={{ style: { fontSize: '1.2rem' } }}
-                                    InputLabelProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
                                 />
                                 <TextField
                                     label="Birth Date"
@@ -190,8 +190,8 @@ const UserProfile = () => {
                                     onChange={handleChange}
                                     fullWidth
                                     margin="normal"
-                                    InputLabelProps={{ shrink: true, style: { fontSize: '1.2rem' } }}
-                                    InputProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputLabelProps={{ shrink: true, style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
                                     required
                                 />
                                 <TextField
@@ -202,17 +202,17 @@ const UserProfile = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputProps={{ style: { fontSize: '1.2rem' } }}
-                                    InputLabelProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
                                 />
-                                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem' }}>
+                                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>
                                     Update Information
                                 </Button>
                             </form>
                         </div>
                     ) : (
                         <div>
-                            <Typography variant="h4" gutterBottom sx={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', mb: 3, color: 'primary.main' }}>
+                            <Typography variant="h4" gutterBottom sx={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', mb: 3, color: 'primary.main', fontFamily: 'Helvetica, sans-serif' }}>
                                 Your Information
                             </Typography>
                             <Grid container spacing={2} alignItems="center">
@@ -222,45 +222,45 @@ const UserProfile = () => {
                                 <Grid item xs={8} sx={{ backgroundColor: '#f0f0f0', padding: 2 }}>
                                     <Grid container spacing={2}>
                                         <Grid item xs={4}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Full Name:</Typography>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Full Name:</Typography>
                                         </Grid>
                                         <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.fullName}</Typography>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{userData.fullName}</Typography>
                                         </Grid>
                                         <Grid item xs={4}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Phone Number:</Typography>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Phone Number:</Typography>
                                         </Grid>
                                         <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.phoneNumber}</Typography>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{userData.phoneNumber}</Typography>
                                         </Grid>
                                         <Grid item xs={4}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Birth Date:</Typography>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Birth Date:</Typography>
                                         </Grid>
                                         <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{formatDate(userData.birthDate)}</Typography>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{formatDate(userData.birthDate)}</Typography>
                                         </Grid>
                                         <Grid item xs={4}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Address:</Typography>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Address:</Typography>
                                         </Grid>
                                         <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.address}</Typography>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{userData.address}</Typography>
                                         </Grid>
                                         <Grid item xs={4}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Email:</Typography>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Email:</Typography>
                                         </Grid>
                                         <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.email}</Typography>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{userData.email}</Typography>
                                         </Grid>
                                         <Grid item xs={4}>
-                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Role:</Typography>
+                                            <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Role:</Typography>
                                         </Grid>
                                         <Grid item xs={8}>
-                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{getRoleDisplay(userData.role)}</Typography>
+                                            <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{getRoleDisplay(userData.role)}</Typography>
                                         </Grid>
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            <Button variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem' }} onClick={() => setIsNewUser(true)}>
+                            <Button variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }} onClick={() => setIsNewUser(true)}>
                                 Update Information
                             </Button>
                         </div>
