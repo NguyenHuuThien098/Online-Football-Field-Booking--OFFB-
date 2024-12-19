@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Compressor from 'compressorjs';
+import { Container, Card, CardContent, CardHeader, TextField, Button, Typography, Grid, Avatar, Alert } from '@mui/material';
 
 const UserProfile = () => {
     const [userData, setUserData] = useState({
@@ -123,79 +124,142 @@ const UserProfile = () => {
     };
 
     return (
-            <div style={{ padding: "20px" }}>
-                <h2>Thông tin người dùng</h2>
-                {message && <p style={{ color: "green" }}>{message}</p>}
-                {isNewUser ? (
-                    <div>
-                        <p>Chào mừng bạn, vui lòng cập nhật thông tin của bạn!</p>
-                        <form onSubmit={handleSubmit}>
-                            <div>
-                                <label>Họ và tên</label>
-                                <input
-                                    type="text"
+        <Container maxWidth="lg" sx={{ mt: 5 }}>
+            <Card sx={{ padding: 4 }}>
+                <CardHeader title="Thông tin người dùng" sx={{ backgroundColor: 'primary.main', color: 'white', fontSize: '2rem' }} />
+                <CardContent>
+                    {message && <Alert severity="success" sx={{ fontSize: '1.5rem' }}>{message}</Alert>}
+                    {isNewUser ? (
+                        <div>
+                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.5rem' }}>Chào mừng bạn, vui lòng cập nhật thông tin của bạn!</Typography>
+                            <form onSubmit={handleSubmit}>
+                                {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 150, height: 150, mb: 3, mx: 'auto' }} />}
+                                <Button
+                                    variant="contained"
+                                    component="label"
+                                    fullWidth
+                                    sx={{ mb: 3, fontSize: '1.5rem' }}
+                                >
+                                    Tải ảnh lên
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        hidden
+                                        onChange={handleImageChange}
+                                    />
+                                </Button>
+                                <TextField
+                                    label="Họ và tên"
                                     name="fullName"
                                     value={userData.fullName}
                                     onChange={handleChange}
+                                    fullWidth
+                                    margin="normal"
                                     required
+                                    InputProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.5rem' } }}
                                 />
-                            </div>
-                            <div>
-                                <label>Số điện thoại</label>
-                                <input
-                                    type="text"
+                                <TextField
+                                    label="Số điện thoại"
                                     name="phoneNumber"
                                     value={userData.phoneNumber}
                                     onChange={handleChange}
+                                    fullWidth
+                                    margin="normal"
                                     required
+                                    InputProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.5rem' } }}
                                 />
-                            </div>
-                            <div>
-                                <label>Ngày sinh</label>
-                                <input
-                                    type="date"
+                                <TextField
+                                    label="Ngày sinh"
                                     name="birthDate"
+                                    type="date"
                                     value={userData.birthDate}
                                     onChange={handleChange}
+                                    fullWidth
+                                    margin="normal"
+                                    InputLabelProps={{ shrink: true, style: { fontSize: '1.5rem' } }}
+                                    InputProps={{ style: { fontSize: '1.5rem' } }}
                                     required
                                 />
-                            </div>
-                            <div>
-                                <label>Địa chỉ</label>
-                                <input
-                                    type="text"
+                                <TextField
+                                    label="Địa chỉ"
                                     name="address"
                                     value={userData.address}
                                     onChange={handleChange}
+                                    fullWidth
+                                    margin="normal"
                                     required
+                                    InputProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.5rem' } }}
                                 />
-                            </div>
-                            <div>
-                                <label>Ảnh</label>
-                                <input type="file" accept="image/*" onChange={handleImageChange} />
-                                {userData.image && <img src={userData.image} alt="Ảnh người dùng" width="100" />}
-                            </div>
-                            <button type="submit">Cập nhật thông tin</button>
-                        </form>
-                    </div>
-                ) : (
-                    <div>
-                        <p>Thông tin của bạn:</p>
-                        <p>Họ và tên: {userData.fullName}</p>
-                        <p>Số điện thoại: {userData.phoneNumber}</p>
-                        <p>Ngày sinh: {userData.birthDate}</p>
-                        <p>Địa chỉ: {userData.address}</p>
-                        <p>Email: {userData.email}</p>
-                        <p>Vai trò: {userData.role}</p>
-                        {userData.image ? (
-                            <img src={userData.image} alt="Ảnh người dùng" width="100" />
-                        ) : (
-                            <p>Không có ảnh.</p>
-                        )}
-                        <button onClick={() => setIsNewUser(true)}>Cập nhật thông tin</button>
-                    </div>
-                )}
-            </div>
+                                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: '1.5rem' }}>
+                                    Cập nhật thông tin
+                                </Button>
+                            </form>
+                        </div>
+                    ) : (
+                        <div>
+                            <Typography variant="h4" gutterBottom sx={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', mb: 4, color: 'primary.main' }}>
+                                Thông tin của bạn
+                            </Typography>
+                            {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 150, height: 150, mb: 3, mx: 'auto' }} />}
+                            <Grid container spacing={3} alignItems="center">
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Họ và tên:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.fullName}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Số điện thoại:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.phoneNumber}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Ngày sinh:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.birthDate}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Địa chỉ:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.address}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Email:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.email}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Vai trò:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.role}</Typography>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Ảnh:</Typography>
+                                </Grid>
+                                <Grid item xs={8}>
+                                    {userData.image ? (
+                                        <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 150, height: 150, mt: 2 }} />
+                                    ) : (
+                                        <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>Không có ảnh.</Typography>
+                                    )}
+                                </Grid>
+                            </Grid>
+                            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: '1.5rem' }} onClick={() => setIsNewUser(true)}>
+                                Cập nhật thông tin
+                            </Button>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </Container>
     );
 };
 

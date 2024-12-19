@@ -7,12 +7,10 @@ import {
     Routes,
     Route,
     Navigate,
-    useNavigate,
 } from "react-router-dom";
 
 const Header = () => {
     const [role, setRole] = useState('');
-    const navigate = useNavigate();
     const handleLogout = () => {
         localStorage.setItem('isAuthenticated', 'false');
         localStorage.setItem('token', '');
@@ -20,9 +18,9 @@ const Header = () => {
         localStorage.setItem('userId', '');
         window.location.reload();
     };
-    const handleLogin = () => {
-        navigate('/login');
-    };
+    // const handleLogin = () => {
+    //     Navigate('/login');
+    // };
     useEffect(() => {
         setRole(localStorage.getItem("userRole"));
     }, []);
@@ -67,7 +65,7 @@ const Header = () => {
                                 Logout
                             </button>
                         ) : (
-                            <button onClick={handleLogin} className="btn btn-primary">
+                            <button href="/" className="btn btn-primary">
                                 Login
                             </button>
                         )}
