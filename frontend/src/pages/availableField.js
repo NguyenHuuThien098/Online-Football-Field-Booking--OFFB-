@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import MainLayout from "../layouts/MainLayout";
 import SearchTool from "../components/common/SearchTool";
 import Item from "../components/common/Item";
 import axios from "axios";
@@ -22,7 +21,7 @@ const Hover = styled(Card)(({ theme }) => ({
 
 }));
 
-const Home = () => {
+const AvailableField = () => {
   const [fields, setFields] = useState([]); // Danh sách sân
   const [matches, setMatches] = useState([]); // Danh sách trận đấu
   const [searchParams, setSearchParams] = useState({
@@ -37,6 +36,8 @@ const Home = () => {
   const [errorFields, setErrorFields] = useState("");
   const [errorMatches, setErrorMatches] = useState("");
 
+  const role = localStorage.getItem("userRole");
+  
   useEffect(() => {
     fetchDefaultFields(); // Tải danh sách sân mặc định
     fetchMatches(); // Tải danh sách trận đấu
@@ -50,7 +51,6 @@ const Home = () => {
     try {
       const response = await axios.get("http://localhost:5000/api/guest/fields");
       setFields(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching default fields:", error);
       setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");
@@ -75,17 +75,23 @@ const Home = () => {
     }
   };
 
-  // Tìm kiếm sân
+// Tìm kiếm sân
   const searchFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
 
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/guest/search",
-        { params: searchParams }
-      );
-      setFields(response.data); // Hiển thị kết quả tìm kiếm
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrorFields("Bạn cần đăng nhập để tìm kiếm.");
+        return;
+      }
+
+      const response = await axios.get("http://localhost:5000/api/guest/search", {
+        params: searchParams,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFields(response.data);
     } catch (error) {
       console.error("Error searching fields:", error);
       setErrorFields("Có lỗi xảy ra khi tìm kiếm sân.");
@@ -94,9 +100,7 @@ const Home = () => {
     }
   };
 
-  return (
-    <MainLayout>
-      {/* Search Tool */}
+  return (      
       <div className="bg-light p-3">
         <Hover>
           <SearchTool
@@ -145,45 +149,9 @@ const Home = () => {
           ) : (
             <p className="text-center">Không tìm thấy sân nào.</p>
           )}
-
-          {/* Matches Section */}
-
-          <Paper
-            className="w-100"
-            elevation={3}
-            sx={{
-              borderRadius: '8px',
-              textAlign: 'center',
-              backgroundColor: '#1976d2', // Đặt màu nền tại đây
-              // border: "1px solid gray"
-            }}
-          >
-
-            <Typography variant="h2" component="h2" color="white" className="mt-4">
-              Danh sách trận đấu mở
-            </Typography>
-          </Paper>
-
-
-          {loadingMatches ? (
-            <p className="text-center">Đang tải danh sách trận đấu...</p>
-          ) : errorMatches ? (
-            <p style={{ color: "red" }} className="text-center">{errorMatches}</p>
-          ) : matches.length > 0 ? (
-            <div className="d-flex flex-wrap justify-content-center">
-              {matches.map((match) => (
-                <Item key={match.id} match={match} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-center">Không có trận đấu nào được mở.</p>
-          )}
         </Container>
       </div>
-
-
-    </MainLayout>
   );
 };
 
-export default Home;
+export default AvailableField;

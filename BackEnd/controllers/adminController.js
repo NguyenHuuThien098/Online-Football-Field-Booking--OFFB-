@@ -7,7 +7,6 @@ const googleLogin = async (req, res) => {
    
     try {
         // const user = await User.verifyGoogleToken(token);
-        console.log('User:', user); // Ghi log thông tin người dùng
 
         // Đặt vai trò cho người dùng
         await User.setUserRole(user.uid, 'admin');

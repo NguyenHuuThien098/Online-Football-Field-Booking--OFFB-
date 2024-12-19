@@ -1,14 +1,11 @@
 import React from 'react'; 
 import "bootstrap/dist/css/bootstrap.min.css";
-import MainLayout from "../layouts/MainLayout";
 
 const History_Matchjoined = () => {
-    return (
-        <MainLayout>
-            
-            <div class="container mt-5">
+    return (            
+            <div className="container mt-5">
                 <h1>Field booked</h1>
-                <table class="table table-striped table-hover">
+                <table className="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
@@ -43,7 +40,6 @@ const History_Matchjoined = () => {
                     </tbody>
                 </table>
             </div>
-        </ MainLayout>
     );
 };
 

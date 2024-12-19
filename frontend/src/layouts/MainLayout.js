@@ -11,9 +11,9 @@ const MainLayout = ({ children, role }) => {
       <div name="header">    <Header role={role} />      </div>
       
       {/* Body */}
-      <div name="body" class="row">
+      <div name="body" className="row">
         {/* Sidebar */}
-        <div name="sidebar" class="col-2 vh-100 p-0">
+        <div name="sidebar" className="col-2 vh-100 p-0">
           <Sidebar />
         </div>
 

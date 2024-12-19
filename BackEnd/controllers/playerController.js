@@ -9,7 +9,6 @@ exports.googleLogin = async (req, res) => {
     const { token } = req.body;
     try {
         const user = await User.verifyGoogleToken(token);
-        console.log('User:', user);
         await User.setUserRole(user.uid, 'player');
         res.status(200).send({ message: 'Đăng nhập thành công với tư cách Player', uid: user.uid });
     } catch (error) {
@@ -58,7 +57,6 @@ exports.bookField = async (req, res) => {
     const { largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
     try {
-        console.log("bookField request received with body:", req.body);
 
         // Lấy thông tin sân lớn và sân nhỏ (nếu có)
         const largeField = await Field.getLargeFieldById(largeFieldId);
@@ -132,7 +130,6 @@ exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;
 
     try {
-        console.log("Cancel booking request received for bookingId:", bookingId);
 
         // Lấy thông tin đặt sân từ Firebase
         const bookingRef = admin.database().ref('bookings').child(bookingId);
@@ -216,10 +213,8 @@ const getPlayerName = async (userId) => {
     try {
         const user = await User.getUserById(userId);
         if (user && user.name) {
-            console.log("Player name:", user.name);  
             return user.name;
         }
-        console.log("Player name: Player");  
         return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
     } catch (error) {
         console.error("Error fetching player name:", error);

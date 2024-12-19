@@ -3,12 +3,11 @@ import React from 'react';
 import Chart from "chart.js/auto";
 
 import { Bar } from "react-chartjs-2";
-import MainLayout from "../layouts/MainLayout";
 
 const Report = () => {
     const revernue = 500
   return (
-    <MainLayout>
+    <>
       <div className="chart-container">
         <h2 style={{ textAlign: "center" }}>Statistics and Report </h2>
         <Bar
@@ -65,7 +64,7 @@ const Report = () => {
         />
       </div>
       <h1>Total Revernue: {revernue}</h1>
-    </MainLayout>
+    </>
   );
 };
 export default Report;

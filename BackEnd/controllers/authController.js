@@ -59,7 +59,6 @@ exports.loginWithGoogle = async (req, res) => {
         const customToken = await admin.auth().createCustomToken(uid);
 
         // In ra thông tin người dùng và vai trò của họ
-        console.log(`User logged in: ${email}, Role: ${user.role}`);
 
         res.status(200).json({ message: 'Login successful', token: customToken, role: user.role });
     } catch (error) {

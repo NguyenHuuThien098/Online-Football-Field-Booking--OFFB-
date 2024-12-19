@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import SearchTool from "../components/common/SearchTool";
+import Item from "../components/common/Item";
 import axios from "axios";
-import { Container, Paper, Typography } from '@mui/material';
+import Compressor from 'compressorjs';
+import { Container, Row, Col } from 'react-bootstrap';
+import { Typography, Paper } from '@mui/material';
 import { Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
 
-import Item from "../components/common/Item";
+
+
 const Hover = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
   display: 'flex',
@@ -15,9 +18,10 @@ const Hover = styled(Card)(({ theme }) => ({
     transform: 'scale(0.99)', // Subtle hover scale effect
     boxShadow: theme.shadows[5], // Áp dụng hiệu ứng đổ bóng từ theme
   },
+
 }));
 
-const PlayerPage = () => {
+const OpenMatch = () => {
   const [fields, setFields] = useState([]); // Danh sách sân
   const [matches, setMatches] = useState([]); // Danh sách trận đấu
   const [searchParams, setSearchParams] = useState({
@@ -31,34 +35,24 @@ const PlayerPage = () => {
   const [loadingMatches, setLoadingMatches] = useState(false);
   const [errorFields, setErrorFields] = useState("");
   const [errorMatches, setErrorMatches] = useState("");
-  const [userId, setUserId] = useState("");
-  const navigate = useNavigate();
 
+  const role = localStorage.getItem("userRole");
+  
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUserId = localStorage.getItem("userId");
-
-    if (token && storedUserId) {
-      setUserId(storedUserId);
-      fetchDefaultFields(token); // Tải danh sách sân
-      fetchMatches(token);
-    } else {
-      navigate("/login"); // Chuyển hướng đến trang đăng nhập nếu không có token
-    }
-  }, [navigate]);
+    fetchDefaultFields(); // Tải danh sách sân mặc định
+    fetchMatches(); // Tải danh sách trận đấu
+  }, []);
 
   // Lấy danh sách sân mặc định
-  const fetchDefaultFields = async (token) => {
+  const fetchDefaultFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
 
     try {
-      const response = await axios.get("http://localhost:5000/api/guest/fields", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get("http://localhost:5000/api/guest/fields");
       setFields(response.data);
     } catch (error) {
-      console.error("Error fetching fields:", error);
+      console.error("Error fetching default fields:", error);
       setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");
     } finally {
       setLoadingFields(false);
@@ -66,14 +60,12 @@ const PlayerPage = () => {
   };
 
   // Lấy danh sách trận đấu
-  const fetchMatches = async (token) => {
+  const fetchMatches = async () => {
     setLoadingMatches(true);
     setErrorMatches("");
 
     try {
-      const response = await axios.get("http://localhost:5000/api/matches/all", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get("http://localhost:5000/api/matches/all");
       setMatches(response.data);
     } catch (error) {
       console.error("Error fetching matches:", error);
@@ -83,7 +75,7 @@ const PlayerPage = () => {
     }
   };
 
-  // Tìm kiếm sân
+// Tìm kiếm sân
   const searchFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
@@ -107,7 +99,8 @@ const PlayerPage = () => {
       setLoadingFields(false);
     }
   };
-  return (
+
+  return (      
       <div className="bg-light p-3">
         <Hover>
           <SearchTool
@@ -127,36 +120,6 @@ const PlayerPage = () => {
 
           }}
         >
-
-          <Paper
-            className="w-100 mt-2"
-            elevation={3}
-            sx={{
-              borderRadius: '8px',
-              textAlign: 'center',
-              backgroundColor: '#1976d2', // Đặt màu nền tại đây
-              // border: "2px solid gray"
-            }}
-          >
-            <Typography variant="h2" component="h2" color="white">
-              Danh sách sân bóng
-            </Typography>
-          </Paper>
-
-          {loadingFields ? (
-            <p className="text-center">Đang tải danh sách sân...</p>
-          ) : errorFields ? (
-            <p style={{ color: "red" }} className="text-center">{errorFields}</p>
-          ) : fields.length > 0 ? (
-            <ul>
-              {fields.map((field) => (
-                <Item key={field.fieldId} field={field} />
-              ))}
-            </ul>
-          ) : (
-            <p className="text-center">Không tìm thấy sân nào.</p>
-          )}
-
           {/* Matches Section */}
 
           <Paper
@@ -170,7 +133,7 @@ const PlayerPage = () => {
             }}
           >
 
-            <Typography variant="h2" component="h2" color="white">
+            <Typography variant="h2" component="h2" color="white" className="mt-4">
               Danh sách trận đấu mở
             </Typography>
           </Paper>
@@ -194,4 +157,4 @@ const PlayerPage = () => {
   );
 };
 
-export default PlayerPage;
+export default OpenMatch;

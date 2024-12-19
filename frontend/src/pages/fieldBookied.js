@@ -79,7 +79,6 @@ const FieldBooked = () => {
             if (!details.startTime) missingFields.push("Giờ Bắt Đầu");
             if (!details.endTime) missingFields.push("Giờ Kết Thúc");
 
-            console.log("Các trường còn thiếu:", missingFields.join(", "));
             alert('Vui lòng nhập đầy đủ ngày, giờ bắt đầu và giờ kết thúc.');
             return;
         }
