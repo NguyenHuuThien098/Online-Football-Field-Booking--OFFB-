@@ -14,15 +14,15 @@ const Sidebar = () => {
       color: '#000',
     },
     activeLink: {
-      textDecoration: 'none',
+      textDecoration:  'none',
       padding: '10px 15px',
-      color: '#fff',
-      backgroundColor: '#007bff',
-      borderBottom: '5px solid #007bff',
+      color: '#000',
+      backgroundColor: 'white',
+      borderLeft: '20px solid #007bff',
       transition: 'all 0.3s ease',
     },
     accordionHeader: {
-      fontWeight: 'bold',
+      fontWeight: 'bold', 
     },
   };
 
@@ -53,9 +53,13 @@ const Sidebar = () => {
       >
         Personal
       </Link>
-      <button className="btn" onClick={() => setIsOpen(!isOpen)}>
+      <Link 
+        className="btn" 
+        onClick={() => setIsOpen(!isOpen)}
+        style={isOpen ? styles.activeLink : styles.link}
+      >
         History
-      </button>
+      </Link>
       <Collapse in={isOpen}>
         <div>
           <div className="nav flex-column">
