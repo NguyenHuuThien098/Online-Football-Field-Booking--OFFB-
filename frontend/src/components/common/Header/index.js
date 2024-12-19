@@ -7,16 +7,21 @@ import {
     Routes,
     Route,
     Navigate,
+    useNavigate,
 } from "react-router-dom";
 
 const Header = () => {
     const [role, setRole] = useState('');
+    const navigate = useNavigate();
     const handleLogout = () => {
         localStorage.setItem('isAuthenticated', 'false');
         localStorage.setItem('token', '');
         localStorage.setItem('userRole', '');
         localStorage.setItem('userId', '');
         window.location.reload();
+    };
+    const handleLogin = () => {
+        navigate('/login');
     };
     useEffect(() => {
         setRole(localStorage.getItem("userRole"));
@@ -59,11 +64,11 @@ const Header = () => {
                         </div>
                         {role ? (
                             <button onClick={handleLogout} className="btn btn-danger">
-                                logout
+                                Logout
                             </button>
                         ) : (
-                            <button href="Login" className="btn btn-primary">
-                                login
+                            <button onClick={handleLogin} className="btn btn-primary">
+                                Login
                             </button>
                         )}
                     </div>

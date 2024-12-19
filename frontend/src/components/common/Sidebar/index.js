@@ -26,7 +26,7 @@ const Sidebar = () => {
     },
   };
 
-  const role = localStorage.getItem('role');
+  const role = localStorage.getItem('userRole');
   const availableFieldLink = role === 'player' ? '/player-page' : '/field-owner-dashboard';
 
   return (
