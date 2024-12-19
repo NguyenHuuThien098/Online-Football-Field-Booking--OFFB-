@@ -125,20 +125,20 @@ const UserProfile = () => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 5 }}>
-            <Card sx={{ padding: 4 }}>
-                <CardHeader title="Thông tin người dùng" sx={{ backgroundColor: 'primary.main', color: 'white', fontSize: '2rem' }} />
+            <Card sx={{ padding: 3 }}>
+                <CardHeader title="Thông tin người dùng" sx={{ backgroundColor: 'primary.main', color: 'white', fontSize: '1.5rem' }} />
                 <CardContent>
-                    {message && <Alert severity="success" sx={{ fontSize: '1.5rem' }}>{message}</Alert>}
+                    {message && <Alert severity="success" sx={{ fontSize: '1.2rem' }}>{message}</Alert>}
                     {isNewUser ? (
                         <div>
-                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.5rem' }}>Chào mừng bạn, vui lòng cập nhật thông tin của bạn!</Typography>
+                            <Typography variant="body1" gutterBottom sx={{ fontSize: '1.2rem' }}>Chào mừng bạn, vui lòng cập nhật thông tin của bạn!</Typography>
                             <form onSubmit={handleSubmit}>
-                                {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 150, height: 150, mb: 3, mx: 'auto' }} />}
+                                {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 120, height: 120, mb: 2, mx: 'auto' }} />}
                                 <Button
                                     variant="contained"
                                     component="label"
                                     fullWidth
-                                    sx={{ mb: 3, fontSize: '1.5rem' }}
+                                    sx={{ mb: 2, fontSize: '1.2rem' }}
                                 >
                                     Tải ảnh lên
                                     <input
@@ -156,8 +156,8 @@ const UserProfile = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputProps={{ style: { fontSize: '1.5rem' } }}
-                                    InputLabelProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Số điện thoại"
@@ -167,8 +167,8 @@ const UserProfile = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputProps={{ style: { fontSize: '1.5rem' } }}
-                                    InputLabelProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Ngày sinh"
@@ -178,8 +178,8 @@ const UserProfile = () => {
                                     onChange={handleChange}
                                     fullWidth
                                     margin="normal"
-                                    InputLabelProps={{ shrink: true, style: { fontSize: '1.5rem' } }}
-                                    InputProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputLabelProps={{ shrink: true, style: { fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem' } }}
                                     required
                                 />
                                 <TextField
@@ -190,69 +190,69 @@ const UserProfile = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputProps={{ style: { fontSize: '1.5rem' } }}
-                                    InputLabelProps={{ style: { fontSize: '1.5rem' } }}
+                                    InputProps={{ style: { fontSize: '1.2rem' } }}
+                                    InputLabelProps={{ style: { fontSize: '1.2rem' } }}
                                 />
-                                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: '1.5rem' }}>
+                                <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem' }}>
                                     Cập nhật thông tin
                                 </Button>
                             </form>
                         </div>
                     ) : (
                         <div>
-                            <Typography variant="h4" gutterBottom sx={{ fontSize: '2.5rem', fontWeight: 'bold', textAlign: 'center', mb: 4, color: 'primary.main' }}>
+                            <Typography variant="h4" gutterBottom sx={{ fontSize: '2rem', fontWeight: 'bold', textAlign: 'center', mb: 3, color: 'primary.main' }}>
                                 Thông tin của bạn
                             </Typography>
-                            {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 150, height: 150, mb: 3, mx: 'auto' }} />}
-                            <Grid container spacing={3} alignItems="center">
+                            {userData.image && <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 120, height: 120, mb: 2, mx: 'auto' }} />}
+                            <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Họ và tên:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Họ và tên:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.fullName}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.fullName}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Số điện thoại:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Số điện thoại:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.phoneNumber}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.phoneNumber}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Ngày sinh:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Ngày sinh:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.birthDate}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.birthDate}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Địa chỉ:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Địa chỉ:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.address}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.address}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Email:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Email:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.email}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.email}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Vai trò:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Vai trò:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>{userData.role}</Typography>
+                                    <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>{userData.role}</Typography>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.5rem' }}>Ảnh:</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem' }}>Ảnh:</Typography>
                                 </Grid>
                                 <Grid item xs={8}>
                                     {userData.image ? (
-                                        <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 150, height: 150, mt: 2 }} />
+                                        <Avatar src={userData.image} alt="Ảnh người dùng" sx={{ width: 120, height: 120, mt: 1 }} />
                                     ) : (
-                                        <Typography variant="body2" sx={{ mb: 2, fontSize: '1.5rem' }}>Không có ảnh.</Typography>
+                                        <Typography variant="body2" sx={{ mb: 1, fontSize: '1.2rem' }}>Không có ảnh.</Typography>
                                     )}
                                 </Grid>
                             </Grid>
-                            <Button variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: '1.5rem' }} onClick={() => setIsNewUser(true)}>
+                            <Button variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem' }} onClick={() => setIsNewUser(true)}>
                                 Cập nhật thông tin
                             </Button>
                         </div>
