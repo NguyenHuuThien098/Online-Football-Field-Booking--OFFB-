@@ -6,7 +6,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import PersonIcon from '@mui/icons-material/Person';
 import HistoryIcon from '@mui/icons-material/History';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -104,7 +104,7 @@ const Sidebar = () => {
             to="/field-owner-dashboard"
             style={location.pathname === '/field-owner-dashboard' ? styles.activeLink : styles.link}
           >
-            <ManageAccountsIcon sx={{ mr: 1 }} />
+            <DashboardIcon sx={{ mr: 1 }} />
             Field management
           </Link>
         </>
