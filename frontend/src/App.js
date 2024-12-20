@@ -17,6 +17,7 @@ import FieldDetail from "./components/common/FieldDetail";
 import FieldBookied from "./pages/fieldBookied"; // Import FieldBookied
 import Personal from "./pages/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
+
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
@@ -32,7 +33,7 @@ const App = () => {
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
     }
-    if (role && userRole !== role) {
+    if (role && !role.includes(userRole)) {
       return <Navigate to="/" />;
     }
     return element;
@@ -42,7 +43,6 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
-
         <Route
           path="/"
           element={
@@ -89,21 +89,23 @@ const App = () => {
           path="/field-owner-dashboard"
           element={
             <MainLayout>
-
               <ProtectedRoute
                 element={<FieldOwnerDashboard />}
-                role="field_owner"
+                role={["field_owner"]}
               />
             </MainLayout>
           }
         />
         <Route
           path="/fieldBookied"
-          element={<ProtectedRoute element={
+          element={
             <MainLayout>
-              <FieldBookied />
+              <ProtectedRoute
+                element={<FieldBookied />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
-          } role={["player", "field_owner"]} />}
+          }
         />
         <Route
           path="/personal"
@@ -115,35 +117,27 @@ const App = () => {
         />
         <Route
           path="/fieldDetail"
-          element={<ProtectedRoute element={
+          element={
             <MainLayout>
-              <FieldDetail />
+              <ProtectedRoute element={<FieldDetail />} />
             </MainLayout>
-          } />}
+          }
         />
         <Route
           path="/History_MatchJoined"
-          element={<ProtectedRoute element={
+          element={
             <MainLayout>
-              <History_MatchJoined />
+              <ProtectedRoute element={<History_MatchJoined />} />
             </MainLayout>
-          } />}
-        />
-        <Route
-          path="/History_FieldBooked"
-          element={<ProtectedRoute element={
-            <MainLayout>
-              <History_FieldBooked />
-            </MainLayout>
-          } />}
+          }
         />
         <Route
           path="/Report"
-          element={<ProtectedRoute element={
+          element={
             <MainLayout>
-              <Report />
+              <ProtectedRoute element={<Report />} role={["field_owner"]} />
             </MainLayout>
-          } role="field_owner" />}
+          }
         />
       </Routes>
     </Router>
