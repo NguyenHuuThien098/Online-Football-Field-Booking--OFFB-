@@ -5,7 +5,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import PlayerPage from "./components/PlayerPage";
 import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
 import Register from "./components/Register";
 import AvailableField from "./pages/availableField";
@@ -99,20 +98,12 @@ const App = () => {
           }
         />
         <Route
-          path="/player-page"
-          element={<ProtectedRoute element={
-            <MainLayout>
-              <PlayerPage />
-            </MainLayout>
-          } role="player" />}
-        />
-        <Route
           path="/fieldBookied"
           element={<ProtectedRoute element={
             <MainLayout>
               <FieldBookied />
             </MainLayout>
-          } role="player" />}
+          } role={["player", "field_owner"]} />}
         />
         <Route
           path="/personal"

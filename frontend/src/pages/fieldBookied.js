@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Container, Card, CardContent, TextField, Button, Typography, Grid, Box, Modal } from '@mui/material';
 
 const FieldBooked = () => {
     const location = useLocation();  // Nhận dữ liệu từ state
@@ -70,15 +71,7 @@ const FieldBooked = () => {
               }
             : bookingDetails;
 
-        // console.log(details);
-        // return;
-
         if (!details.date || !details.startTime || !details.endTime) {
-            const missingFields = [];
-            if (!details.date) missingFields.push("Ngày");
-            if (!details.startTime) missingFields.push("Giờ Bắt Đầu");
-            if (!details.endTime) missingFields.push("Giờ Kết Thúc");
-
             alert('Vui lòng nhập đầy đủ ngày, giờ bắt đầu và giờ kết thúc.');
             return;
         }
@@ -90,7 +83,6 @@ const FieldBooked = () => {
                 {
                     smallFieldId: field.id,
                     largeFieldId,
-                    // smallFieldId: smallFieldId || null,
                     userId,
                     date: details.date,
                     startTime: details.startTime,
@@ -125,127 +117,115 @@ const FieldBooked = () => {
     };
 
     const handleCancel = () => {
-        navigate('/player-page');
+        navigate('/');
     };
 
     return (
-        <div style={{ padding: '20px', margin: 'auto', maxWidth: '400px' }}>
-            <h3>Đặt Sân</h3>
-            <p>Sân: {field?.name || 'Không xác định'}</p>
+        <Container maxWidth="sm" sx={{ mt: 5 }}>
+            <Card sx={{ boxShadow: 3 }}>
+                <CardContent>
+                    <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
+                        Đặt Sân
+                    </Typography>
+                    <Typography variant="h6" gutterBottom>
+                        Sân: {field?.name || 'Không xác định'}
+                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Ngày"
+                                type="date"
+                                value={bookingDetails.date}
+                                onChange={(e) => handleBookingChange('date', e.target.value)}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <TextField
+                                label="Giờ Bắt Đầu"
+                                type="time"
+                                value={bookingDetails.startTime}
+                                onChange={(e) => handleBookingChange('startTime', e.target.value)}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <TextField
+                                label="Giờ Kết Thúc"
+                                type="time"
+                                value={bookingDetails.endTime}
+                                onChange={(e) => handleBookingChange('endTime', e.target.value)}
+                                fullWidth
+                                InputLabelProps={{ shrink: true }}
+                                required
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                label="Số Người"
+                                select
+                                SelectProps={{ native: true }}
+                                value={bookingDetails.numberOfPeople}
+                                onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
+                                fullWidth
+                                required
+                            >
+                                <option value="5">5 Người</option>
+                                <option value="7">7 Người</option>
+                                <option value="11">11 Người</option>
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading}>
+                                Xác Nhận Đặt Sân
+                            </Button>
+                            <Button variant="contained" color="secondary" onClick={handleCancel} disabled={isLoading}>
+                                Hủy
+                            </Button>
+                        </Grid>
+                    </Grid>
+                    {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+                </CardContent>
+            </Card>
 
-            <label>Ngày:</label>
-            <input
-                type="date"
-                value={bookingDetails.date}
-                onChange={(e) => handleBookingChange('date', e.target.value)}
-                required
-            />
-            <br />
-            <br />
-
-            <label>Giờ Bắt Đầu:</label>
-            <input
-                type="time"
-                value={bookingDetails.startTime}
-                onChange={(e) => handleBookingChange('startTime', e.target.value)}
-                required
-            />
-            <br />
-            <br />
-
-            <label>Giờ Kết Thúc:</label>
-            <input
-                type="time"
-                value={bookingDetails.endTime}
-                onChange={(e) => handleBookingChange('endTime', e.target.value)}
-                required
-            />
-            <br />
-            <br />
-
-            <label>Số Người:</label>
-            <select
-                value={bookingDetails.numberOfPeople}
-                onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
-            >
-                <option value="5">5 Người</option>
-                <option value="7">7 Người</option>
-                <option value="11">11 Người</option>
-            </select>
-            <br />
-            <br />
-
-            <button onClick={() => handleBookField()} disabled={isLoading}>
-                Xác Nhận Đặt Sân
-            </button>
-            <button onClick={handleCancel} disabled={isLoading} style={{ marginLeft: '10px' }}>
-                Hủy
-            </button>
-
-            {error && <p style={{ color: 'red', marginTop: '10px' }}>{error}</p>}
-
-            {showModal && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        background: 'rgba(0, 0, 0, 0.7)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        zIndex: 1000,
-                    }}
-                >
-                    <div
-                        style={{
-                            background: 'white',
-                            padding: '20px',
-                            borderRadius: '10px',
-                            width: '90%',
-                            maxWidth: '500px',
-                            textAlign: 'center',
-                        }}
-                    >
-                        <h4>Các khung giờ còn trống</h4>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '20px' }}>
-                            {availableSlots.map((slot, index) => (
-                                <button
-                                    key={index}
-                                    style={{
-                                        padding: '10px 15px',
-                                        borderRadius: '5px',
-                                        border: '1px solid #ccc',
-                                        background: '#f0f0f0',
-                                        cursor: 'pointer',
-                                    }}
-                                    disabled={isLoading}
-                                    onClick={() => handleBookField(slot)}
-                                >
-                                    {slot}
-                                </button>
-                            ))}
-                        </div>
-                        <button
-                            onClick={() => setShowModal(false)}
-                            style={{
-                                marginTop: '20px',
-                                padding: '10px 20px',
-                                borderRadius: '5px',
-                                border: 'none',
-                                background: '#d9534f',
-                                color: 'white',
-                                cursor: 'pointer',
-                            }}
-                        >
-                            Đóng
-                        </button>
-                    </div>
-                </div>
-            )}
-        </div>
+            <Modal open={showModal} onClose={() => setShowModal(false)}>
+                <Box sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: 400,
+                    bgcolor: 'background.paper',
+                    border: '2px solid #000',
+                    boxShadow: 24,
+                    p: 4,
+                }}>
+                    <Typography variant="h6" component="h2">
+                        Các khung giờ còn trống
+                    </Typography>
+                    <Box sx={{ mt: 2 }}>
+                        {availableSlots.map((slot, index) => (
+                            <Button
+                                key={index}
+                                variant="outlined"
+                                sx={{ m: 1 }}
+                                onClick={() => handleBookField(slot)}
+                                disabled={isLoading}
+                            >
+                                {slot}
+                            </Button>
+                        ))}
+                    </Box>
+                    <Button onClick={() => setShowModal(false)} variant="contained" color="error" sx={{ mt: 2 }}>
+                        Đóng
+                    </Button>
+                </Box>
+            </Modal>
+        </Container>
     );
 };
 
