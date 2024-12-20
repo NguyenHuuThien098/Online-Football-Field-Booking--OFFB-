@@ -27,6 +27,7 @@ const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
                 } else {
                     navigate('/');
                 }
+                window.location.reload(); // Reload the entire webpage
             } else {
                 setError('Tài khoản không tồn tại. Vui lòng đăng ký.');
             }

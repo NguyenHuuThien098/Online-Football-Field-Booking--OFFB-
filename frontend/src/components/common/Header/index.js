@@ -6,17 +6,14 @@ import axios from 'axios';
 import { Typography, Menu, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {
-    BrowserRouter as Router,
-    Routes,
-    Route,
-    Navigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
     const [role, setRole] = useState('');
     const [userData, setUserData] = useState({});
     const [anchorEl, setAnchorEl] = useState(null);
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         localStorage.setItem('isAuthenticated', 'false');
@@ -84,25 +81,43 @@ const Header = () => {
             </div>
             <div name="right" className="col border-start">
                 <div className="row d-flex justify-content-evenly">
-                    <div className="col d-flex flex-column align-items-center justify-content-center">
-                        <div name="avatar">
-                            <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }} />
+                    {isAuthenticated ? (
+                        <>
+                            <div className="col d-flex flex-column align-items-center justify-content-center">
+                                <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
+                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }} />
+                                </div>
+                                <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>{userData.fullName}</Typography>
+                            </div>
+                            <div className="col d-flex align-items-center justify-content-center" name="notification">
+                                <NotificationsIcon fontSize="large" />
+                            </div>
+                            <div className="col d-flex align-items-center justify-content-center" name="setting">
+                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} />
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                >
+                                    <MenuItem sx={{ m: 2 }}>
+                                        <Typography variant="body2" sx={{ mr: 1 }}>Logout: </Typography>
+                                        <button onClick={handleLogout} className="btn btn-danger">
+                                            Logout
+                                        </button>
+                                    </MenuItem>
+                                </Menu>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="col d-flex flex-column align-items-center justify-content-center">
+                            <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
+                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }} />
+                            </div>
+                            <button onClick={() => navigate('/login')} className="btn btn-primary mt-2">
+                                Login
+                            </button>
                         </div>
-                        <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>{userData.fullName}</Typography>
-                    </div>
-                    <div className="col d-flex align-items-center justify-content-center" name="notification">
-                        <NotificationsIcon fontSize="large" />
-                    </div>
-                    <div className="col d-flex align-items-center justify-content-center" name="setting">
-                        <SettingsIcon fontSize="large" onClick={handleSettingsClick} />
-                        <Menu
-                            anchorEl={anchorEl}
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            <MenuItem onClick={handleLogout}>Logout</MenuItem>
-                        </Menu>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

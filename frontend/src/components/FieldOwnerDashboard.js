@@ -41,7 +41,7 @@ const FieldOwnerDashboard = () => {
                     setLoading(false);
                     return;
                 }
-                if (role !== 'field_owner') {
+                if (role != 'field_owner') {
                     setError('Không phải owner');
                     setLoading(false);
                     return;
