@@ -131,7 +131,7 @@ const AvailableField = () => {
               // border: "2px solid gray"
             }}
           >
-            <Typography variant="h2" component="h2" color="white">
+            <Typography variant="h2" component="h2" color="white" className="mt-4">
               Danh sách sân bóng
             </Typography>
           </Paper>

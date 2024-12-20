@@ -12,6 +12,7 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const role = localStorage.getItem('userRole');
 
   const styles = {
     link: {
@@ -20,6 +21,7 @@ const Sidebar = () => {
       color: '#000',
       display: 'flex',
       alignItems: 'center',
+      position: 'relative',
     },
     activeLink: {
       textDecoration:  'none',
@@ -30,14 +32,25 @@ const Sidebar = () => {
       transition: 'all 0.3s ease',
       display: 'flex',
       alignItems: 'center',
+      position: 'relative',
+    },
+    underline: {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      width: '0%',
+      height: '2px',
+      backgroundColor: '#007bff',
+      transition: 'width 0.3s ease',
+    },
+    activeUnderline: {
+      width: '100%',
     },
     accordionHeader: {
       fontWeight: 'bold', 
     },
   };
-
-  const role = localStorage.getItem('userRole');
-  const availableFieldLink = role === 'player' ? '/player-page' : '/field-owner-dashboard';
 
   return (
     <nav className="nav flex-column">
@@ -48,6 +61,7 @@ const Sidebar = () => {
       >
         <HomeIcon sx={{ mr: 1 }} />
         Available Field
+        <span style={{ ...styles.underline, ...(location.pathname === '/' && styles.activeUnderline) }}></span>
       </Link>
       <Link
         className="btn"
@@ -56,6 +70,7 @@ const Sidebar = () => {
       >
         <SportsSoccerIcon sx={{ mr: 1 }} />
         Open Match
+        <span style={{ ...styles.underline, ...(location.pathname === '/openMatch' && styles.activeUnderline) }}></span>
       </Link>
       <hr />
 
@@ -68,6 +83,7 @@ const Sidebar = () => {
           >
             <PersonIcon sx={{ mr: 1 }} />
             Personal
+            <span style={{ ...styles.underline, ...(location.pathname === '/personal' && styles.activeUnderline) }}></span>
           </Link>
           <Link 
             className="btn" 
@@ -76,6 +92,7 @@ const Sidebar = () => {
           >
             <HistoryIcon sx={{ mr: 1 }} />
             History
+            <span style={{ ...styles.underline, ...(isOpen && styles.activeUnderline) }}></span>
           </Link>
           <Collapse in={isOpen}>
             <div>
@@ -87,6 +104,7 @@ const Sidebar = () => {
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Field booked
+                  <span style={{ ...styles.underline, ...(location.pathname === '/History_FieldBooked' && styles.activeUnderline) }}></span>
                 </Link>
                 <Link
                   className="btn"
@@ -95,18 +113,22 @@ const Sidebar = () => {
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Match joined
+                  <span style={{ ...styles.underline, ...(location.pathname === '/History_MatchJoined' && styles.activeUnderline) }}></span>
                 </Link>
               </div>
             </div>
           </Collapse>
-          <Link
-            className="btn"
-            to="/field-owner-dashboard"
-            style={location.pathname === '/field-owner-dashboard' ? styles.activeLink : styles.link}
-          >
-            <DashboardIcon sx={{ mr: 1 }} />
-            Field management
-          </Link>
+          {role !== 'player' && (
+            <Link
+              className="btn"
+              to="/field-owner-dashboard"
+              style={location.pathname === '/field-owner-dashboard' ? styles.activeLink : styles.link}
+            >
+              <DashboardIcon sx={{ mr: 1 }} />
+              Field management
+              <span style={{ ...styles.underline, ...(location.pathname === '/field-owner-dashboard' && styles.activeUnderline) }}></span>
+            </Link>
+          )}
         </>
       )}
     </nav>

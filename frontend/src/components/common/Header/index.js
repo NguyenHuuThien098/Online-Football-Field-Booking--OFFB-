@@ -76,8 +76,11 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div name="middle" className="col-7 d-flex align-items-center">
+            <div name="middle" className="col-7 d-flex align-items-center justify-content-between">
                 <h1 name="role" style={{ fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}>{formatRole(role)}</h1>
+                {isAuthenticated && (
+                    <Typography variant="body2" sx={{ fontSize: '1.2rem', borderBottom: '2px solid #007bff' }}>{userData.fullName}</Typography>
+                )}
             </div>
             <div name="right" className="col border-start">
                 <div className="row d-flex justify-content-evenly">
@@ -85,9 +88,8 @@ const Header = () => {
                         <>
                             <div className="col d-flex flex-column align-items-center justify-content-center">
                                 <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }} />
+                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff' }} />
                                 </div>
-                                <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>{userData.fullName}</Typography>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
                                 <NotificationsIcon fontSize="large" />
@@ -111,7 +113,7 @@ const Header = () => {
                     ) : (
                         <div className="col d-flex flex-column align-items-center justify-content-center">
                             <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover' }} />
+                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff' }} />
                             </div>
                             <button onClick={() => navigate('/login')} className="btn btn-primary mt-2">
                                 Login

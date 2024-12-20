@@ -196,6 +196,18 @@ const UserProfile = () => {
                                     InputProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
                                     InputLabelProps={{ style: { fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' } }}
                                 />
+                                <input
+                                    accept="image/*"
+                                    style={{ display: 'none' }}
+                                    id="avatar-upload"
+                                    type="file"
+                                    onChange={handleImageChange}
+                                />
+                                <label htmlFor="avatar-upload">
+                                    <Button variant="contained" color="primary" component="span" sx={{ mt: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>
+                                        Upload Avatar
+                                    </Button>
+                                </label>
                                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>
                                     Update Information
                                 </Button>
@@ -210,7 +222,7 @@ const UserProfile = () => {
                                 <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
                                     {userData.image && <Avatar src={userData.image} alt="User Image" sx={{ width: 300, height: 300, mb: 2, boxShadow: 3, border: '5px solid #007bff' }} />}
                                 </Grid>
-                                <Grid item xs={8} sx={{ backgroundColor: '#f0f0f0', padding: 2 }}>
+                                <Grid item xs={8} sx={{ padding: 2 }}>
                                     <Grid container spacing={2}>
                                         <Grid item xs={4}>
                                             <Typography variant="body2" fontWeight="bold" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>Full Name:</Typography>
