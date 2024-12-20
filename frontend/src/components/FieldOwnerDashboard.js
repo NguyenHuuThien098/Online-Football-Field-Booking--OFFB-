@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Button, Grid, Card, CardContent, Typography, TextField, Collapse, IconButton, Box } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
 
 const FieldOwnerDashboard = () => {
     const [fields, setFields] = useState([]);
@@ -26,8 +25,7 @@ const FieldOwnerDashboard = () => {
         notes: '',
         questions: ''
     });
-    const [openFieldForm, setOpenFieldForm] = useState(false);
-    const [openMatchForm, setOpenMatchForm] = useState(false);
+    const [tabIndex, setTabIndex] = useState(0);
 
     const navigate = useNavigate();
 
@@ -73,8 +71,12 @@ const FieldOwnerDashboard = () => {
                     setError('Dữ liệu trả về không hợp lệ');
                 }
             } catch (error) {
-                console.error("Error fetching fields and matches:", error);
-                setError('Có lỗi xảy ra khi tải danh sách sân và trận đấu.');
+                if (error.response && error.response.status === 403) {
+                    setError('Bạn không có quyền truy cập vào tài nguyên này.');
+                } else {
+                    console.error("Error fetching fields and matches:", error);
+                    setError('Có lỗi xảy ra khi tải danh sách sân và trận đấu.');
+                }
             } finally {
                 setLoading(false);
             }
@@ -219,6 +221,10 @@ const FieldOwnerDashboard = () => {
         }
     };
 
+    const handleTabChange = (event, newValue) => {
+        setTabIndex(newValue);
+    };
+
     if (loading) {
         return (
             <Typography variant="h4" align="center">Đang tải danh sách sân và trận đấu...</Typography>
@@ -232,187 +238,215 @@ const FieldOwnerDashboard = () => {
     }
 
     return (
-        <Container>
-            <Typography variant="h3" align="center" gutterBottom>
+        <>
+            <Typography variant="h3" align="center" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
                 Field Owner Dashboard
             </Typography>
-            <Button variant="contained" color="primary" onClick={() => navigate('/')}>
-                Back to Homepage
-            </Button>
-            <Typography variant="h5" align="center" gutterBottom>
-                Welcome to the Field Owner Dashboard!
-            </Typography>
-            <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h4" gutterBottom>
-                        Danh sách sân của bạn:
-                    </Typography>
-                    {fields.map((field) => (
-                        <Card key={field.fieldId} variant="outlined" sx={{ mb: 2 }}>
-                            <CardContent>
-                                <Typography variant="h5">{field.name || 'Tên sân không xác định'}</Typography>
-                                <Typography variant="body1">Địa điểm: {field.location}</Typography>
-                                <Typography variant="body1">Loại sân: {field.type}</Typography>
-                                <Typography variant="body1">Giá: {field.price}</Typography>
-                                <Typography variant="body1">Hình ảnh: {field.image}</Typography>
-                                <Typography variant="body1">Số điện thoại liên hệ: {field.contactNumber}</Typography>
-                                <Typography variant="body1">Giờ hoạt động: {field.operatingHours}</Typography>
-                                <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2 }}>
-                                    Cập nhật
+            <Container>
+                <Tabs value={tabIndex} onChange={handleTabChange} centered>
+                    <Tab label="Fields" />
+                    <Tab label="Matches" />
+                </Tabs>
+                {tabIndex === 0 && (
+                    <div>
+                        <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                            Danh sách sân của bạn:
+                        </Typography>
+                        {fields.map((field) => (
+                            <Card key={field.fieldId} variant="outlined" sx={{ mb: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{field.name || 'Tên sân không xác định'}</Typography>
+                                    <Typography variant="body1">Địa điểm: {field.location}</Typography>
+                                    <Typography variant="body1">Loại sân: {field.type}</Typography>
+                                    <Typography variant="body1">Giá: {field.price}</Typography>
+                                    <Typography variant="body1">Hình ảnh: {field.image}</Typography>
+                                    <Typography variant="body1">Số điện thoại liên hệ: {field.contactNumber}</Typography>
+                                    <Typography variant="body1">Giờ hoạt động: {field.operatingHours}</Typography>
+                                    <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)' }}>
+                                        Cập nhật
+                                    </Button>
+                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteField(field.fieldId)} sx={{ mt: 2, width: 'calc(50% - 8px)' }}>
+                                        Xóa
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ))}
+                        <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
+                            <Typography variant="h5" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                                Thêm sân mới:
+                            </Typography>
+                            <form onSubmit={handleAddField}>
+                                <TextField
+                                    label="Tên sân"
+                                    value={newField.name}
+                                    onChange={(e) => setNewField({ ...newField, name: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Địa điểm"
+                                    value={newField.location}
+                                    onChange={(e) => setNewField({ ...newField, location: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Loại sân"
+                                    value={newField.type}
+                                    onChange={(e) => setNewField({ ...newField, type: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Giá thuê (VNĐ/giờ)"
+                                    value={newField.price}
+                                    onChange={(e) => setNewField({ ...newField, price: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Link ảnh sân"
+                                    value={newField.image}
+                                    onChange={(e) => setNewField({ ...newField, image: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Số điện thoại liên hệ"
+                                    value={newField.contactNumber}
+                                    onChange={(e) => setNewField({ ...newField, contactNumber: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Giờ hoạt động"
+                                    value={newField.operatingHours}
+                                    onChange={(e) => setNewField({ ...newField, operatingHours: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%' }}>
+                                    Thêm sân
                                 </Button>
-                                <Button variant="contained" color="secondary" onClick={() => handleDeleteField(field.fieldId)} sx={{ mt: 2 }}>
-                                    Xóa
+                            </form>
+                        </Box>
+                    </div>
+                )}
+                {tabIndex === 1 && (
+                    <div>
+                        <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                            Danh sách trận đấu mở:
+                        </Typography>
+                        {matches.map((match) => (
+                            <Card key={match.id} variant="outlined" sx={{ mb: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2 }}>
+                                <CardContent>
+                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Địa chỉ: {match.address}</Typography>
+                                    <Typography variant="body1">Thời gian: {match.time}</Typography>
+                                    <Typography variant="body1">Tên chủ sân: {match.ownerName}</Typography>
+                                    <Typography variant="body1">Số lượng người chơi: {match.playerCount}</Typography>
+                                    <Typography variant="body1">Ghi chú: {match.notes}</Typography>
+                                    <Typography variant="body1">Câu hỏi: {match.questions}</Typography>
+                                    <Button variant="contained" color="primary" onClick={() => handleUpdateMatch(match.id)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)' }}>
+                                        Cập nhật
+                                    </Button>
+                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteMatch(match.id)} sx={{ mt: 2, width: 'calc(50% - 8px)' }}>
+                                        Xóa
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ))}
+                        <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
+                            <Typography variant="h5" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                                Thêm trận đấu mới:
+                            </Typography>
+                            <form onSubmit={handleAddMatch}>
+                                <TextField
+                                    label="Địa chỉ"
+                                    value={newMatch.address}
+                                    onChange={(e) => setNewMatch({ ...newMatch, address: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Thời gian"
+                                    value={newMatch.time}
+                                    onChange={(e) => setNewMatch({ ...newMatch, time: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Tên chủ sân"
+                                    value={newMatch.ownerName}
+                                    onChange={(e) => setNewMatch({ ...newMatch, ownerName: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Số lượng người chơi"
+                                    value={newMatch.playerCount}
+                                    onChange={(e) => setNewMatch({ ...newMatch, playerCount: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    required
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Ghi chú"
+                                    value={newMatch.notes}
+                                    onChange={(e) => setNewMatch({ ...newMatch, notes: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <TextField
+                                    label="Câu hỏi"
+                                    value={newMatch.questions}
+                                    onChange={(e) => setNewMatch({ ...newMatch, questions: e.target.value })}
+                                    fullWidth
+                                    margin="normal"
+                                    InputLabelProps={{ style: { color: 'black' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                />
+                                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%' }}>
+                                    Thêm trận đấu
                                 </Button>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    <Typography variant="h4" gutterBottom>
-                        Danh sách trận đấu mở:
-                    </Typography>
-                    {matches.map((match) => (
-                        <Card key={match.id} variant="outlined" sx={{ mb: 2 }}>
-                            <CardContent>
-                                <Typography variant="h5">Địa chỉ: {match.address}</Typography>
-                                <Typography variant="body1">Thời gian: {match.time}</Typography>
-                                <Typography variant="body1">Tên chủ sân: {match.ownerName}</Typography>
-                                <Typography variant="body1">Số lượng người chơi: {match.playerCount}</Typography>
-                                <Typography variant="body1">Ghi chú: {match.notes}</Typography>
-                                <Typography variant="body1">Câu hỏi: {match.questions}</Typography>
-                                <Button variant="contained" color="primary" onClick={() => handleUpdateMatch(match.id)} sx={{ mt: 2, mr: 2 }}>
-                                    Cập nhật
-                                </Button>
-                                <Button variant="contained" color="secondary" onClick={() => handleDeleteMatch(match.id)} sx={{ mt: 2 }}>
-                                    Xóa
-                                </Button>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </Grid>
-            </Grid>
-            <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3 }}>
-                <Typography variant="h4" gutterBottom>
-                    Thêm sân mới:
-                </Typography>
-                <form onSubmit={handleAddField}>
-                    <TextField
-                        label="Tên sân"
-                        value={newField.name}
-                        onChange={(e) => setNewField({ ...newField, name: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Địa điểm"
-                        value={newField.location}
-                        onChange={(e) => setNewField({ ...newField, location: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Loại sân"
-                        value={newField.type}
-                        onChange={(e) => setNewField({ ...newField, type: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Giá thuê (VNĐ/giờ)"
-                        value={newField.price}
-                        onChange={(e) => setNewField({ ...newField, price: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Link ảnh sân"
-                        value={newField.image}
-                        onChange={(e) => setNewField({ ...newField, image: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label="Số điện thoại liên hệ"
-                        value={newField.contactNumber}
-                        onChange={(e) => setNewField({ ...newField, contactNumber: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Giờ hoạt động"
-                        value={newField.operatingHours}
-                        onChange={(e) => setNewField({ ...newField, operatingHours: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
-                        Thêm sân
-                    </Button>
-                </form>
-            </Box>
-            <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3 }}>
-                <Typography variant="h4" gutterBottom>
-                    Thêm trận đấu mở:
-                </Typography>
-                <form onSubmit={handleAddMatch}>
-                    <TextField
-                        label="Địa chỉ"
-                        value={newMatch.address}
-                        onChange={(e) => setNewMatch({ ...newMatch, address: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Thời gian"
-                        value={newMatch.time}
-                        onChange={(e) => setNewMatch({ ...newMatch, time: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Tên chủ sân"
-                        value={newMatch.ownerName}
-                        onChange={(e) => setNewMatch({ ...newMatch, ownerName: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Số lượng người chơi"
-                        value={newMatch.playerCount}
-                        onChange={(e) => setNewMatch({ ...newMatch, playerCount: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        label="Ghi chú"
-                        value={newMatch.notes}
-                        onChange={(e) => setNewMatch({ ...newMatch, notes: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <TextField
-                        label="Câu hỏi"
-                        value={newMatch.questions}
-                        onChange={(e) => setNewMatch({ ...newMatch, questions: e.target.value })}
-                        fullWidth
-                        margin="normal"
-                    />
-                    <Button variant="contained" color="primary" type="submit" sx={{ mt: 2 }}>
-                        Thêm trận đấu
-                    </Button>
-                </form>
-            </Box>
-        </Container>
+                            </form>
+                        </Box>
+                    </div>
+                )}
+            </Container>
+        </>
     );
 };
 
