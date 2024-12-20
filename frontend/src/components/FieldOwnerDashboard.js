@@ -227,13 +227,13 @@ const FieldOwnerDashboard = () => {
 
     if (loading) {
         return (
-            <Typography variant="h4" align="center">Đang tải danh sách sân và trận đấu...</Typography>
+            <Typography variant="h3" align="center">Đang tải danh sách sân và trận đấu...</Typography>
         );
     }
 
     if (error) {
         return (
-            <Typography variant="h6" color="error" align="center">{error}</Typography>
+            <Typography variant="h5" color="error" align="center">{error}</Typography>
         );
     }
 
@@ -244,35 +244,35 @@ const FieldOwnerDashboard = () => {
             </Typography>
             <Container>
                 <Tabs value={tabIndex} onChange={handleTabChange} centered>
-                    <Tab label="Fields" />
-                    <Tab label="Matches" />
+                    <Tab label="Fields" sx={{ fontSize: '1.2rem' }} />
+                    <Tab label="Matches" sx={{ fontSize: '1.2rem' }} />
                 </Tabs>
                 {tabIndex === 0 && (
                     <div>
-                        <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                        <Typography variant="h3" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
                             Danh sách sân của bạn:
                         </Typography>
                         {fields.map((field) => (
                             <Card key={field.fieldId} variant="outlined" sx={{ mb: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2 }}>
                                 <CardContent>
-                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{field.name || 'Tên sân không xác định'}</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{field.name || 'Tên sân không xác định'}</Typography>
                                     <Typography variant="body1">Địa điểm: {field.location}</Typography>
                                     <Typography variant="body1">Loại sân: {field.type}</Typography>
                                     <Typography variant="body1">Giá: {field.price}</Typography>
                                     <Typography variant="body1">Hình ảnh: {field.image}</Typography>
                                     <Typography variant="body1">Số điện thoại liên hệ: {field.contactNumber}</Typography>
                                     <Typography variant="body1">Giờ hoạt động: {field.operatingHours}</Typography>
-                                    <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)' }}>
+                                    <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                         Cập nhật
                                     </Button>
-                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteField(field.fieldId)} sx={{ mt: 2, width: 'calc(50% - 8px)' }}>
+                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteField(field.fieldId)} sx={{ mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                         Xóa
                                     </Button>
                                 </CardContent>
                             </Card>
                         ))}
                         <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
-                            <Typography variant="h5" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                            <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
                                 Thêm sân mới:
                             </Typography>
                             <form onSubmit={handleAddField}>
@@ -283,8 +283,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Địa điểm"
@@ -293,8 +293,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Loại sân"
@@ -303,8 +303,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Giá thuê (VNĐ/giờ)"
@@ -313,8 +313,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Link ảnh sân"
@@ -322,8 +322,8 @@ const FieldOwnerDashboard = () => {
                                     onChange={(e) => setNewField({ ...newField, image: e.target.value })}
                                     fullWidth
                                     margin="normal"
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Số điện thoại liên hệ"
@@ -332,8 +332,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Giờ hoạt động"
@@ -342,10 +342,10 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
-                                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%' }}>
+                                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%', fontSize: '1.2rem' }}>
                                     Thêm sân
                                 </Button>
                             </form>
@@ -354,29 +354,29 @@ const FieldOwnerDashboard = () => {
                 )}
                 {tabIndex === 1 && (
                     <div>
-                        <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                        <Typography variant="h3" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
                             Danh sách trận đấu mở:
                         </Typography>
                         {matches.map((match) => (
                             <Card key={match.id} variant="outlined" sx={{ mb: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2 }}>
                                 <CardContent>
-                                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Địa chỉ: {match.address}</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Địa chỉ: {match.address}</Typography>
                                     <Typography variant="body1">Thời gian: {match.time}</Typography>
                                     <Typography variant="body1">Tên chủ sân: {match.ownerName}</Typography>
                                     <Typography variant="body1">Số lượng người chơi: {match.playerCount}</Typography>
                                     <Typography variant="body1">Ghi chú: {match.notes}</Typography>
                                     <Typography variant="body1">Câu hỏi: {match.questions}</Typography>
-                                    <Button variant="contained" color="primary" onClick={() => handleUpdateMatch(match.id)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)' }}>
+                                    <Button variant="contained" color="primary" onClick={() => handleUpdateMatch(match.id)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                         Cập nhật
                                     </Button>
-                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteMatch(match.id)} sx={{ mt: 2, width: 'calc(50% - 8px)' }}>
+                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteMatch(match.id)} sx={{ mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                         Xóa
                                     </Button>
                                 </CardContent>
                             </Card>
                         ))}
                         <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
-                            <Typography variant="h5" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                            <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
                                 Thêm trận đấu mới:
                             </Typography>
                             <form onSubmit={handleAddMatch}>
@@ -387,8 +387,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Thời gian"
@@ -397,8 +397,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Tên chủ sân"
@@ -407,8 +407,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Số lượng người chơi"
@@ -417,8 +417,8 @@ const FieldOwnerDashboard = () => {
                                     fullWidth
                                     margin="normal"
                                     required
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Ghi chú"
@@ -426,8 +426,8 @@ const FieldOwnerDashboard = () => {
                                     onChange={(e) => setNewMatch({ ...newMatch, notes: e.target.value })}
                                     fullWidth
                                     margin="normal"
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
                                 <TextField
                                     label="Câu hỏi"
@@ -435,10 +435,10 @@ const FieldOwnerDashboard = () => {
                                     onChange={(e) => setNewMatch({ ...newMatch, questions: e.target.value })}
                                     fullWidth
                                     margin="normal"
-                                    InputLabelProps={{ style: { color: 'black' } }}
-                                    InputProps={{ style: { color: 'black', backgroundColor: 'white' } }}
+                                    InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                                    InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                                 />
-                                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%' }}>
+                                <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%', fontSize: '1.2rem' }}>
                                     Thêm trận đấu
                                 </Button>
                             </form>

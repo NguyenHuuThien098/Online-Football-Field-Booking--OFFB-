@@ -124,10 +124,10 @@ const FieldBooked = () => {
         <Container maxWidth="sm" sx={{ mt: 5 }}>
             <Card sx={{ boxShadow: 3 }}>
                 <CardContent>
-                    <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
+                    <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1, fontSize: '2rem' }}>
                         Đặt Sân
                     </Typography>
-                    <Typography variant="h6" gutterBottom>
+                    <Typography variant="h6" gutterBottom sx={{ fontSize: '1.5rem' }}>
                         Sân: {field?.name || 'Không xác định'}
                     </Typography>
                     <Grid container spacing={2}>
@@ -140,6 +140,7 @@ const FieldBooked = () => {
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
                                 required
+                                inputProps={{ style: { fontSize: '1.2rem' } }}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -151,6 +152,7 @@ const FieldBooked = () => {
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
                                 required
+                                inputProps={{ style: { fontSize: '1.2rem' } }}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -162,6 +164,7 @@ const FieldBooked = () => {
                                 fullWidth
                                 InputLabelProps={{ shrink: true }}
                                 required
+                                inputProps={{ style: { fontSize: '1.2rem' } }}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -173,6 +176,7 @@ const FieldBooked = () => {
                                 onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
                                 fullWidth
                                 required
+                                inputProps={{ style: { fontSize: '1.2rem' } }}
                             >
                                 <option value="5">5 Người</option>
                                 <option value="7">7 Người</option>
@@ -180,15 +184,15 @@ const FieldBooked = () => {
                             </TextField>
                         </Grid>
                         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading}>
+                            <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading} sx={{ fontSize: '1.2rem' }}>
                                 Xác Nhận Đặt Sân
                             </Button>
-                            <Button variant="contained" color="secondary" onClick={handleCancel} disabled={isLoading}>
+                            <Button variant="contained" sx={{ backgroundColor: 'red', fontSize: '1.2rem' }} onClick={handleCancel} disabled={isLoading}>
                                 Hủy
                             </Button>
                         </Grid>
                     </Grid>
-                    {error && <Typography color="error" sx={{ mt: 2 }}>{error}</Typography>}
+                    {error && <Typography color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>{error}</Typography>}
                 </CardContent>
             </Card>
 
@@ -204,7 +208,7 @@ const FieldBooked = () => {
                     boxShadow: 24,
                     p: 4,
                 }}>
-                    <Typography variant="h6" component="h2">
+                    <Typography variant="h6" component="h2" sx={{ fontSize: '1.5rem' }}>
                         Các khung giờ còn trống
                     </Typography>
                     <Box sx={{ mt: 2 }}>
@@ -212,7 +216,7 @@ const FieldBooked = () => {
                             <Button
                                 key={index}
                                 variant="outlined"
-                                sx={{ m: 1 }}
+                                sx={{ m: 1, fontSize: '1.2rem' }}
                                 onClick={() => handleBookField(slot)}
                                 disabled={isLoading}
                             >
@@ -220,7 +224,7 @@ const FieldBooked = () => {
                             </Button>
                         ))}
                     </Box>
-                    <Button onClick={() => setShowModal(false)} variant="contained" color="error" sx={{ mt: 2 }}>
+                    <Button onClick={() => setShowModal(false)} variant="contained" color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>
                         Đóng
                     </Button>
                 </Box>

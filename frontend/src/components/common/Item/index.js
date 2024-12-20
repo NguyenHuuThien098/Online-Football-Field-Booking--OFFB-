@@ -95,6 +95,10 @@ const Item = ({ field, match }) => {
     return new Date(dateTimeString).toLocaleDateString('en-GB', options);
   };
 
+  const formatPrice = (price) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  };
+
   if (field) {
     return (
       <StyledCard className={`mt-4 mx-3 border-primary `}
@@ -139,7 +143,7 @@ const Item = ({ field, match }) => {
             Mô tả: {field.description}
           </Typography> */}
           <Typography variant="body2" color="success" fontSize={24}>
-            Giá: {field.price}k/h
+            Giá: {formatPrice(field.price)} VNĐ
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleBookingClick}>
