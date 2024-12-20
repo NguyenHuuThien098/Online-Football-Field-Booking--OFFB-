@@ -23,6 +23,7 @@ const Sidebar = () => {
       display: 'flex',
       alignItems: 'center',
       position: 'relative',
+      transition: 'background-color 0.3s ease',
     },
     activeLink: {
       textDecoration:  'none',
@@ -51,6 +52,12 @@ const Sidebar = () => {
     accordionHeader: {
       fontWeight: 'bold', 
     },
+    hover: {
+      backgroundColor: '#f0f0f0',
+    },
+    activeHover: {
+      backgroundColor: '#80bfff',
+    },
   };
 
   const isHistoryActive = location.pathname.startsWith('/History');
@@ -61,6 +68,12 @@ const Sidebar = () => {
         className="btn"
         to="/"
         style={location.pathname === '/' ? styles.activeLink : styles.link}
+        onMouseEnter={(e) => {
+          if (location.pathname !== '/') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+        }}
+        onMouseLeave={(e) => {
+          if (location.pathname !== '/') e.currentTarget.style.backgroundColor = '';
+        }}
       >
         <HomeIcon sx={{ mr: 1 }} />
         Available Field
@@ -70,6 +83,12 @@ const Sidebar = () => {
         className="btn"
         to="/openMatch"
         style={location.pathname === '/openMatch' ? styles.activeLink : styles.link}
+        onMouseEnter={(e) => {
+          if (location.pathname !== '/openMatch') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+        }}
+        onMouseLeave={(e) => {
+          if (location.pathname !== '/openMatch') e.currentTarget.style.backgroundColor = '';
+        }}
       >
         <SportsSoccerIcon sx={{ mr: 1 }} />
         Open Match
@@ -83,6 +102,12 @@ const Sidebar = () => {
             className="btn"
             to="/personal"
             style={location.pathname === '/personal' ? styles.activeLink : styles.link}
+            onMouseEnter={(e) => {
+              if (location.pathname !== '/personal') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+            }}
+            onMouseLeave={(e) => {
+              if (location.pathname !== '/personal') e.currentTarget.style.backgroundColor = '';
+            }}
           >
             <PersonIcon sx={{ mr: 1 }} />
             Personal
@@ -92,6 +117,12 @@ const Sidebar = () => {
             className="btn" 
             onClick={() => setIsOpen(!isOpen)}
             style={isHistoryActive ? styles.activeLink : styles.link}
+            onMouseEnter={(e) => {
+              if (!isHistoryActive) e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+            }}
+            onMouseLeave={(e) => {
+              if (!isHistoryActive) e.currentTarget.style.backgroundColor = '';
+            }}
           >
             <HistoryIcon sx={{ mr: 1 }} />
             History
@@ -105,6 +136,12 @@ const Sidebar = () => {
                   className="btn"
                   to="/History_FieldBooked"
                   style={location.pathname === '/History_FieldBooked' ? styles.activeLink : styles.link}
+                  onMouseEnter={(e) => {
+                    if (location.pathname !== '/History_FieldBooked') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (location.pathname !== '/History_FieldBooked') e.currentTarget.style.backgroundColor = '';
+                  }}
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Field booked
@@ -114,6 +151,12 @@ const Sidebar = () => {
                   className="btn"
                   to="/History_MatchJoined"
                   style={location.pathname === '/History_MatchJoined' ? styles.activeLink : styles.link}
+                  onMouseEnter={(e) => {
+                    if (location.pathname !== '/History_MatchJoined') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    if (location.pathname !== '/History_MatchJoined') e.currentTarget.style.backgroundColor = '';
+                  }}
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Match joined
@@ -127,6 +170,12 @@ const Sidebar = () => {
               className="btn"
               to="/field-owner-dashboard"
               style={location.pathname === '/field-owner-dashboard' ? styles.activeLink : styles.link}
+              onMouseEnter={(e) => {
+                if (location.pathname !== '/field-owner-dashboard') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+              }}
+              onMouseLeave={(e) => {
+                if (location.pathname !== '/field-owner-dashboard') e.currentTarget.style.backgroundColor = '';
+              }}
             >
               <DashboardIcon sx={{ mr: 1 }} />
               Field management

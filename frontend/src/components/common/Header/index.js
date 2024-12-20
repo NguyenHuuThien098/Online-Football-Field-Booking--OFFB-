@@ -88,14 +88,14 @@ const Header = () => {
                         <>
                             <div className="col d-flex flex-column align-items-center justify-content-center">
                                 <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff' }} />
+                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease' }} />
                                 </div>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
-                                <NotificationsIcon fontSize="large" />
+                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease' }} />
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="setting">
-                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} />
+                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease' }} />
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={Boolean(anchorEl)}
@@ -113,7 +113,7 @@ const Header = () => {
                     ) : (
                         <div className="col d-flex flex-column align-items-center justify-content-center">
                             <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff' }} />
+                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease' }} />
                             </div>
                             <button onClick={() => navigate('/login')} className="btn btn-primary mt-2">
                                 Login
