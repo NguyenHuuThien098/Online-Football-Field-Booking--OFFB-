@@ -7,6 +7,7 @@ import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import PersonIcon from '@mui/icons-material/Person';
 import HistoryIcon from '@mui/icons-material/History';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,6 +53,8 @@ const Sidebar = () => {
     },
   };
 
+  const isHistoryActive = location.pathname.startsWith('/History');
+
   return (
     <nav className="nav flex-column">
       <Link
@@ -88,13 +91,14 @@ const Sidebar = () => {
           <Link 
             className="btn" 
             onClick={() => setIsOpen(!isOpen)}
-            style={isOpen ? styles.activeLink : styles.link}
+            style={isHistoryActive ? styles.activeLink : styles.link}
           >
             <HistoryIcon sx={{ mr: 1 }} />
             History
-            <span style={{ ...styles.underline, ...(isOpen && styles.activeUnderline) }}></span>
+            <ExpandMoreIcon sx={{ ml: 'auto' }} />
+            <span style={{ ...styles.underline, ...(isHistoryActive && styles.activeUnderline) }}></span>
           </Link>
-          <Collapse in={isOpen}>
+          <Collapse in={isOpen || isHistoryActive}>
             <div>
               <div className="nav flex-column">
                 <Link
