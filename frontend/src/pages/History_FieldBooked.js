@@ -254,7 +254,6 @@ const History_FieldBooked = () => {
     });
 
     return (
-        <MainLayout>
             <Container>
                 <Title>{isOwner ? 'Quản lý yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</Title>
                 {error && <ErrorAlert>{error}</ErrorAlert>}
@@ -368,7 +367,6 @@ const History_FieldBooked = () => {
                     </>
                 )}
             </Container>
-        </MainLayout>
     );
 };
 

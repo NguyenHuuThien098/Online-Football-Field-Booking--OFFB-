@@ -208,7 +208,7 @@ const UserProfile = () => {
                             </Typography>
                             <Grid container spacing={2} alignItems="center">
                                 <Grid item xs={4} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: 2 }}>
-                                    {userData.image && <Avatar src={userData.image} alt="User Image" sx={{ width: 300, height: 300, mb: 2, boxShadow: 3 }} />}
+                                    {userData.image && <Avatar src={userData.image} alt="User Image" sx={{ width: 300, height: 300, mb: 2, boxShadow: 3, border: '5px solid #007bff' }} />}
                                 </Grid>
                                 <Grid item xs={8} sx={{ backgroundColor: '#f0f0f0', padding: 2 }}>
                                     <Grid container spacing={2}>

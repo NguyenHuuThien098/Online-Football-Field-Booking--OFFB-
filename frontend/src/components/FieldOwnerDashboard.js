@@ -34,10 +34,15 @@ const FieldOwnerDashboard = () => {
         const fetchFieldsAndMatches = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const ownerId = localStorage.getItem('ownerId'); // Lấy ownerId từ local storage
-
+                const ownerId = localStorage.getItem('userId');
+                const role = localStorage.getItem('userRole');
                 if (!ownerId) {
                     setError('Không tìm thấy ownerId');
+                    setLoading(false);
+                    return;
+                }
+                if (role !== 'field_owner') {
+                    setError('Không phải owner');
                     setLoading(false);
                     return;
                 }
