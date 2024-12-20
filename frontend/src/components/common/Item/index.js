@@ -24,8 +24,6 @@ const Item = ({ field, match }) => {
   const [ownerName, setOwnerName] = useState(null); // State để lưu tên chủ sân
   const [ownerPhone, setOwnerPhone] = useState(null); // State để lưu số điện thoại
   const navigate = useNavigate();
-
-
   useEffect(() => {
     if (field?.ownerId) {
       fetchOwnerInfo(field.ownerId); // Lấy thông tin chủ sân khi có ownerId
@@ -59,12 +57,24 @@ const Item = ({ field, match }) => {
   };
 
   const availableTimeSlots = () => {
+    if (!field || !field.bookingSlots) {
+      return (
+        <Typography variant="h6" color="#f44336">
+          Currently unavailable
+        </Typography>
+      );
+    }
+
     const today = new Date().toISOString().slice(0, 10); // Get today's date
     const availableSlots = [];
 
     for (const date in field.bookingSlots) {
-      if (date >= today && field.bookingSlots[date]["15:00-16:00"]) {
-        availableSlots.push(date);
+      if (date >= today) {
+        for (const timeSlot in field.bookingSlots[date]) {
+          if (field.bookingSlots[date][timeSlot]) {
+            availableSlots.push({ date, timeSlot });
+          }
+        }
       }
     }
 
@@ -72,11 +82,11 @@ const Item = ({ field, match }) => {
       return (
         <div>
           <Typography variant="h6" color="primary">
-            Available on:
+            Available Slots:
           </Typography>
-          <div sx={{ display: 'flex', flexWrap: 'wrap' }}>
-            {availableSlots.map((date) => (
-              <Chip key={date} label={date} sx={{ marginRight: 1 }} />
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {availableSlots.map((slot, index) => (
+              <Chip key={index} label={`${slot.date} ${slot.timeSlot}`} style={{ marginRight: 8, marginBottom: 8 }} />
             ))}
           </div>
         </div>
@@ -102,7 +112,7 @@ const Item = ({ field, match }) => {
   if (field) {
     return (
       <StyledCard className={`mt-4 mx-3 border-primary `}
-        sx={{ width: 600, height: 300 }}
+        sx={{ width: 1200, height: 300 }}
       >
         <CardActionArea sx={{ width: 300, height: 300 }}>
           <CardMedia

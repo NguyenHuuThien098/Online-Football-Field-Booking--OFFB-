@@ -10,10 +10,14 @@ const FieldDetail = () => {
 
     const [ownerName, setOwnerName] = useState(null); // Lưu tên chủ sân
     const [ownerPhone, setOwnerPhone] = useState(null); // Lưu số điện thoại chủ sân
+    const [largeField, setLargeField] = useState(null); // State để lưu thông tin sân lớn
 
     useEffect(() => {
         if (field?.ownerId) {
             fetchOwnerInfo(field.ownerId); // Lấy thông tin chủ sân khi có ownerId
+        }
+        if (field?.largeFieldId) {
+            fetchLargeField(field.largeFieldId); // Lấy thông tin sân lớn khi có largeFieldId
         }
     }, [field]);
 
@@ -34,6 +38,22 @@ const FieldDetail = () => {
             console.error("Error fetching owner info:", error);
             setOwnerName("Không rõ");
             setOwnerPhone("Không có");
+        }
+    };
+
+    const fetchLargeField = async (largeFieldId) => {
+        try {
+            const db = getDatabase();
+            const fieldRef = ref(db, `field-owner/large-field/${largeFieldId}`);
+            const snapshot = await get(fieldRef);
+            if (snapshot.exists()) {
+                const fieldData = snapshot.val();
+                setLargeField(fieldData);
+            } else {
+                console.error("No large field data available");
+            }
+        } catch (error) {
+            console.error("Error fetching large field info:", error);
         }
     };
 
@@ -70,7 +90,9 @@ const FieldDetail = () => {
                             <Card.Text>
                                 <b>Chủ sân:</b> {ownerName || "Đang tải..."} <br />
                                 <b>SĐT:</b> {ownerPhone || "Đang tải..."} <br />
-                                <b>Địa chỉ:</b> {field.location}
+                                <b>Địa chỉ:</b> {field.location} <br />
+                                <b>Tên sân lớn:</b> {largeField?.name || "Đang tải..."} <br />
+                                <b>Địa chỉ sân lớn:</b> {largeField?.address || "Đang tải..."}
                             </Card.Text>
                             <div className="d-flex justify-content-end mb-3">
                                 <Button variant="primary" onClick={handleBookField}>
