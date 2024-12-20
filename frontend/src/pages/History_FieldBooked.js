@@ -2,13 +2,66 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { getDatabase, ref, get } from 'firebase/database';
+import { Button, Select, MenuItem, CircularProgress } from '@mui/material';
+import styled from 'styled-components';
+
+const Container = styled.div`
+  padding: 2rem;
+`;
+
+const Title = styled.h1`
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1976d2;
+`;
+
+const StatusSelectWrapper = styled.div`
+  margin-bottom: 1.5rem;
+`;
+
+const TableWrapper = styled.div`
+  overflow-x: auto;
+  margin-top: 2rem;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+`;
+
+const TableHeader = styled.th`
+  background-color: #1976d2;
+  color: white;
+  padding: 0.8rem;
+  text-align: left;
+`;
+
+const TableRow = styled.tr`
+  border-bottom: 1px solid #ddd;
+`;
+
+const TableCell = styled.td`
+  padding: 0.8rem;
+  text-align: left;
+`;
+
+const ErrorAlert = styled.div`
+  background-color: #f8d7da;
+  color: #842029;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+`;
 
 const History_FieldBooked = () => {
     const [bookings, setBookings] = useState([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isOwner, setIsOwner] = useState(false);
-    const [statusFilter, setStatusFilter] = useState('');  // State for the selected status filter
+    const [statusFilter, setStatusFilter] = useState('');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -30,19 +83,35 @@ const History_FieldBooked = () => {
     
             const db = getDatabase();
             const largeFieldsRef = ref(db, 'largeFields');
-            const smallFieldsRef = ref(db, 'smallFields');
             const usersRef = ref(db, 'users');
+            const bookingsRef = ref(db, 'bookings');
     
-            const [largeFieldsSnapshot, smallFieldsSnapshot, usersSnapshot] = await Promise.all([
+            const [largeFieldsSnapshot, usersSnapshot, bookingsSnapshot] = await Promise.all([
                 get(largeFieldsRef),
-                get(smallFieldsRef),
-                get(usersRef)
+                get(usersRef),
+                get(bookingsRef),
             ]);
     
             const largeFieldsData = largeFieldsSnapshot.exists() ? largeFieldsSnapshot.val() : {};
-            const smallFieldsData = smallFieldsSnapshot.exists() ? smallFieldsSnapshot.val() : {};
             const usersData = usersSnapshot.exists() ? usersSnapshot.val() : {};
+            const bookingsDataRaw = bookingsSnapshot.exists() ? bookingsSnapshot.val() : {};
     
+            // Tạo smallFieldsData từ largeFields
+            const smallFieldsData = {};
+            Object.keys(largeFieldsData).forEach(largeFieldId => {
+                const largeField = largeFieldsData[largeFieldId];
+                if (largeField.smallFields) {
+                    Object.keys(largeField.smallFields).forEach(smallFieldId => {
+                        smallFieldsData[smallFieldId] = {
+                            ...largeField.smallFields[smallFieldId],
+                            largeFieldAddress: largeField.address, // Địa chỉ sân lớn
+                            largeFieldName: largeField.name,      // Tên sân lớn
+                        };
+                    });
+                }
+            });
+    
+            // Trường hợp cho role 'field_owner'
             if (role === 'field_owner') {
                 const response = await axios.get(`http://localhost:5000/api/confirmed/owner/${userId}/bookings`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -51,15 +120,13 @@ const History_FieldBooked = () => {
                 bookingsData = response.data.data.flatMap(field =>
                     field.bookings.filter(booking => booking.status === '0').map(booking => {
                         const smallField = smallFieldsData[booking.smallFieldId] || {};
-                        const largeField = largeFieldsData[booking.largeFieldId] || {};
                         const userInfo = usersData[booking.userId] || {};
-    
-                        const fieldName = smallField.name || largeField.name || 'Tên sân chưa lấy được';
     
                         return {
                             bookingId: booking.bookingId,
-                            fieldName: fieldName,
-                            location: smallField.largeFieldAddress || largeField.address || 'Địa chỉ không có',
+                            fieldName: smallField.largeFieldName || 'Tên sân lớn chưa lấy được',
+                            fieldNamesmall: smallField.name || 'Tên sân nhỏ chưa lấy được',
+                            location: smallField.largeFieldAddress || 'Địa chỉ không có',
                             date: booking.date,
                             startTime: booking.startTime,
                             endTime: booking.endTime,
@@ -71,39 +138,28 @@ const History_FieldBooked = () => {
                     })
                 );
             } else {
-                const bookingsRef = ref(db, 'bookings');
-                const snapshot = await get(bookingsRef);
+                // Trường hợp người dùng
+                bookingsData = Object.keys(bookingsDataRaw)
+                    .filter(key => bookingsDataRaw[key].userId === userId)
+                    .map(key => {
+                        const booking = bookingsDataRaw[key];
+                        const smallField = smallFieldsData[booking.smallFieldId] || {};
+                        const userInfo = usersData[booking.userId] || {};
     
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-    
-                    bookingsData = Object.keys(data)
-                        .filter(key => data[key].userId === userId)
-                        .map(key => {
-                            const booking = data[key];
-                            const smallField = smallFieldsData[booking.smallFieldId] || {};
-                            const largeField = largeFieldsData[booking.largeFieldId] || {};
-                            const userInfo = usersData[booking.userId] || {};
-    
-                            const fieldNamelarg  = smallField.name || largeField.name || 'Tên sân chưa lấy được';
-                            const fieldNamesmall = smallField.largeFieldName ;             
-                            return {
-                                bookingId: key,
-                                fieldNamelarg: fieldNamelarg,
-                                fieldNamesmall: fieldNamesmall,
-                                location: smallField.largeFieldAddress || largeField.address || 'Địa chỉ không có',
-                                date: booking.date,
-                                startTime: booking.startTime,
-                                endTime: booking.endTime,
-                                numberOfPeople: booking.numberOfPeople,
-                                playerName: userInfo.fullName || 'Chưa có tên',
-                                phoneNumber: userInfo.phoneNumber || 'Chưa có số điện thoại',
-                                status: booking.status,
-                            };
-                        });
-                } else {
-                    setError('Không có lịch sử đặt sân.');
-                }
+                        return {
+                            bookingId: key,
+                            fieldName: smallField.largeFieldName || 'Tên sân lớn chưa lấy được',
+                            fieldNamesmall: smallField.name || 'Tên sân nhỏ chưa lấy được',
+                            location: smallField.largeFieldAddress || 'Địa chỉ không có',
+                            date: booking.date,
+                            startTime: booking.startTime,
+                            endTime: booking.endTime,
+                            numberOfPeople: booking.numberOfPeople,
+                            playerName: userInfo.fullName || 'Chưa có tên',
+                            phoneNumber: userInfo.phoneNumber || 'Chưa có số điện thoại',
+                            status: booking.status,
+                        };
+                    });
             }
     
             setBookings(bookingsData);
@@ -114,6 +170,7 @@ const History_FieldBooked = () => {
             setIsLoading(false);
         }
     };
+    
 
     const cancelBooking = async (bookingId) => {
         if (!window.confirm('Bạn có chắc muốn hủy đặt sân này không?')) return;
@@ -197,111 +254,121 @@ const History_FieldBooked = () => {
     });
 
     return (
-            <div className="container mt-5">
-                <h1 className="text-center mb-4">{isOwner ? 'Quản lý yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</h1>
-                {error && (
-                    <div className="alert alert-danger" role="alert">
-                        {error}
-                    </div>
-                )}
+        <MainLayout>
+            <Container>
+                <Title>{isOwner ? 'Quản lý yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</Title>
+                {error && <ErrorAlert>{error}</ErrorAlert>}
                 {isLoading ? (
-                    <p className="text-center">Đang tải dữ liệu...</p>
+                    <div style={{ textAlign: 'center' }}>
+                        <CircularProgress />
+                    </div>
                 ) : (
                     <>
-                        {/* Status Filter Dropdown */}
-                        <div className="mb-4">
+                        <StatusSelectWrapper>
                             <label className="mr-2">Lọc theo trạng thái:</label>
-                            <select
-                                className="form-select"
+                            <Select
                                 value={statusFilter}
                                 onChange={handleStatusChange}
+                                fullWidth
+                                variant="outlined"
                             >
-                                <option value="">Tất cả</option>
-                                <option value="0">Chờ xác nhận</option>
-                                <option value="1">Đã xác nhận</option>
-                                <option value="2">Đã hủy</option>
-                            </select>
-                        </div>
-
-                        <div className="table-responsive">
-                            <table className="table table-striped table-bordered table-hover">
-                                <thead className="thead-dark">
-                                    <tr>
-                                        <th scope="col">Sân lớn</th>
-                                        <th scope="col">Tên sân nhỏ</th>
-                                        <th scope="col">Địa chỉ</th>
-                                        <th scope="col">Ngày</th>
-                                        <th scope="col">Giờ</th>
-                                        <th scope="col">Số người</th>
-                                        <th scope="col">Người đặt</th>
-                                        <th scope="col">Số điện thoại</th>
-                                        <th scope="col">Trạng thái</th>
-                                        <th scope="col">Hành động</th>
-                                    </tr>
+                                <MenuItem value="">Tất cả</MenuItem>
+                                <MenuItem value="0">Chờ xác nhận</MenuItem>
+                                <MenuItem value="1">Đã xác nhận</MenuItem>
+                                <MenuItem value="2">Đã hủy</MenuItem>
+                            </Select>
+                        </StatusSelectWrapper>
+                        <TableWrapper>
+                            <Table>
+                                <thead>
+                                    <TableRow>
+                                        <TableHeader>Sân lớn</TableHeader>
+                                        <TableHeader>Tên sân nhỏ</TableHeader>
+                                        <TableHeader>Địa chỉ</TableHeader>
+                                        <TableHeader>Ngày</TableHeader>
+                                        <TableHeader>Giờ</TableHeader>
+                                        <TableHeader>Số người</TableHeader>
+                                        <TableHeader>Người đặt</TableHeader>
+                                        <TableHeader>Số điện thoại</TableHeader>
+                                        <TableHeader>Trạng thái</TableHeader>
+                                        <TableHeader>Hành động</TableHeader>
+                                    </TableRow>
                                 </thead>
                                 <tbody>
                                     {filteredBookings.length > 0 ? (
                                         filteredBookings.map((booking) => (
-                                            <tr key={booking.bookingId}>
-                                                <td>{booking.fieldNamelarg}</td>
-                                                <td> {booking.fieldNamesmall}</td>
-                                                <td>{booking.location}</td>
-                                                <td>{booking.date}</td>
-                                                <td>{`${booking.startTime} - ${booking.endTime}`}</td>
-                                                <td>{booking.numberOfPeople} người</td>
-                                                <td>{booking.playerName}</td>
-                                                <td>{booking.phoneNumber}</td>
-                                                <td>
+                                            <TableRow key={booking.bookingId}>
+                                                <TableCell>{booking.fieldName}</TableCell>
+                                                <TableCell>{booking.fieldNamesmall}</TableCell>
+                                                <TableCell>{booking.location}</TableCell>
+                                                <TableCell>{booking.date}</TableCell>
+                                                <TableCell>{`${booking.startTime} - ${booking.endTime}`}</TableCell>
+                                                <TableCell>{booking.numberOfPeople} người</TableCell>
+                                                <TableCell>{booking.playerName}</TableCell>
+                                                <TableCell>{booking.phoneNumber}</TableCell>
+                                                <TableCell>
                                                     {booking.status === '0' ? 'Chờ chủ sân xác nhận' :
-                                                     booking.status === '1' ? 'Chủ sân đã xác nhận yêu cầu' : 'Chủ sân từ đã từ chối yêu cầu'}
-                                                </td>
-                                                <td>
+                                                     booking.status === '1' ? 'Đã xác nhận' : 'Đã hủy'}
+                                                </TableCell>
+                                                <TableCell>
                                                     {booking.status === '0' && isOwner ? (
                                                         <>
-                                                            <button className="btn btn-outline-success btn-sm mr-2" onClick={() => confirmBooking(booking.bookingId)} disabled={isLoading}>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="primary"
+                                                                onClick={() => confirmBooking(booking.bookingId)}
+                                                                disabled={isLoading}
+                                                                style={{ marginRight: '5px' }}
+                                                            >
                                                                 Xác nhận
-                                                            </button>
-                                                            <button className="btn btn-outline-danger btn-sm" onClick={() => rejectBooking(booking.bookingId)} disabled={isLoading}>
-                                                                Từ chối
-                                                            </button>
-                                                        </>
-                                                    ) : isOwner ? (
-                                                        booking.status !== '2' && (
-                                                            <button
-                                                                className="btn btn-outline-warning btn-sm"
-                                                                onClick={() => cancelBooking(booking.bookingId)}
+                                                            </Button>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                onClick={() => rejectBooking(booking.bookingId)}
                                                                 disabled={isLoading}
                                                             >
-                                                                Hủy
-                                                            </button>
-                                                        )
+                                                                Từ chối
+                                                            </Button>
+                                                        </>
+                                                    ) : isOwner && booking.status !== '2' ? (
+                                                        <Button
+                                                            variant="contained"
+                                                            color="error"
+                                                            onClick={() => cancelBooking(booking.bookingId)}
+                                                            disabled={isLoading}
+                                                        >
+                                                            Hủy
+                                                        </Button>
                                                     ) : (
                                                         booking.status === '1' && (
-                                                            <button
-                                                                className="btn btn-outline-danger btn-sm"
+                                                            <Button
+                                                                variant="contained"
+                                                                color="error"
                                                                 onClick={() => cancelBooking(booking.bookingId)}
                                                                 disabled={isLoading}
                                                             >
                                                                 Hủy đặt sân
-                                                            </button>
+                                                            </Button>
                                                         )
                                                     )}
-                                                </td>
-                                            </tr>
+                                                </TableCell>
+                                            </TableRow>
                                         ))
                                     ) : (
-                                        <tr>
-                                            <td colSpan="7" className="text-center">
-                                                Chưa có yêu cầu đặt sân nào.
-                                            </td>
-                                        </tr>
+                                        <TableRow>
+                                            <TableCell colSpan="10" style={{ textAlign: 'center' }}>
+                                                Không có yêu cầu đặt sân nào.
+                                            </TableCell>
+                                        </TableRow>
                                     )}
                                 </tbody>
-                            </table>
-                        </div>
+                            </Table>
+                        </TableWrapper>
                     </>
                 )}
-            </div>
+            </Container>
+        </MainLayout>
     );
 };
 

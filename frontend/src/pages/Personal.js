@@ -125,6 +125,11 @@ const UserProfile = () => {
         }
     };
 
+    const handleCancel = () => {
+        setIsNewUser(false); // Hide the update form and return to info view
+        setMessage(''); // Reset any messages
+    };
+
     return (
         <div maxWidth="lg" sx={{ mt: 5 }}>
             <Card sx={{ padding: 3, fontFamily: 'Helvetica, sans-serif' }}>
