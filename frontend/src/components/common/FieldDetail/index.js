@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Button, Row, Col } from 'react-bootstrap';
+import { Container, Card, Button, Row, Col, ListGroup } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDatabase, ref, get } from 'firebase/database'; // Import Firebase functions
 
@@ -62,9 +62,9 @@ const FieldDetail = () => {
     return (
         <Container className="mt-5">
             <Row className="justify-content-center">
-                <Col md={6}>
+                <Col md={8}>
                     <Card className="shadow rounded">
-                        <Card.Img variant="top" src={field.image} rounded />
+                        <Card.Img variant="top" src={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'} rounded />
                         <Card.Body>
                             <Card.Title>{field.name}</Card.Title>
                             <Card.Text>
@@ -72,13 +72,7 @@ const FieldDetail = () => {
                                 <b>SĐT:</b> {ownerPhone || "Đang tải..."} <br />
                                 <b>Địa chỉ:</b> {field.location}
                             </Card.Text>
-                        </Card.Body>
-                    </Card>
-                </Col>
-                <Col xs={12} md={6}>
-                    <Card className="shadow rounded">
-                        <Card.Body>
-                            <div className="d-flex justify-content-end">
+                            <div className="d-flex justify-content-end mb-3">
                                 <Button variant="primary" onClick={handleBookField}>
                                     Đặt sân
                                 </Button>
@@ -94,10 +88,10 @@ const FieldDetail = () => {
                                     </div>
                                 </div>
                                 <Card.Title>Ghi chú</Card.Title>
-                                <ul className="list-group list-group-flush">
-                                    <li className="list-group-item">10-sáng - 3h chiều sale</li>
-                                    <li className="list-group-item">10-sáng - 3h chiều sale</li>
-                                </ul>
+                                <ListGroup variant="flush">
+                                    <ListGroup.Item>10-sáng - 3h chiều sale</ListGroup.Item>
+                                    <ListGroup.Item>10-sáng - 3h chiều sale</ListGroup.Item>
+                                </ListGroup>
                             </Card.Text>
                         </Card.Body>
                     </Card>
