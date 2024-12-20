@@ -17,7 +17,7 @@ const Sidebar = () => {
   const styles = {
     link: {
       textDecoration: 'none',
-      padding: '10px 15px',
+      padding: '10px 20px', // Increased padding
       color: '#000',
       display: 'flex',
       alignItems: 'center',
@@ -25,7 +25,7 @@ const Sidebar = () => {
     },
     activeLink: {
       textDecoration:  'none',
-      padding: '10px 15px',
+      padding: '10px 20px', // Increased padding
       color: '#fff',
       backgroundColor: '#80bfff', // Lighter blue background color
       borderLeft: '20px solid #007bff',
