@@ -249,8 +249,8 @@ const FieldOwnerDashboard = () => {
                 </Tabs>
                 {tabIndex === 0 && (
                     <div>
-                        <Typography variant="h3" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
-                            Danh sách sân của bạn:
+                        <Typography variant="h3" gutterBottom align="center" sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
+                            Danh sách sân của bạn
                         </Typography>
                         {fields.map((field) => (
                             <Card key={field.fieldId} variant="outlined" sx={{ mb: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2 }}>
@@ -272,7 +272,7 @@ const FieldOwnerDashboard = () => {
                             </Card>
                         ))}
                         <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
-                            <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                            <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
                                 Thêm sân mới:
                             </Typography>
                             <form onSubmit={handleAddField}>
@@ -354,7 +354,7 @@ const FieldOwnerDashboard = () => {
                 )}
                 {tabIndex === 1 && (
                     <div>
-                        <Typography variant="h3" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                        <Typography variant="h3" gutterBottom align='center' sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
                             Danh sách trận đấu mở:
                         </Typography>
                         {matches.map((match) => (
@@ -376,7 +376,7 @@ const FieldOwnerDashboard = () => {
                             </Card>
                         ))}
                         <Box sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
-                            <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.light', color: 'white', padding: 2, borderRadius: 1 }}>
+                            <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
                                 Thêm trận đấu mới:
                             </Typography>
                             <form onSubmit={handleAddMatch}>

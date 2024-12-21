@@ -56,7 +56,7 @@ const ErrorAlert = styled.div`
   border-radius: 0.5rem;
 `;
 
-const History_FieldBooked = () => {
+const HistoryFieldBooked = () => {
     const [bookings, setBookings] = useState([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -370,4 +370,4 @@ const History_FieldBooked = () => {
     );
 };
 
-export default History_FieldBooked;
+export default HistoryFieldBooked;

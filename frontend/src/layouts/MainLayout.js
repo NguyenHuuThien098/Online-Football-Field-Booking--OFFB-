@@ -8,17 +8,21 @@ const MainLayout = ({ children, role }) => {
   return (
     <div name="container" className={"w-100"}>
       {/* Header */}
-      <div name="header">    <Header role={role} />      </div>
+      <div name="header" className={styles.stickyHeader}>
+        <Header role={role} />
+      </div>
       
       {/* Body */}
       <div name="body" className="row">
         {/* Sidebar */}
-        <div name="sidebar" className="col-2 vh-100 p-0">
+        <div name="sidebar" className={`col-2 vh-100 p-0 border-end ${styles.stickySidebar}`}>
           <Sidebar />
         </div>
 
-      {/* Content */}
-        <div name="content" className="col p-0 border-start">{children}</div>  
+        {/* Content */}
+        <div name="content" className={`col border-start ${styles.content}`}>
+          {children}
+        </div>  
       </div>
     </div>
   );

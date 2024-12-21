@@ -1,7 +1,7 @@
 import React from 'react'; 
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const History_Matchjoined = () => {
+const HistoryMatchjoined = () => {
     return (            
             <div className="container mt-5">
                 <h1>Field booked</h1>
@@ -43,4 +43,4 @@ const History_Matchjoined = () => {
     );
 };
 
-export default History_Matchjoined
+export default HistoryMatchjoined
