@@ -14,6 +14,18 @@ const Sidebar = () => {
   const location = useLocation();
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const role = localStorage.getItem('userRole');
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const styles = {
     link: {
@@ -61,10 +73,14 @@ const Sidebar = () => {
     },
   };
 
+  const sidebarStyle = {
+    boxShadow: '3px 0 5px -2px rgba(0,0,0,0.2)', // Add shadow only on the right side
+  };
+
   const isHistoryActive = location.pathname.startsWith('/History');
 
   return (
-    <nav className="nav flex-column">
+    <nav className="nav flex-column" style={sidebarStyle}>
       <Link
         className="btn"
         to="/"

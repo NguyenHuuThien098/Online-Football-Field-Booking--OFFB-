@@ -72,7 +72,7 @@ const HistoryFieldBooked = () => {
             setIsOwner(role === 'field_owner');
             fetchBookings(userId, token, role);
         } else {
-            setError('Bạn chưa đăng nhập.');
+            setError('You are not logged in.');
         }
     }, []);
 
@@ -96,7 +96,7 @@ const HistoryFieldBooked = () => {
             const usersData = usersSnapshot.exists() ? usersSnapshot.val() : {};
             const bookingsDataRaw = bookingsSnapshot.exists() ? bookingsSnapshot.val() : {};
     
-            // Tạo smallFieldsData từ largeFields
+            // Create smallFieldsData from largeFields
             const smallFieldsData = {};
             Object.keys(largeFieldsData).forEach(largeFieldId => {
                 const largeField = largeFieldsData[largeFieldId];
@@ -104,14 +104,14 @@ const HistoryFieldBooked = () => {
                     Object.keys(largeField.smallFields).forEach(smallFieldId => {
                         smallFieldsData[smallFieldId] = {
                             ...largeField.smallFields[smallFieldId],
-                            largeFieldAddress: largeField.address, // Địa chỉ sân lớn
-                            largeFieldName: largeField.name,      // Tên sân lớn
+                            largeFieldAddress: largeField.address, // Large field address
+                            largeFieldName: largeField.name,      // Large field name
                         };
                     });
                 }
             });
     
-            // Trường hợp cho role 'field_owner'
+            // Case for role 'field_owner'
             if (role === 'field_owner') {
                 const response = await axios.get(`http://localhost:5000/api/confirmed/owner/${userId}/bookings`, {
                     headers: { Authorization: `Bearer ${token}` },
@@ -124,21 +124,21 @@ const HistoryFieldBooked = () => {
     
                         return {
                             bookingId: booking.bookingId,
-                            fieldName: smallField.largeFieldName || 'Tên sân lớn chưa lấy được',
-                            fieldNamesmall: smallField.name || 'Tên sân nhỏ chưa lấy được',
-                            location: smallField.largeFieldAddress || 'Địa chỉ không có',
+                            fieldName: smallField.largeFieldName || 'Large field name not available',
+                            fieldNamesmall: smallField.name || 'Small field name not available',
+                            location: smallField.largeFieldAddress || 'Address not available',
                             date: booking.date,
                             startTime: booking.startTime,
                             endTime: booking.endTime,
                             numberOfPeople: booking.numberOfPeople,
-                            playerName: userInfo.fullName || 'Chưa có tên',
-                            phoneNumber: userInfo.phoneNumber || 'Chưa có số điện thoại',
+                            playerName: userInfo.fullName || 'Name not available',
+                            phoneNumber: userInfo.phoneNumber || 'Phone number not available',
                             status: booking.status,
                         };
                     })
                 );
             } else {
-                // Trường hợp người dùng
+                // Case for user
                 bookingsData = Object.keys(bookingsDataRaw)
                     .filter(key => bookingsDataRaw[key].userId === userId)
                     .map(key => {
@@ -148,15 +148,15 @@ const HistoryFieldBooked = () => {
     
                         return {
                             bookingId: key,
-                            fieldName: smallField.largeFieldName || 'Tên sân lớn chưa lấy được',
-                            fieldNamesmall: smallField.name || 'Tên sân nhỏ chưa lấy được',
-                            location: smallField.largeFieldAddress || 'Địa chỉ không có',
+                            fieldName: smallField.largeFieldName || 'Large field name not available',
+                            fieldNamesmall: smallField.name || 'Small field name not available',
+                            location: smallField.largeFieldAddress || 'Address not available',
                             date: booking.date,
                             startTime: booking.startTime,
                             endTime: booking.endTime,
                             numberOfPeople: booking.numberOfPeople,
-                            playerName: userInfo.fullName || 'Chưa có tên',
-                            phoneNumber: userInfo.phoneNumber || 'Chưa có số điện thoại',
+                            playerName: userInfo.fullName || 'Name not available',
+                            phoneNumber: userInfo.phoneNumber || 'Phone number not available',
                             status: booking.status,
                         };
                     });
@@ -165,7 +165,7 @@ const HistoryFieldBooked = () => {
             setBookings(bookingsData);
         } catch (err) {
             console.error(err);
-            setError('Không thể lấy lịch sử đặt sân.');
+            setError('Unable to fetch booking history.');
         } finally {
             setIsLoading(false);
         }
@@ -173,7 +173,7 @@ const HistoryFieldBooked = () => {
     
 
     const cancelBooking = async (bookingId) => {
-        if (!window.confirm('Bạn có chắc muốn hủy đặt sân này không?')) return;
+        if (!window.confirm('Are you sure you want to cancel this booking?')) return;
 
         const token = localStorage.getItem('token');
         setIsLoading(true);
@@ -182,12 +182,12 @@ const HistoryFieldBooked = () => {
                 `http://localhost:5000/api/player/bookings/${bookingId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Hủy đặt sân thành công!');
+            alert('Booking cancelled successfully!');
             const userId = localStorage.getItem('userId');
             fetchBookings(userId, token, localStorage.getItem('role'));
         } catch (err) {
             console.error(err.response ? err.response.data : err);
-            setError('Không thể hủy đặt sân.');
+            setError('Unable to cancel booking.');
         } finally {
             setIsLoading(false);
         }
@@ -195,7 +195,7 @@ const HistoryFieldBooked = () => {
 
     const confirmBooking = async (bookingId) => {
         if (!bookingId) {
-            alert('ID đặt sân không hợp lệ.');
+            alert('Invalid booking ID.');
             return;
         }
         const token = localStorage.getItem('token');
@@ -206,13 +206,13 @@ const HistoryFieldBooked = () => {
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Bạn đã chấp nhận yêu cầu đặt sân!');
+            alert('You have accepted the booking request!');
             setBookings(prevBookings =>
                 prevBookings.filter(booking => booking.bookingId !== bookingId)
             );
         } catch (err) {
             console.error(err.response ? err.response.data : err);
-            setError('Không thể xác nhận đặt sân.');
+            setError('Unable to confirm booking.');
         } finally {
             setIsLoading(false);
         }
@@ -220,7 +220,7 @@ const HistoryFieldBooked = () => {
     
     const rejectBooking = async (bookingId) => {
         if (!bookingId) {
-            alert('ID đặt sân không hợp lệ.');
+            alert('Invalid booking ID.');
             return;
         }
         const token = localStorage.getItem('token');
@@ -231,13 +231,13 @@ const HistoryFieldBooked = () => {
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Bạn đã từ chối yêu cầu đặt sân!');
+            alert('You have rejected the booking request!');
             setBookings(prevBookings =>
                 prevBookings.filter(booking => booking.bookingId !== bookingId)
             );
         } catch (err) {
             console.error(err.response ? err.response.data : err);
-            setError('Không thể từ chối đặt sân.');
+            setError('Unable to reject booking.');
         } finally {
             setIsLoading(false);
         }
@@ -255,7 +255,7 @@ const HistoryFieldBooked = () => {
 
     return (
             <Container>
-                <Title>{isOwner ? 'Quản lý yêu cầu Đặt Sân' : 'Lịch Sử Đặt Sân'}</Title>
+                <Title>{isOwner ? 'Manage Booking Requests' : 'Booking History'}</Title>
                 {error && <ErrorAlert>{error}</ErrorAlert>}
                 {isLoading ? (
                     <div style={{ textAlign: 'center' }}>
@@ -264,33 +264,33 @@ const HistoryFieldBooked = () => {
                 ) : (
                     <>
                         <StatusSelectWrapper>
-                            <label className="mr-2">Lọc theo trạng thái:</label>
+                            <label className="mr-2">Filter by status:</label>
                             <Select
                                 value={statusFilter}
                                 onChange={handleStatusChange}
                                 fullWidth
                                 variant="outlined"
                             >
-                                <MenuItem value="">Tất cả</MenuItem>
-                                <MenuItem value="0">Chờ xác nhận</MenuItem>
-                                <MenuItem value="1">Đã xác nhận</MenuItem>
-                                <MenuItem value="2">Đã hủy</MenuItem>
+                                <MenuItem value="">All</MenuItem>
+                                <MenuItem value="0">Pending Confirmation</MenuItem>
+                                <MenuItem value="1">Confirmed</MenuItem>
+                                <MenuItem value="2">Cancelled</MenuItem>
                             </Select>
                         </StatusSelectWrapper>
                         <TableWrapper>
                             <Table>
                                 <thead>
                                     <TableRow>
-                                        <TableHeader>Sân lớn</TableHeader>
-                                        <TableHeader>Tên sân nhỏ</TableHeader>
-                                        <TableHeader>Địa chỉ</TableHeader>
-                                        <TableHeader>Ngày</TableHeader>
-                                        <TableHeader>Giờ</TableHeader>
-                                        <TableHeader>Số người</TableHeader>
-                                        <TableHeader>Người đặt</TableHeader>
-                                        <TableHeader>Số điện thoại</TableHeader>
-                                        <TableHeader>Trạng thái</TableHeader>
-                                        <TableHeader>Hành động</TableHeader>
+                                        <TableHeader>Large Field</TableHeader>
+                                        <TableHeader>Small Field Name</TableHeader>
+                                        <TableHeader>Address</TableHeader>
+                                        <TableHeader>Date</TableHeader>
+                                        <TableHeader>Time</TableHeader>
+                                        <TableHeader>Number of People</TableHeader>
+                                        <TableHeader>Booker</TableHeader>
+                                        <TableHeader>Phone Number</TableHeader>
+                                        <TableHeader>Status</TableHeader>
+                                        <TableHeader>Action</TableHeader>
                                     </TableRow>
                                 </thead>
                                 <tbody>
@@ -302,12 +302,12 @@ const HistoryFieldBooked = () => {
                                                 <TableCell>{booking.location}</TableCell>
                                                 <TableCell>{booking.date}</TableCell>
                                                 <TableCell>{`${booking.startTime} - ${booking.endTime}`}</TableCell>
-                                                <TableCell>{booking.numberOfPeople} người</TableCell>
+                                                <TableCell>{booking.numberOfPeople} people</TableCell>
                                                 <TableCell>{booking.playerName}</TableCell>
                                                 <TableCell>{booking.phoneNumber}</TableCell>
                                                 <TableCell>
-                                                    {booking.status === '0' ? 'Chờ chủ sân xác nhận' :
-                                                     booking.status === '1' ? 'Đã xác nhận' : 'Đã hủy'}
+                                                    {booking.status === '0' ? 'Pending Confirmation' :
+                                                     booking.status === '1' ? 'Confirmed' : 'Cancelled'}
                                                 </TableCell>
                                                 <TableCell>
                                                     {booking.status === '0' && isOwner ? (
@@ -319,7 +319,7 @@ const HistoryFieldBooked = () => {
                                                                 disabled={isLoading}
                                                                 style={{ marginRight: '5px' }}
                                                             >
-                                                                Xác nhận
+                                                                Confirm
                                                             </Button>
                                                             <Button
                                                                 variant="contained"
@@ -327,7 +327,7 @@ const HistoryFieldBooked = () => {
                                                                 onClick={() => rejectBooking(booking.bookingId)}
                                                                 disabled={isLoading}
                                                             >
-                                                                Từ chối
+                                                                Reject
                                                             </Button>
                                                         </>
                                                     ) : isOwner && booking.status !== '2' ? (
@@ -337,7 +337,7 @@ const HistoryFieldBooked = () => {
                                                             onClick={() => cancelBooking(booking.bookingId)}
                                                             disabled={isLoading}
                                                         >
-                                                            Hủy
+                                                            Cancel
                                                         </Button>
                                                     ) : (
                                                         booking.status === '1' && (
@@ -347,7 +347,7 @@ const HistoryFieldBooked = () => {
                                                                 onClick={() => cancelBooking(booking.bookingId)}
                                                                 disabled={isLoading}
                                                             >
-                                                                Hủy đặt sân
+                                                                Cancel Booking
                                                             </Button>
                                                         )
                                                     )}
@@ -357,7 +357,7 @@ const HistoryFieldBooked = () => {
                                     ) : (
                                         <TableRow>
                                             <TableCell colSpan="10" style={{ textAlign: 'center' }}>
-                                                Không có yêu cầu đặt sân nào.
+                                                No booking requests found.
                                             </TableCell>
                                         </TableRow>
                                     )}

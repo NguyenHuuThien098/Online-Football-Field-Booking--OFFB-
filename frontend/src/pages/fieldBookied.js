@@ -4,10 +4,10 @@ import axios from "axios";
 import { Container, Card, CardContent, TextField, Button, Typography, Grid, Box, Modal } from '@mui/material';
 
 const FieldBooked = () => {
-    const location = useLocation();  // Nhận dữ liệu từ state
+    const location = useLocation();  // Receive data from state
     const navigate = useNavigate();
 
-    const { field } = location.state || {};  // Lấy field từ state
+    const { field } = location.state || {};  // Get field from state
 
     const [userId, setUserId] = useState('');
     const [token, setToken] = useState('');
@@ -31,7 +31,7 @@ const FieldBooked = () => {
         const storedToken = localStorage.getItem('token');
 
         if (!storedUserId || !storedToken) {
-            alert('Bạn cần đăng nhập để đặt sân.');
+            alert('You need to log in to book a field.');
             navigate('/login');
             return;
         }
@@ -40,7 +40,7 @@ const FieldBooked = () => {
         setToken(storedToken);
 
         if (!field) {
-            setError('Dữ liệu sân không khả dụng. Vui lòng thử lại.');
+            setError('Field data is not available. Please try again.');
         }
 
         setLargeFieldId(field?.largeFieldId || '');
@@ -56,11 +56,11 @@ const FieldBooked = () => {
 
     const handleBookField = async (selectedSlot = null) => {
         if (!field?.id) {
-            setError('Thiếu ID sân. Vui lòng thử lại.');
+            setError('Missing field ID. Please try again.');
             return;
         }
         if (!userId) {
-            setError('Dữ liệu người dùng không khả dụng. Vui lòng đăng nhập.');
+            setError('User data is not available. Please log in.');
             return;
         }
 
@@ -72,7 +72,7 @@ const FieldBooked = () => {
             : bookingDetails;
 
         if (!details.date || !details.startTime || !details.endTime) {
-            alert('Vui lòng nhập đầy đủ ngày, giờ bắt đầu và giờ kết thúc.');
+            alert('Please enter the full date, start time, and end time.');
             return;
         }
 
@@ -92,10 +92,10 @@ const FieldBooked = () => {
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Đã gửi yêu cầu đặt sân thành công!');
+            alert('Field booking request sent successfully!');
             navigate('/player-page');
         } catch (error) {
-            console.error('Lỗi đặt sân:', error);
+            console.error('Field booking error:', error);
 
             if (error.response && error.response.status === 400) {
                 const { message, availableSlots } = error.response.data;
@@ -105,11 +105,11 @@ const FieldBooked = () => {
             } else if (error.response && error.response.status === 409) {
                 // Handle time conflict
                 const { availableSlots } = error.response.data;
-                setError('Lịch đặt trùng với một lịch đã có. Vui lòng chọn lại khung giờ.');
+                setError('The booking time conflicts with an existing booking. Please select another time slot.');
                 setAvailableSlots(availableSlots || []); // Show available time slots
                 setShowModal(true);  // Show modal with available slots
             } else {
-                setError('Có lỗi xảy ra khi đặt sân.');
+                setError('An error occurred while booking the field.');
             }
         } finally {
             setIsLoading(false);
@@ -125,15 +125,15 @@ const FieldBooked = () => {
             <Card sx={{ boxShadow: 3 }}>
                 <CardContent>
                     <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1, fontSize: '2rem' }}>
-                        Đặt Sân
+                        Book Field
                     </Typography>
                     <Typography variant="h6" gutterBottom sx={{ fontSize: '1.5rem' }}>
-                        Sân: {field?.name || 'Không xác định'}
+                        Field: {field?.name || 'Unknown'}
                     </Typography>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
-                                label="Ngày"
+                                label="Date"
                                 type="date"
                                 value={bookingDetails.date}
                                 onChange={(e) => handleBookingChange('date', e.target.value)}
@@ -145,7 +145,7 @@ const FieldBooked = () => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextField
-                                label="Giờ Bắt Đầu"
+                                label="Start Time"
                                 type="time"
                                 value={bookingDetails.startTime}
                                 onChange={(e) => handleBookingChange('startTime', e.target.value)}
@@ -157,7 +157,7 @@ const FieldBooked = () => {
                         </Grid>
                         <Grid item xs={6}>
                             <TextField
-                                label="Giờ Kết Thúc"
+                                label="End Time"
                                 type="time"
                                 value={bookingDetails.endTime}
                                 onChange={(e) => handleBookingChange('endTime', e.target.value)}
@@ -169,7 +169,7 @@ const FieldBooked = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <TextField
-                                label="Số Người"
+                                label="Number of People"
                                 select
                                 SelectProps={{ native: true }}
                                 value={bookingDetails.numberOfPeople}
@@ -178,17 +178,17 @@ const FieldBooked = () => {
                                 required
                                 inputProps={{ style: { fontSize: '1.2rem' } }}
                             >
-                                <option value="5">5 Người</option>
-                                <option value="7">7 Người</option>
-                                <option value="11">11 Người</option>
+                                <option value="5">5 People</option>
+                                <option value="7">7 People</option>
+                                <option value="11">11 People</option>
                             </TextField>
                         </Grid>
                         <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading} sx={{ fontSize: '1.2rem' }}>
-                                Xác Nhận Đặt Sân
+                                Confirm Booking
                             </Button>
                             <Button variant="contained" sx={{ backgroundColor: 'red', fontSize: '1.2rem' }} onClick={handleCancel} disabled={isLoading}>
-                                Hủy
+                                Cancel
                             </Button>
                         </Grid>
                     </Grid>
@@ -209,7 +209,7 @@ const FieldBooked = () => {
                     p: 4,
                 }}>
                     <Typography variant="h6" component="h2" sx={{ fontSize: '1.5rem' }}>
-                        Các khung giờ còn trống
+                        Available Time Slots
                     </Typography>
                     <Box sx={{ mt: 2 }}>
                         {availableSlots.map((slot, index) => (
@@ -225,7 +225,7 @@ const FieldBooked = () => {
                         ))}
                     </Box>
                     <Button onClick={() => setShowModal(false)} variant="contained" color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>
-                        Đóng
+                        Close
                     </Button>
                 </Box>
             </Modal>

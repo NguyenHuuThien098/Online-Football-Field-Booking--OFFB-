@@ -8,22 +8,19 @@ import { Typography, Paper } from '@mui/material';
 import { Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-
-
 const Hover = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
   display: 'flex',
   transition: 'transform 0.3s linear',
   '&:active': {
     transform: 'scale(0.99)', // Subtle hover scale effect
-    boxShadow: theme.shadows[5], // Áp dụng hiệu ứng đổ bóng từ theme
+    boxShadow: theme.shadows[5], // Apply shadow effect from theme
   },
-
 }));
 
 const OpenMatch = () => {
-  const [fields, setFields] = useState([]); // Danh sách sân
-  const [matches, setMatches] = useState([]); // Danh sách trận đấu
+  const [fields, setFields] = useState([]); // List of fields
+  const [matches, setMatches] = useState([]); // List of matches
   const [searchParams, setSearchParams] = useState({
     name: "",
     date: "",
@@ -39,11 +36,11 @@ const OpenMatch = () => {
   const role = localStorage.getItem("userRole");
   
   useEffect(() => {
-    fetchDefaultFields(); // Tải danh sách sân mặc định
-    fetchMatches(); // Tải danh sách trận đấu
+    fetchDefaultFields(); // Load default fields
+    fetchMatches(); // Load matches
   }, []);
 
-  // Lấy danh sách sân mặc định
+  // Fetch default fields
   const fetchDefaultFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
@@ -53,13 +50,13 @@ const OpenMatch = () => {
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching default fields:", error);
-      setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");
+      setErrorFields("An error occurred while loading the list of fields.");
     } finally {
       setLoadingFields(false);
     }
   };
 
-  // Lấy danh sách trận đấu
+  // Fetch matches
   const fetchMatches = async () => {
     setLoadingMatches(true);
     setErrorMatches("");
@@ -69,13 +66,13 @@ const OpenMatch = () => {
       setMatches(response.data);
     } catch (error) {
       console.error("Error fetching matches:", error);
-      setErrorMatches("Có lỗi xảy ra khi tải danh sách trận đấu.");
+      setErrorMatches("An error occurred while loading the list of matches.");
     } finally {
       setLoadingMatches(false);
     }
   };
 
-// Tìm kiếm sân
+  // Search fields
   const searchFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
@@ -83,7 +80,7 @@ const OpenMatch = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        setErrorFields("Bạn cần đăng nhập để tìm kiếm.");
+        setErrorFields("You need to log in to search.");
         return;
       }
 
@@ -94,7 +91,7 @@ const OpenMatch = () => {
       setFields(response.data);
     } catch (error) {
       console.error("Error searching fields:", error);
-      setErrorFields("Có lỗi xảy ra khi tìm kiếm sân.");
+      setErrorFields("An error occurred while searching for fields.");
     } finally {
       setLoadingFields(false);
     }
@@ -110,15 +107,11 @@ const OpenMatch = () => {
           />
         </Hover>
 
-
         {/* Fields Section */}
 
         <Container
           className="shadow p-4 mt-5 border-top border-primary"
           style={{ background: "white", borderRadius: '50px' }}
-          sx={{
-
-          }}
         >
           {/* Matches Section */}
 
@@ -128,19 +121,16 @@ const OpenMatch = () => {
             sx={{
               borderRadius: '8px',
               textAlign: 'center',
-              backgroundColor: '#1976d2', // Đặt màu nền tại đây
-              // border: "1px solid gray"
+              backgroundColor: '#1976d2', // Set background color here
             }}
           >
-
             <Typography variant="h2" component="h2" color="white" className="mt-4">
-              Danh sách trận đấu mở
+              Open Matches List
             </Typography>
           </Paper>
 
-
           {loadingMatches ? (
-            <p className="text-center">Đang tải danh sách trận đấu...</p>
+            <p className="text-center">Loading matches...</p>
           ) : errorMatches ? (
             <p style={{ color: "red" }} className="text-center">{errorMatches}</p>
           ) : matches.length > 0 ? (
@@ -150,7 +140,7 @@ const OpenMatch = () => {
               ))}
             </div>
           ) : (
-            <p className="text-center">Không có trận đấu nào được mở.</p>
+            <p className="text-center">No open matches found.</p>
           )}
         </Container>
       </div>
