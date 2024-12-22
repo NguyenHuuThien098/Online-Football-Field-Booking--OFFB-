@@ -57,6 +57,11 @@ const Item = ({ field, match }) => {
       navigate(`/fieldDetail/`, { state: field }); // Chuyển đến trang chi tiết sân
     }
   };
+  const handleJoinClick = () => {
+    if (match) {
+      navigate(`/join_match`, { state: match }); // Chuyển hướng đến trang join_match với dữ liệu trận đấu
+    }
+  };
 
   const availableTimeSlots = () => {
     const today = new Date().toISOString().slice(0, 10); // Get today's date
@@ -191,10 +196,10 @@ const Item = ({ field, match }) => {
 
           </div>
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" sx={{ width: 150, height: 40 }}>
-              Tham gia
-            </Button>
-          </Box>
+          <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleJoinClick}>
+            Tham gia
+          </Button>
+        </Box>
         </CardContent>
       </StyledCard>
 

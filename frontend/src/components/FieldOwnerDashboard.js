@@ -35,6 +35,7 @@ const FieldOwnerDashboard = () => {
                 const token = localStorage.getItem('token');
                 const ownerId = localStorage.getItem('userId');
                 const role = localStorage.getItem('userRole');
+                console.log('Token:', token);
                 if (!ownerId) {
                     setError('Không tìm thấy ownerId');
                     setLoading(false);

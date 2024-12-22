@@ -13,6 +13,7 @@ exports.getAllMatchesPublic = async (req, res) => {
         res.status(500).json({ error: 'Có lỗi xảy ra khi lấy danh sách tất cả các trận đấu!' });
     }
 };
+
 // Hàm tạo trận đấu
 exports.createMatch = async (req, res) => {
     const { largeFieldAddress, smallFieldAddress, time, ownerName, playerCount, notes, questions, images } = req.body;

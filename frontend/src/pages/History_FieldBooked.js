@@ -78,7 +78,7 @@ const History_FieldBooked = () => {
 
     const fetchBookings = async (userId, token, role) => {
         setIsLoading(true);
-        try {
+        try {   
             let bookingsData = [];
     
             const db = getDatabase();

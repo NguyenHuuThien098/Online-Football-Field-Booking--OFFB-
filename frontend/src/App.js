@@ -11,6 +11,7 @@ import AvailableField from "./pages/availableField";
 import OpenMatch from "./pages/openMatch";
 import History_MatchJoined from "./pages/History_Matchjoined";
 import History_FieldBooked from "./pages/History_FieldBooked";
+import Join_match from "./pages/Join_match";
 import Login from "./pages/login";
 import Report from "./pages/report";
 import FieldDetail from "./components/common/FieldDetail";
@@ -43,6 +44,14 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
+        <Route
+          path="/Join_match"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<Join_match />} />
+            </MainLayout>
+          }
+        />
         <Route
           path="/"
           element={
@@ -131,6 +140,15 @@ const App = () => {
             </MainLayout>
           }
         />
+<Route
+          path="/History_FieldBooked"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<History_FieldBooked />} />
+            </MainLayout>
+          }
+        />
+
         <Route
           path="/Report"
           element={

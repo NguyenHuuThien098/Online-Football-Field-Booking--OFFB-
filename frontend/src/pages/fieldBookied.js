@@ -92,8 +92,8 @@ const FieldBooked = () => {
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Đã gửi yêu cầu đặt sân thành công!');
-            navigate('/player-page');
+            alert('Đã gửi yêu cầu đặt sân thành công! Nhấn OK để trở về trang chủ!');
+            navigate('/');
         } catch (error) {
             console.error('Lỗi đặt sân:', error);
 

@@ -83,12 +83,12 @@ exports.joinMatch = async (req, res) => {
         }
 
         // Nếu không cần phê duyệt, thêm trực tiếp vào danh sách players
-        await addPlayerToMatch(matchRef, matchData, playerId);
+        // await addPlayerToMatch(matchRef, matchData, playerId);
 
         // Gửi thông báo cho chủ sân
         await sendNotificationToOwner(matchData.ownerId, playerId, matchId);
 
-        return res.status(200).json({ message: 'Tham gia trận đấu thành công', match: matchData });
+        return res.status(200).json({ message: 'Đã yêu cầu tham gia trận đấu thành công', match: matchData });
     } catch (error) {
         console.error('Lỗi khi tham gia trận đấu:', error);
         return res.status(500).json({ error: 'Không thể tham gia trận đấu', details: error.message });
