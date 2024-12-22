@@ -106,13 +106,13 @@ const Item = ({ field, match }) => {
   };
 
   const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
   if (field) {
     return (
       <StyledCard className={`mt-4 mx-3 border-primary `}
-        sx={{ width: 1200, height: 300 }}
+        sx={{ width: 600, height: 300 }}
       >
         <CardActionArea sx={{ width: 300, height: 300 }}>
           <CardMedia
@@ -131,12 +131,12 @@ const Item = ({ field, match }) => {
               Địa chỉ: {field.largeFieldAddress}
             </Typography>
             <Chip label={field.type}
-              className="text-secondary my-2"
+              className="text-success my-2"
               sx={{
                 backgroundColor: '#FCE0D3',
-                fontSize: '13px',
-                width: '70px',
-                height: '20px',
+                fontSize: '14px',
+                width: '80px',
+                height: '30px',
               }}
             />
           </div>

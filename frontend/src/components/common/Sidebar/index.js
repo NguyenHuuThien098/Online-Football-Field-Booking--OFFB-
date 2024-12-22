@@ -35,6 +35,7 @@ const Sidebar = () => {
       display: 'flex',
       alignItems: 'center',
       position: 'relative',
+      fontStyle: 'italic',
     },
     underline: {
       content: '""',
@@ -134,33 +135,33 @@ const Sidebar = () => {
               <div className="nav flex-column">
                 <Link
                   className="btn"
-                  to="/History_FieldBooked"
-                  style={location.pathname === '/History_FieldBooked' ? styles.activeLink : styles.link}
+                  to="/historyFieldBooked"
+                  style={location.pathname === '/historyFieldBooked' ? styles.activeLink : styles.link}
                   onMouseEnter={(e) => {
-                    if (location.pathname !== '/History_FieldBooked') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+                    if (location.pathname !== '/historyFieldBooked') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
                   }}
                   onMouseLeave={(e) => {
-                    if (location.pathname !== '/History_FieldBooked') e.currentTarget.style.backgroundColor = '';
+                    if (location.pathname !== '/historyFieldBooked') e.currentTarget.style.backgroundColor = '';
                   }}
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Field booked
-                  <span style={{ ...styles.underline, ...(location.pathname === '/History_FieldBooked' && styles.activeUnderline) }}></span>
+                  <span style={{ ...styles.underline, ...(location.pathname === '/historyFieldBooked' && styles.activeUnderline) }}></span>
                 </Link>
                 <Link
                   className="btn"
-                  to="/History_MatchJoined"
-                  style={location.pathname === '/History_MatchJoined' ? styles.activeLink : styles.link}
+                  to="/historyMatchJoined"
+                  style={location.pathname === '/historyMatchJoined' ? styles.activeLink : styles.link}
                   onMouseEnter={(e) => {
-                    if (location.pathname !== '/History_MatchJoined') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+                    if (location.pathname !== '/historyMatchJoined') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
                   }}
                   onMouseLeave={(e) => {
-                    if (location.pathname !== '/History_MatchJoined') e.currentTarget.style.backgroundColor = '';
+                    if (location.pathname !== '/historyMatchJoined') e.currentTarget.style.backgroundColor = '';
                   }}
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Match joined
-                  <span style={{ ...styles.underline, ...(location.pathname === '/History_MatchJoined' && styles.activeUnderline) }}></span>
+                  <span style={{ ...styles.underline, ...(location.pathname === '/historyMatchJoined' && styles.activeUnderline) }}></span>
                 </Link>
               </div>
             </div>
