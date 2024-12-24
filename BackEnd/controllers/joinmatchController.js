@@ -34,9 +34,10 @@ const addPlayerToMatch = async (matchRef, matchData, playerId) => {
 
 // Gửi thông báo cho chủ sân
 const sendNotificationToOwner = async (ownerId, playerId, matchId) => {
+    const fullName = await getPlayerName(playerId);
     const ownerNotificationRef = admin.database().ref(`notifications/${ownerId}`).push();
     await ownerNotificationRef.set({
-        message: `Player ${playerId} đã tham gia trận đấu của bạn.`,
+        message: ` ${fullName} đã yêu cầu tham gia trận đấu của bạn.`,
         matchId,
         timestamp: new Date().toISOString()
     });
@@ -206,11 +207,11 @@ exports.cancelJoinMatch = async (req, res) => {
         } else {
             return res.status(400).json({ error: 'Bạn không thể hủy tham gia nếu chưa được chấp nhận hoặc không có trong danh sách' });
         }
-
+        const fullName = await getPlayerName(playerId);
         // Gửi thông báo cho chủ sân nếu player hủy tham gia
         const ownerNotificationRef = admin.database().ref(`notifications/${matchData.ownerId}`).push();
         await ownerNotificationRef.set({
-            message: `Player ${playerId} đã hủy tham gia trận đấu của bạn.`,
+            message: ` ${fullName} đã hủy tham gia trận đấu của bạn.`,
             matchId,
             timestamp: new Date().toISOString()
         });
@@ -244,5 +245,19 @@ exports.getJoinRequests = async (req, res) => {
     } catch (error) {
         console.error('Lỗi khi lấy danh sách yêu cầu tham gia:', error);
         return res.status(500).json({ error: 'Không thể lấy danh sách yêu cầu tham gia', details: error.message });
+    }
+};
+// Hàm lấy tên người chơi từ Firebase
+const getPlayerName = async (userId) => {
+    try {
+        const userSnapshot = await admin.database().ref(`users/${userId}`).once('value');
+        const userData = userSnapshot.val();
+        if (userData && userData.fullName) {
+            return userData.fullName;
+        }
+        return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
+    } catch (error) {
+        console.error("Error fetching player name:", error);
+        return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
     }
 };

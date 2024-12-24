@@ -18,7 +18,7 @@ import FieldDetail from "./components/common/FieldDetail";
 import FieldBookied from "./pages/fieldBookied"; // Import FieldBookied
 import Personal from "./pages/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
-
+import Nofi from "./pages/Nofi";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
@@ -49,6 +49,14 @@ const App = () => {
           element={
             <MainLayout>
               <ProtectedRoute element={<Join_match />} />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/Nofi"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<Nofi />} />
             </MainLayout>
           }
         />

@@ -93,7 +93,7 @@ exports.bookField = async (req, res) => {
                 });
             }
         }
-
+        const fullName = await getPlayerName(userId);
         // Tạo booking mới
         const booking = await Booking.createBooking(largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople);
 
@@ -107,9 +107,11 @@ exports.bookField = async (req, res) => {
 
         // Thông báo cho chủ sân
         const notificationData = {
-            message: `Player đã yêu cầu đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
+            message: `${fullName} đã yêu cầu đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
+            createdAt: Date.now(),
             smallFieldId,
+           
         };
         await Notification.notifyFieldOwner(largeField.ownerId, notificationData);
 
@@ -170,6 +172,7 @@ exports.cancelBooking = async (req, res) => {
         const notificationData = {
             message: `${playerName} đã hủy đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
+            createdAt,
             smallFieldId,
         };
 
@@ -208,12 +211,13 @@ exports.playerHome = (req, res) => {
     res.status(200).send('Đây là trang chủ của Player');
 };
 
-// Lấy tên người chơi
+// Hàm lấy tên người chơi từ Firebase
 const getPlayerName = async (userId) => {
     try {
-        const user = await User.getUserById(userId);
-        if (user && user.name) {
-            return user.name;
+        const userSnapshot = await admin.database().ref(`users/${userId}`).once('value');
+        const userData = userSnapshot.val();
+        if (userData && userData.fullName) {
+            return userData.fullName;
         }
         return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
     } catch (error) {
@@ -221,6 +225,7 @@ const getPlayerName = async (userId) => {
         return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
     }
 };
+
 
 // Hàm lấy email của chủ sân dựa trên ownerId
 const getFieldOwnerEmail = async (ownerId) => {

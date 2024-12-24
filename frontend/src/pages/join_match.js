@@ -27,6 +27,7 @@ const JoinMatch = () => {
       setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
     }
   };
+  
   const handleJoinMatch = async () => {
     const token = getToken();
     if (!token) {

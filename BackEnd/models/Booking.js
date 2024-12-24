@@ -106,10 +106,11 @@ class Booking {
         }
     
         // Thông báo cho chủ sân
-        await Notification.notifyFieldOwner(largeField.ownerId, {
-            message: `Sân của bạn đã được người chơi yêu cầu đặt vào ${date} lúc ${startTime}-${endTime} bởi ${playerName}`,
-            bookingId: newBookingRef.key, // Sử dụng `key` làm ID duy nhất
-        });
+        // await Notification.notifyFieldOwner(largeField.ownerId, {
+        //     message: `Sân ${bookingData.smallFieldId} của bạn đã được người chơi yêu cầu đặt vào ${date} lúc ${startTime}-${endTime} bởi ${playerName}`,
+        //     date: new Date().toISOString(),
+        //     bookingId: newBookingRef.key, // Sử dụng `key` làm ID duy nhất
+        // });
     
         // Trả về dữ liệu booking sau khi tạo
         return bookingData;
@@ -188,6 +189,12 @@ static async rejectBooking(bookingId) {
         throw new Error(error.message);
     }
 }
+// Lấy thông tin booking theo bookingId
+static async getBookingById(bookingId) {
+    const bookingSnapshot = await admin.database().ref('bookings').child(bookingId).once('value');
+    const booking = bookingSnapshot.val();
+    return booking;
+}
 
     // Xóa booking (Chỉ có thể xóa nếu booking đã được xác nhận)
     static async deleteBooking(bookingId) {
@@ -240,18 +247,19 @@ static async rejectBooking(bookingId) {
 
 module.exports = Booking;
 
-// Hàm lấy tên người chơi
+
+// Hàm lấy tên người chơi từ Firebase
 const getPlayerName = async (userId) => {
     try {
-        const user = await User.getUserById(userId);
-        if (user && user.name) {
-            return user.name;
+        const userSnapshot = await admin.database().ref(`users/${userId}`).once('value');
+        const userData = userSnapshot.val();
+        if (userData && userData.fullName) {
+            return userData.fullName;
         }
         return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
     } catch (error) {
         console.error("Error fetching player name:", error);
-        return 'Player';  // Trả về 'Player' nếu có lỗi
+        return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
     }
-
-    
 };
+

@@ -3,7 +3,7 @@ import logo from "../../../img/iconTraiBanh.png";
 import defaultAvatar from "../../../img/avatar.png";
 import style from "./Header.module.scss";
 import axios from 'axios';
-import { Typography, Menu, MenuItem } from '@mui/material';
+import { Typography, Menu, MenuItem, Badge } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ const Header = () => {
     const [role, setRole] = useState('');
     const [userData, setUserData] = useState({});
     const [anchorEl, setAnchorEl] = useState(null);
+    const [notificationsCount, setNotificationsCount] = useState(0); // Số thông báo chưa đọc
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const navigate = useNavigate();
 
@@ -52,6 +53,62 @@ const Header = () => {
 
         fetchUserData();
     }, []);
+
+    useEffect(() => {
+        // Lấy số lượng thông báo chưa đọc
+        const fetchNotificationsCount = async () => {
+            const token = localStorage.getItem("token");
+            const userId = localStorage.getItem("userId");
+            const role = localStorage.getItem("role");
+
+            try {
+                const endpoint = role === "field_owner"
+                    ? `http://localhost:5000/api/notifications/owner/${userId}`
+                    : `http://localhost:5000/api/notifications/player/${userId}`;
+
+                const response = await axios.get(endpoint, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                // Set số lượng thông báo chưa đọc
+                const unreadCount = response.data.notifications.filter(notification => !notification.isRead).length;
+                setNotificationsCount(unreadCount);
+            } catch (error) {
+                console.error("Error fetching notifications:", error);
+            }
+        };
+
+        if (isAuthenticated) {
+            fetchNotificationsCount();
+        }
+    }, [isAuthenticated]);
+
+    // Hàm xử lý khi người dùng nhấp vào thông báo (đánh dấu đã đọc)
+    const markNotificationsAsRead = async () => {
+        const token = localStorage.getItem("token");
+        const userId = localStorage.getItem("userId");
+        const role = localStorage.getItem("role");
+
+        try {
+            const endpoint = role === "field_owner"
+                ? `http://localhost:5000/api/notifications/owner/${userId}/markAsRead`
+                : `http://localhost:5000/api/notifications/player/${userId}/markAsRead`;
+
+            // Gửi yêu cầu cập nhật trạng thái thông báo
+            await axios.post(endpoint, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            // Cập nhật lại số lượng thông báo
+            setNotificationsCount(0);
+        } catch (error) {
+            console.error("Error marking notifications as read:", error);
+        }
+    };
 
     const formatRole = (role) => {
         switch (role) {
@@ -95,10 +152,27 @@ const Header = () => {
                                 </div>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
-                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
-                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
-                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
-                                />
+                                <Badge
+                                    badgeContent={notificationsCount} // Hiển thị số lượng thông báo
+                                    color={notificationsCount > 0 ? "error" : "default"} // Màu đỏ nếu có thông báo chưa đọc
+                                >
+                                    <NotificationsIcon
+                                        fontSize="large"
+                                        sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                        onMouseEnter={(e) => { 
+                                            e.currentTarget.style.transform = 'scale(1.1)'; 
+                                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; 
+                                        }}
+                                        onMouseLeave={(e) => { 
+                                            e.currentTarget.style.transform = 'scale(1)'; 
+                                            e.currentTarget.style.boxShadow = 'none'; 
+                                        }}
+                                        onClick={() => {
+                                            navigate('/Nofi'); // Điều hướng đến trang thông báo
+                                            markNotificationsAsRead(); // Đánh dấu thông báo đã đọc
+                                        }}
+                                    />
+                                </Badge>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="setting">
                                 <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
