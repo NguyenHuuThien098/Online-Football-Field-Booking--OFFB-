@@ -60,50 +60,6 @@ const Item = ({ field, match }) => {
     }
   };
 
-  const availableTimeSlots = () => {
-    if (!field || !field.bookingSlots) {
-      return (
-        <Typography variant="h6" color="#f44336">
-          Currently unavailable
-        </Typography>
-      );
-    }
-
-    const today = new Date().toISOString().slice(0, 10); // Get today's date
-    const availableSlots = [];
-
-    for (const date in field.bookingSlots) {
-      if (date >= today) {
-        for (const timeSlot in field.bookingSlots[date]) {
-          if (field.bookingSlots[date][timeSlot]) {
-            availableSlots.push({ date, timeSlot });
-          }
-        }
-      }
-    }
-
-    if (availableSlots.length > 0) {
-      return (
-        <div>
-          <Typography variant="h6" color="primary">
-            Available Slots:
-          </Typography>
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {availableSlots.map((slot, index) => (
-              <Chip key={index} label={`${slot.date} ${slot.timeSlot}`} style={{ marginRight: 8, marginBottom: 8 }} />
-            ))}
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <Typography variant="h6" color="#f44336">
-          Currently unavailable
-        </Typography>
-      );
-    }
-  };
-
   const formatDateTime = (dateTimeString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateTimeString).toLocaleDateString('en-GB', options);
@@ -149,13 +105,6 @@ const Item = ({ field, match }) => {
               Large field names: {field.largeFieldName || "Default Large Field Name"}
             </Typography>
 
-          <Typography variant="body2">
-            {availableTimeSlots()}
-          </Typography>
-
-          {/* <Typography variant="body2" color="text.secondary">
-            Description: {field.description}
-          </Typography> */}
           <Typography variant="body2" color="success" fontSize={24}>
             Price: {formatPrice(field.price) || "0"} VND
           </Typography>

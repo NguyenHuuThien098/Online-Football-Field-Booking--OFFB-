@@ -71,6 +71,15 @@ const Sidebar = () => {
     activeHover: {
       backgroundColor: '#80bfff',
     },
+    nestedLink: {
+      textDecoration: 'none',
+      padding: '10px 40px', // Increased padding to indent
+      color: '#000',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      transition: 'background-color 0.3s ease',
+    },
   };
 
   const sidebarStyle = {
@@ -152,7 +161,7 @@ const Sidebar = () => {
                 <Link
                   className="btn"
                   to="/historyFieldBooked"
-                  style={location.pathname === '/historyFieldBooked' ? styles.activeLink : styles.link}
+                  style={location.pathname === '/historyFieldBooked' ? styles.activeLink : styles.nestedLink}
                   onMouseEnter={(e) => {
                     if (location.pathname !== '/historyFieldBooked') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
                   }}
@@ -167,7 +176,7 @@ const Sidebar = () => {
                 <Link
                   className="btn"
                   to="/historyMatchJoined"
-                  style={location.pathname === '/historyMatchJoined' ? styles.activeLink : styles.link}
+                  style={location.pathname === '/historyMatchJoined' ? styles.activeLink : styles.nestedLink}
                   onMouseEnter={(e) => {
                     if (location.pathname !== '/historyMatchJoined') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
                   }}

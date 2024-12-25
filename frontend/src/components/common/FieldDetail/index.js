@@ -82,6 +82,52 @@ const FieldDetail = () => {
         }
     };
 
+    const availableTimeSlots = () => {
+        if (!field || !field.bookingSlots) {
+            return (
+                <p style={{ color: '#f44336' }}>
+                    Currently unavailable
+                </p>
+            );
+        }
+
+        const today = new Date().toISOString().slice(0, 10); // Get today's date
+        const availableSlots = [];
+
+        for (const date in field.bookingSlots) {
+            if (date >= today) {
+                for (const timeSlot in field.bookingSlots[date]) {
+                    if (field.bookingSlots[date][timeSlot]) {
+                        availableSlots.push({ date, timeSlot });
+                    }
+                }
+            }
+        }
+
+        if (availableSlots.length > 0) {
+            return (
+                <div>
+                    <p style={{ color: 'primary' }}>
+                        Available Slots:
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                        {availableSlots.map((slot, index) => (
+                            <span key={index} style={{ marginRight: 8, marginBottom: 8, padding: '5px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                                {`${slot.date} ${slot.timeSlot}`}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <p style={{ color: '#f44336' }}>
+                    Currently unavailable
+                </p>
+            );
+        }
+    };
+
     if (!field) {
         return <p>No field information. Please go back to the previous page.</p>;
     }
@@ -106,6 +152,10 @@ const FieldDetail = () => {
                                     Book field
                                 </Button>
                             </div>
+                            <Card.Title>Available Time Slots</Card.Title>
+                            <Card.Text>
+                                {availableTimeSlots()}
+                            </Card.Text>
                             <Card.Title>Contact information</Card.Title>
                             <Card.Text>
                                 <div className="d-flex justify-content-between">
