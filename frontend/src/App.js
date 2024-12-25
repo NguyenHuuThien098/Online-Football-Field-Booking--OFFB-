@@ -5,17 +5,17 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
-import Register from "./components/Register";
-import AvailableField from "./pages/availableField";
-import OpenMatch from "./pages/openMatch";
-import HistoryMatchJoined from "./pages/historyMatchjoined";
-import HistoryFieldBooked from "./pages/historyFieldBooked";
+import FieldOwnerDashboard from "./components/fieldOwner/FieldOwnerDashboard";
+import Register from "./components/Login/Register";
+import AvailableField from "./components/common/AvailableField";
+import OpenMatch from "./components/common/OpenMatch";
+import HistoryMatchJoined from "./components/LoginedUser/historyMatchjoined";
+import HistoryFieldBooked from "./components/LoginedUser/historyFieldBooked";
 import Login from "./pages/login";
-import Report from "./pages/report";
+import Report from "./components/fieldOwner/report";
 import FieldDetail from "./components/common/FieldDetail";
-import FieldBookied from "./pages/fieldBookied"; // Import FieldBookied
-import Personal from "./pages/Personal"; // Import trang cá nhân
+import FieldBookied from "./components/LoginedUser/fieldBooked"; // Import FieldBookied
+import Personal from "./components/LoginedUser/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
 
 const App = () => {

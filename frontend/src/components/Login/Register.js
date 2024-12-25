@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signInWithGoogle, database } from '../firebase';
+import { signInWithGoogle, database } from '../../firebase';
 import { ref, set, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 

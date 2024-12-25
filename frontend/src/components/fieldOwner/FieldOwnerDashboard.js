@@ -4,46 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
 
 const FieldOwnerDashboard = () => {
-    const [fields, setFields] = useState([ {
-            fieldId: 1,
-            name: 'Field 1',
-            location: '123 Main St, City, Country',
-            type: 'Soccer',
-            price: '100,000 VND/hour',
-            image: 'https://example.com/image1.jpg',
-            contactNumber: '0796942241',
-            operatingHours: '06:00 - 22:00',
-        },
-        {
-            fieldId: 2,
-            name: 'Field 2',
-            location: '456 Another St, City, Country',
-            type: 'Basketball',
-            price: '150,000 VND/hour',
-            image: 'https://example.com/image2.jpg',
-            contactNumber: '0796942241',
-            operatingHours: '07:00 - 21:00',
-        }]);
-    const [matches, setMatches] = useState([
-        {
-            id: 1,
-            address: '123 Main ',
-            time: '2023-03-30T18:00:00Z',
-            ownerName: 'Trần Vũ Thanh Lâm',
-            playerCount: 10,
-            notes: 'Bring your own ball',
-            questions: 'What color is the ball?',
-        },
-        {
-            id: 2,
-            address: '456 Another',
-            time: '2023-04-01T19:00:00Z',
-            ownerName: 'Trần Vũ Thanh Lâm',
-            playerCount: 8,
-            notes: 'Bring your own shoes',
-            questions: 'What size are your shoes?',
-        }
-    ]);
+    const [fields, setFields] = useState([]);
+    const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [newField, setNewField] = useState({
@@ -99,6 +61,9 @@ const FieldOwnerDashboard = () => {
                 });
                 const fieldsData = fieldsResponse.data;
                 if (Array.isArray(fieldsData)) {
+                    if (fieldsData.length === 0) {
+                        setError('No fields found');
+                    }
                     setFields(fieldsData);
                 } else {
                     setError('Invalid data returned');
@@ -139,70 +104,20 @@ const FieldOwnerDashboard = () => {
         document.getElementById('add-match-section').scrollIntoView({ behavior: 'smooth' });
     };
 
-    const handleAddField = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
-            const response = await axios.post('http://localhost:5000/api/field-owner/add-field', {
-                ...newField,
-                ownerId
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            setFields([...fields, response.data.field]);
-            setNewField({
-                name: '',
-                location: '',
-                type: '5 person',
-                price: '',
-                image: '',
-                contactNumber: '',
-                operatingHours: ''
-            });
-        } catch (error) {
-            console.error("Error adding field:", error);
-            setError('An error occurred while adding the field.');
-        }
-    };
 
-    const handleUpdateField = async (fieldId) => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await axios.put(`http://localhost:5000/api/field-owner/update-field/${fieldId}`, newField, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            setFields(fields.map(field => field.fieldId === fieldId ? response.data.field : field));
-            setNewField({
-                name: '',
-                location: '',
-                type: '5 persons',
-                price: '',
-                image: '',
-                contactNumber: '',
-                operatingHours: ''
-            });
-        } catch (error) {
-            console.error("Error updating field:", error);
-            setError('An error occurred while updating the field.');
-        }
-    };
 
-    const handleDeleteField = async (fieldId) => {
+    const handleDeleteLargeField = async (largeFieldId) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/api/field-owner/delete-field/${fieldId}`, {
+            await axios.delete(`http://localhost:5000/api/field-owner/large-field/${largeFieldId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setFields(fields.filter(field => field.fieldId !== fieldId));
+            setFields(fields.filter(field => field.fieldId !== largeFieldId));
         } catch (error) {
-            console.error("Error deleting field:", error);
-            setError('An error occurred while deleting the field.');
+            console.error("Error deleting large field:", error);
+            setError('An error occurred while deleting the large field.');
         }
     };
 
@@ -307,17 +222,9 @@ const FieldOwnerDashboard = () => {
         setTabIndex(newValue);
     };
 
-    // if (loading) {
-    //     return (
-    //         <Typography variant="h3" align="center">Loading fields and matches...</Typography>
-    //     );
-    // }
+    const handleUpdateField = async (fieldId) => {
+    }
 
-    // if (error) {
-    //     return (
-    //         <Typography variant="h5" color="error" align="center">{error}</Typography>
-    //     );
-    // }
 
 
 
@@ -340,7 +247,6 @@ return (
                         Add New Large Field +
                     </Button>
                     <hr/>
-                    {console.log(fields)}
                     {fields.map((field, index) => (
                         <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
                             <Grid item xs={12} sm={6}>
@@ -353,33 +259,12 @@ return (
                                         <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                             Update
                                         </Button>
-                                        <Button variant="contained" onClick={() => handleDeleteField(field.fieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
+                                        <Button variant="contained" onClick={() => handleDeleteLargeField(field.fieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                             Delete
                                         </Button>
                                     </CardContent>
                                 </Card>
                             </Grid>
-                            {fields[index + 1] && (
-                                <Grid item xs={12} sm={6}>
-                                    <Card key={fields[index + 1].fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
-                                        <CardContent>
-                                            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{fields[index + 1].name || 'Unnamed Field'}</Typography>
-                                            <Typography variant="body1">Location: {fields[index + 1].location}</Typography>
-                                            <Typography variant="body1">Type: {fields[index + 1].type}</Typography>
-                                            <Typography variant="body1">Price: {fields[index + 1].price}</Typography>
-                                            <Typography variant="body1">Image: {fields[index + 1].image}</Typography>
-                                            <Typography variant="body1">Contact Number: {fields[index + 1].contactNumber}</Typography>
-                                            <Typography variant="body1">Operating Hours: {fields[index + 1].operatingHours}</Typography>
-                                            <Button variant="contained" color="primary" onClick={() => handleUpdateField(fields[index + 1].fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
-                                                Update
-                                            </Button>
-                                            <Button variant="contained" onClick={() => handleDeleteField(fields[index + 1].fieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
-                                                Delete
-                                            </Button>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            )}
                         </Grid>
                     ))}
                     <Box id="add-field-section" sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
