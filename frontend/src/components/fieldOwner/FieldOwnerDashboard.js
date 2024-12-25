@@ -104,8 +104,6 @@ const FieldOwnerDashboard = () => {
         document.getElementById('add-match-section').scrollIntoView({ behavior: 'smooth' });
     };
 
-
-
     const handleDeleteLargeField = async (largeFieldId) => {
         try {
             const token = localStorage.getItem('token');
@@ -227,7 +225,6 @@ const FieldOwnerDashboard = () => {
 
 
 
-
 return (
     <>
         <Typography variant="h3" align="center" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
@@ -256,6 +253,7 @@ return (
                                         <Typography variant="body1">Location: {field.address}</Typography>
                                         <Typography variant="body1">Contact Number: {field.ownerPhone}</Typography>
                                         <Typography variant="body1">Operating Hours: {field.operatingHours}</Typography>
+                                        <Typography variant="body1">Description: {field.otherInfo }</Typography>
                                         <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                             Update
                                         </Button>
