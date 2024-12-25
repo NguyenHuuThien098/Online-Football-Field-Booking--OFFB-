@@ -21,12 +21,16 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 
 const Item = ({ field, match }) => {
-  const [ownerName, setOwnerName] = useState(null); // State để lưu tên chủ sân
-  const [ownerPhone, setOwnerPhone] = useState(null); // State để lưu số điện thoại
+  const [ownerName, setOwnerName] = useState(null); // State to store owner's name
+  const [ownerPhone, setOwnerPhone] = useState(null); // State to store owner's phone number
   const navigate = useNavigate();
   useEffect(() => {
     if (field?.ownerId) {
-      fetchOwnerInfo(field.ownerId); // Lấy thông tin chủ sân khi có ownerId
+      fetchOwnerInfo(field.ownerId); // Fetch owner info when ownerId is available
+    } else {
+      // Fallback data if no ownerId is available
+      setOwnerName("Default Owner");
+      setOwnerPhone("000-000-0000");
     }
   }, [field]);
 
@@ -37,22 +41,22 @@ const Item = ({ field, match }) => {
       const snapshot = await get(userRef);
       if (snapshot.exists()) {
         const userData = snapshot.val();
-        setOwnerName(userData.fullName || "Không rõ"); // Lấy tên hoặc hiển thị "Không rõ"
-        setOwnerPhone(userData.phoneNumber || "Không có"); // Lấy số điện thoại hoặc hiển thị "Không có"
+        setOwnerName(userData.fullName || "Unknown"); // Get name or display "Unknown"
+        setOwnerPhone(userData.phoneNumber || "Not available"); // Get phone number or display "Not available"
       } else {
-        setOwnerName("Không rõ");
-        setOwnerPhone("Không có");
+        setOwnerName("Unknown");
+        setOwnerPhone("Not available");
       }
     } catch (error) {
       console.error("Error fetching owner info:", error);
-      setOwnerName("Không rõ");
-      setOwnerPhone("Không có");
+      setOwnerName("Unknown");
+      setOwnerPhone("Not available");
     }
   };
 
   const handleBookingClick = () => {
     if (field) {
-      navigate(`/fieldDetail/`, { state: field }); // Chuyển đến trang chi tiết sân
+      navigate(`/fieldDetail/`, { state: field }); // Navigate to field detail page
     }
   };
 
@@ -106,13 +110,13 @@ const Item = ({ field, match }) => {
   };
 
   const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 
   if (field) {
     return (
       <StyledCard className={`mt-4 mx-3 border-primary `}
-        sx={{ width: 1200, height: 300 }}
+        sx={{ width: 600, height: 300 }}
       >
         <CardActionArea sx={{ width: 300, height: 300 }}>
           <CardMedia
@@ -124,25 +128,25 @@ const Item = ({ field, match }) => {
         </CardActionArea>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, px: 5, py: 2 }}>
           <Typography variant="h5" component="div">
-            {field.name}
+            {field.name || "Default Field Name"}
           </Typography>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems:"center"}}>
             <Typography variant="body2" color="text.secondary">
-              Địa chỉ: {field.largeFieldAddress}
+              Address: {field.largeFieldAddress || "Default Address"}
             </Typography>
-            <Chip label={field.type}
-              className="text-secondary my-2"
+            <Chip label={field.type || "Default Type"}
+              className="text-success my-2"
               sx={{
                 backgroundColor: '#FCE0D3',
-                fontSize: '13px',
-                width: '70px',
-                height: '20px',
+                fontSize: '14px',
+                width: '80px',
+                height: '30px',
               }}
             />
           </div>
 
           <Typography variant="body2" color="text.secondary">
-              Tên sân lớn: {field.largeFieldName}
+              Large field names: {field.largeFieldName || "Default Large Field Name"}
             </Typography>
 
           <Typography variant="body2">
@@ -150,14 +154,14 @@ const Item = ({ field, match }) => {
           </Typography>
 
           {/* <Typography variant="body2" color="text.secondary">
-            Mô tả: {field.description}
+            Description: {field.description}
           </Typography> */}
           <Typography variant="body2" color="success" fontSize={24}>
-            Giá: {formatPrice(field.price)} VNĐ
+            Price: {formatPrice(field.price) || "0"} VND
           </Typography>
           <Box sx={{ mt: 2 }}>
             <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleBookingClick}>
-              Đặt sân
+              Book field
             </Button>
           </Box>
         </CardContent>
@@ -193,20 +197,20 @@ const Item = ({ field, match }) => {
         </CardActionArea>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, p: 5 }}>
           <Typography variant="h5" component="div">
-            {match.ownerName}
+            {match.ownerName || "Default Owner Name"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Địa chỉ: {match.address}
+            Address: {match.address || "Default Address"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Thời gian: {formatDateTime(match.time)}
+            Time: {formatDateTime(match.time) || "Default Time"}
           </Typography>
           <div>
 
           </div>
           <Box sx={{ mt: 2 }}>
             <Button variant="contained" sx={{ width: 150, height: 40 }}>
-              Tham gia
+              Join
             </Button>
           </Box>
         </CardContent>

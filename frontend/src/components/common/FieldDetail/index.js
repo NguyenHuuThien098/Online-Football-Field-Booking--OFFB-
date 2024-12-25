@@ -6,18 +6,25 @@ import { getDatabase, ref, get } from 'firebase/database'; // Import Firebase fu
 const FieldDetail = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const field = location.state; // Lấy thông tin sân từ state của route
+    const field = location.state; // Get field info from route state
 
-    const [ownerName, setOwnerName] = useState(null); // Lưu tên chủ sân
-    const [ownerPhone, setOwnerPhone] = useState(null); // Lưu số điện thoại chủ sân
-    const [largeField, setLargeField] = useState(null); // State để lưu thông tin sân lớn
+    const [ownerName, setOwnerName] = useState(null); // Store owner's name
+    const [ownerPhone, setOwnerPhone] = useState(null); // Store owner's phone number
+    const [largeField, setLargeField] = useState(null); // State to store large field info
 
     useEffect(() => {
         if (field?.ownerId) {
-            fetchOwnerInfo(field.ownerId); // Lấy thông tin chủ sân khi có ownerId
+            fetchOwnerInfo(field.ownerId); // Fetch owner info when ownerId is available
+        } else {
+            // Fallback data if no ownerId is available
+            setOwnerName("Default Owner");
+            setOwnerPhone("000-000-0000");
         }
         if (field?.largeFieldId) {
-            fetchLargeField(field.largeFieldId); // Lấy thông tin sân lớn khi có largeFieldId
+            fetchLargeField(field.largeFieldId); // Fetch large field info when largeFieldId is available
+        } else {
+            // Fallback data if no largeFieldId is available
+            setLargeField({ name: "Default Large Field", address: "Default Address" });
         }
     }, [field]);
 
@@ -28,16 +35,16 @@ const FieldDetail = () => {
             const snapshot = await get(userRef);
             if (snapshot.exists()) {
                 const userData = snapshot.val();
-                setOwnerName(userData.fullName || "Không rõ");
-                setOwnerPhone(userData.phoneNumber || "Không có");
+                setOwnerName(userData.fullName || "Unknown");
+                setOwnerPhone(userData.phoneNumber || "Not available");
             } else {
-                setOwnerName("Không rõ");
-                setOwnerPhone("Không có");
+                setOwnerName("Unknown");
+                setOwnerPhone("Not available");
             }
         } catch (error) {
             console.error("Error fetching owner info:", error);
-            setOwnerName("Không rõ");
-            setOwnerPhone("Không có");
+            setOwnerName("Unknown");
+            setOwnerPhone("Not available");
         }
     };
 
@@ -58,25 +65,25 @@ const FieldDetail = () => {
     };
 
     const handleBookField = () => {
-        const token = localStorage.getItem('token'); // Kiểm tra token trong localStorage
+        const token = localStorage.getItem('token'); // Check token in localStorage
 
         if (!token) {
-            // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
-            alert('Bạn cần đăng nhập để đặt sân.');
+            // If not logged in, redirect to login page
+            alert('You need to log in to book a field.');
             navigate('/login');
             return;
         }
 
         if (field) {
-            // Điều hướng đến trang FieldBooked và truyền thông tin sân
+            // Navigate to FieldBooked page and pass field info
             navigate('/fieldBookied', { state: { field } });
         } else {
-            alert('Thông tin sân không khả dụng.');
+            alert('Field information is not available.');
         }
     };
 
     if (!field) {
-        return <p>Không có thông tin sân. Vui lòng quay lại trang trước.</p>;
+        return <p>No field information. Please go back to the previous page.</p>;
     }
 
     return (
@@ -88,31 +95,31 @@ const FieldDetail = () => {
                         <Card.Body>
                             <Card.Title>{field.name}</Card.Title>
                             <Card.Text>
-                                <b>Chủ sân:</b> {ownerName || "Đang tải..."} <br />
-                                <b>SĐT:</b> {ownerPhone || "Đang tải..."} <br />
-                                <b>Địa chỉ:</b> {field.location} <br />
-                                <b>Tên sân lớn:</b> {largeField?.name || "Đang tải..."} <br />
-                                <b>Địa chỉ sân lớn:</b> {largeField?.address || "Đang tải..."}
+                                <b>Owner:</b> {ownerName || "Loading..."} <br />
+                                <b>Phone:</b> {ownerPhone || "Loading..."} <br />
+                                <b>Address:</b> {field.location || "Default Address"} <br />
+                                <b>Large field name:</b> {largeField?.name || "Default Large Field"} <br />
+                                <b>Large field address:</b> {largeField?.address || "Default Address"}
                             </Card.Text>
                             <div className="d-flex justify-content-end mb-3">
                                 <Button variant="primary" onClick={handleBookField}>
-                                    Đặt sân
+                                    Book field
                                 </Button>
                             </div>
-                            <Card.Title>Thông tin liên hệ</Card.Title>
+                            <Card.Title>Contact information</Card.Title>
                             <Card.Text>
                                 <div className="d-flex justify-content-between">
                                     <div>
-                                        <b>Zalo:</b> <a href="#">zalo</a>
+                                        <b>Zalo:</b> <a href="#" className="btn btn-outline-primary btn-sm">Zalo</a>
                                     </div>
                                     <div>
-                                        <b>Facebook:</b> <a href="#">Facebook</a>
+                                        <b>Facebook:</b> <a href="#" className="btn btn-outline-primary btn-sm">Facebook</a>
                                     </div>
                                 </div>
-                                <Card.Title>Ghi chú</Card.Title>
+                                <Card.Title>Notes</Card.Title>
                                 <ListGroup variant="flush">
-                                    <ListGroup.Item>10-sáng - 3h chiều sale</ListGroup.Item>
-                                    <ListGroup.Item>10-sáng - 3h chiều sale</ListGroup.Item>
+                                    <ListGroup.Item>10 AM - 3 PM sale</ListGroup.Item>
+                                    <ListGroup.Item>10 AM - 3 PM sale</ListGroup.Item>
                                 </ListGroup>
                             </Card.Text>
                         </Card.Body>

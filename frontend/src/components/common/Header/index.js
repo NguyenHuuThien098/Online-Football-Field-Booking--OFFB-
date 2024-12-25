@@ -65,7 +65,7 @@ const Header = () => {
     };
 
     return (
-        <div className="row border" style={{ padding: '10px 0' }}>
+        <div className="row border py-2" style={{ padding: '10px 0' }}>
             <div name="left" className="col-2 p-0 border-end d-flex align-items-center">
                 <div className="row">
                     <div className="col-4">
@@ -76,10 +76,10 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div name="middle" className="col-7 d-flex align-items-center justify-content-between">
+            <div name="middle" className="col-7 d-flex align-items-center justify-content-between px-4">
                 <h1 name="role" style={{ fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}>{formatRole(role)}</h1>
                 {isAuthenticated && (
-                    <Typography variant="body2" sx={{ fontSize: '1.2rem', borderBottom: '2px solid #007bff' }}>{userData.fullName}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: '1.6rem', borderBottom: '2px solid #007bff' }}>{userData.fullName}</Typography>
                 )}
             </div>
             <div name="right" className="col border-start">
@@ -88,20 +88,20 @@ const Header = () => {
                         <>
                             <div className="col d-flex flex-column align-items-center justify-content-center">
                                 <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
+                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
                                         onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                     />
                                 </div>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
-                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 />
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="setting">
-                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 />

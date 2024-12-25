@@ -22,7 +22,7 @@ const UserProfile = () => {
         field_owner: 'Chủ sân',
     };
     const [isLoading, setIsLoading] = useState(false);
-    
+    const [imagePreview, setImagePreview] = useState(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -70,7 +70,10 @@ const UserProfile = () => {
                 quality: 0.6, // Reduce image quality to 60%
                 success: (compressedFile) => {
                     const reader = new FileReader();
-                    reader.onloadend = () => setUserData({ ...userData, image: reader.result });
+                    reader.onloadend = () => {
+                        setUserData({ ...userData, image: reader.result });
+                        setImagePreview(reader.result);
+                    };
                     reader.readAsDataURL(compressedFile);
                 },
             });
@@ -208,6 +211,11 @@ const UserProfile = () => {
                                         Upload Avatar
                                     </Button>
                                 </label>
+                                {imagePreview && (
+                                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                                        <img src={imagePreview} alt="Preview" style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }} />
+                                    </div>
+                                )}
                                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>
                                     Update Information
                                 </Button>

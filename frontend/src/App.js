@@ -9,8 +9,8 @@ import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
 import Register from "./components/Register";
 import AvailableField from "./pages/availableField";
 import OpenMatch from "./pages/openMatch";
-import History_MatchJoined from "./pages/History_Matchjoined";
-import History_FieldBooked from "./pages/History_FieldBooked";
+import HistoryMatchJoined from "./pages/historyMatchjoined";
+import HistoryFieldBooked from "./pages/historyFieldBooked";
 import Login from "./pages/login";
 import Report from "./pages/report";
 import FieldDetail from "./components/common/FieldDetail";
@@ -124,18 +124,26 @@ const App = () => {
           }
         />
         <Route
-          path="/History_MatchJoined"
-          element={
-            <MainLayout>
-              <ProtectedRoute element={<History_MatchJoined />} />
-            </MainLayout>
-          }
-        />
-        <Route
           path="/Report"
           element={
             <MainLayout>
               <ProtectedRoute element={<Report />} role={["field_owner"]} />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/historyMatchJoined"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<HistoryMatchJoined />} />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/historyFieldBooked"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<HistoryFieldBooked />} />
             </MainLayout>
           }
         />
