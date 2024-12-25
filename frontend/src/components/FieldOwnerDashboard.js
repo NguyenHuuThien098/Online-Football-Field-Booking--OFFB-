@@ -308,9 +308,9 @@ return (
                     </Button>
                     <hr/>
                     {fields.map((field, index) => (
-                        <Grid container spacing={2} key={index}>
+                        <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
                             <Grid item xs={12} sm={6}>
-                                <Card key={field.fieldId} variant="outlined" sx={{ mb: 2, mt: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
+                                <Card key={field.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
                                     <CardContent>
                                         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{field.name || 'Unnamed Field'}</Typography>
                                         <Typography variant="body1">Location: {field.location}</Typography>
@@ -330,7 +330,7 @@ return (
                             </Grid>
                             {fields[index + 1] && (
                                 <Grid item xs={12} sm={6}>
-                                    <Card key={fields[index + 1].fieldId} variant="outlined" sx={{ mb: 2, mt: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
+                                    <Card key={fields[index + 1].fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
                                         <CardContent>
                                             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{fields[index + 1].name || 'Unnamed Field'}</Typography>
                                             <Typography variant="body1">Location: {fields[index + 1].location}</Typography>
@@ -447,9 +447,9 @@ return (
                     </Button>
                     <hr/>
                     {matches.map((match, index) => (
-                        <Grid container spacing={2} key={index}>
+                        <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
                             <Grid item xs={12} sm={6}>
-                                <Card key={match.id} variant="outlined" sx={{ mb: 2, mt: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
+                                <Card key={match.id} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
                                     <CardContent>
                                         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Address: {match.address}</Typography>
                                         <Typography variant="body1">Time: {match.time}</Typography>
@@ -468,7 +468,7 @@ return (
                             </Grid>
                             {matches[index + 1] && (
                                 <Grid item xs={12} sm={6}>
-                                    <Card key={matches[index + 1].id} variant="outlined" sx={{ mb: 2, mt: 2, border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
+                                    <Card key={matches[index + 1].id} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
                                         <CardContent>
                                             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Address: {matches[index + 1].address}</Typography>
                                             <Typography variant="body1">Time: {matches[index + 1].time}</Typography>

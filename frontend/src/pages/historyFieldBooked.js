@@ -70,11 +70,56 @@ const HistoryFieldBooked = () => {
 
         if (token && userId) {
             setIsOwner(role === 'field_owner');
-            fetchBookings(userId, token, role);
+            // Comment out the actual fetch call and use mock data instead
+            // fetchBookings(userId, token, role);
+            setBookings(mockBookings);
         } else {
             setError('You are not logged in.');
         }
     }, []);
+
+    // Mock data for demonstration
+    const mockBookings = [
+        {
+            bookingId: '1',
+            fieldName: 'Large Field A',
+            fieldNamesmall: 'Small Field 1',
+            location: '123 Main St',
+            date: '2023-10-01',
+            startTime: '10:00',
+            endTime: '12:00',
+            numberOfPeople: 10,
+            playerName: 'John Doe',
+            phoneNumber: '1234567890',
+            status: '0', // Pending Confirmation
+        },
+        {
+            bookingId: '2',
+            fieldName: 'Large Field B',
+            fieldNamesmall: 'Small Field 2',
+            location: '456 Elm St',
+            date: '2023-10-02',
+            startTime: '14:00',
+            endTime: '16:00',
+            numberOfPeople: 8,
+            playerName: 'Jane Smith',
+            phoneNumber: '0987654321',
+            status: '1', // Confirmed
+        },
+        {
+            bookingId: '3',
+            fieldName: 'Large Field C',
+            fieldNamesmall: 'Small Field 3',
+            location: '789 Oak St',
+            date: '2023-10-03',
+            startTime: '09:00',
+            endTime: '11:00',
+            numberOfPeople: 12,
+            playerName: 'Alice Johnson',
+            phoneNumber: '1122334455',
+            status: '2', // Cancelled
+        },
+    ];
 
     const fetchBookings = async (userId, token, role) => {
         setIsLoading(true);

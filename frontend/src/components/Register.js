@@ -53,32 +53,39 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             justifyContent: 'center',
             height: '100vh',
             backgroundColor: '#f0f4f8',
-            padding: '20px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+            padding: '40px',
+            borderRadius: '12px',
+            boxShadow: '0 8px 20px rgba(0, 0, 0, 0.1)',
         },
         heading: {
-            marginBottom: '20px',
+            marginBottom: '30px',
             color: '#333',
+            fontSize: '2rem',
+            fontWeight: 'bold',
         },
         errorMessage: {
             color: 'red',
             marginBottom: '10px',
+            fontSize: '1rem',
         },
         successMessage: {
             color: 'green',
             marginBottom: '10px',
+            fontSize: '1rem',
         },
         radioGroup: {
-            marginBottom: '20px',
+            marginBottom: '30px',
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '20px',
         },
         button: {
             backgroundColor: '#4285F4',
             color: 'white',
             border: 'none',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            fontSize: '16px',
+            padding: '15px 30px',
+            borderRadius: '8px',
+            fontSize: '1.2rem',
             cursor: 'pointer',
             transition: 'background-color 0.3s',
         },
@@ -87,12 +94,14 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
         },
         label: {
             marginRight: '15px',
+            fontSize: '1.2rem',
+            color: '#333',
         },
     };
 
     return (
         <div style={styles.container}>
-            <h2 style={styles.heading}>Đăng Ký</h2>
+            <h2 style={styles.heading}>Sign up</h2>
             {error && <p style={styles.errorMessage}>{error}</p>}
             {success && <p style={styles.successMessage}>{success}</p>}
             <div style={styles.radioGroup}>
@@ -121,7 +130,7 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                 onMouseOut={e => e.currentTarget.style.backgroundColor = styles.button.backgroundColor}
                 onClick={handleGoogleLogin}
             >
-                Đăng Ký Bằng Google
+                Sign Up with Google
             </button>
         </div>
     );
