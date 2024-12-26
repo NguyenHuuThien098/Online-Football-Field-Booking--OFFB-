@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
-import Field from './Field';
+import LargeField from './LargeField';
 import Match from './Match';
 const FieldOwnerDashboard = () => {
     const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ const FieldOwnerDashboard = () => {
                     <Tab label="Matches" sx={{ fontSize: '1.2rem' }} />
                 </Tabs>
                 {tabIndex === 0 && (
-                    <Field />
+                    <LargeField />
                 )}
                 {tabIndex === 1 && (
                     <Match />
