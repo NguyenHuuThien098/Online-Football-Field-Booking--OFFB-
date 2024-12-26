@@ -3,7 +3,7 @@ import logo from "../../../img/iconTraiBanh.png";
 import defaultAvatar from "../../../img/avatar.png";
 import style from "./Header.module.scss";
 import axios from 'axios';
-import { Typography, Menu, MenuItem, Badge } from '@mui/material';
+import { Typography, Menu, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,6 @@ const Header = () => {
     const [role, setRole] = useState('');
     const [userData, setUserData] = useState({});
     const [anchorEl, setAnchorEl] = useState(null);
-    const [notificationsCount, setNotificationsCount] = useState(0); // Số thông báo chưa đọc
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const navigate = useNavigate();
 
@@ -30,6 +29,10 @@ const Header = () => {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleNotificationClick = () => {
+        navigate('/Nofi');  // Chuyển đến trang thông báo
     };
 
     useEffect(() => {
@@ -54,62 +57,6 @@ const Header = () => {
         fetchUserData();
     }, []);
 
-    useEffect(() => {
-        // Lấy số lượng thông báo chưa đọc
-        const fetchNotificationsCount = async () => {
-            const token = localStorage.getItem("token");
-            const userId = localStorage.getItem("userId");
-            const role = localStorage.getItem("role");
-
-            try {
-                const endpoint = role === "field_owner"
-                    ? `http://localhost:5000/api/notifications/owner/${userId}`
-                    : `http://localhost:5000/api/notifications/player/${userId}`;
-
-                const response = await axios.get(endpoint, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                // Set số lượng thông báo chưa đọc
-                const unreadCount = response.data.notifications.filter(notification => !notification.isRead).length;
-                setNotificationsCount(unreadCount);
-            } catch (error) {
-                console.error("Error fetching notifications:", error);
-            }
-        };
-
-        if (isAuthenticated) {
-            fetchNotificationsCount();
-        }
-    }, [isAuthenticated]);
-
-    // Hàm xử lý khi người dùng nhấp vào thông báo (đánh dấu đã đọc)
-    const markNotificationsAsRead = async () => {
-        const token = localStorage.getItem("token");
-        const userId = localStorage.getItem("userId");
-        const role = localStorage.getItem("role");
-
-        try {
-            const endpoint = role === "field_owner"
-                ? `http://localhost:5000/api/notifications/owner/${userId}/markAsRead`
-                : `http://localhost:5000/api/notifications/player/${userId}/markAsRead`;
-
-            // Gửi yêu cầu cập nhật trạng thái thông báo
-            await axios.post(endpoint, {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            // Cập nhật lại số lượng thông báo
-            setNotificationsCount(0);
-        } catch (error) {
-            console.error("Error marking notifications as read:", error);
-        }
-    };
-
     const formatRole = (role) => {
         switch (role) {
             case 'field_owner':
@@ -122,7 +69,7 @@ const Header = () => {
     };
 
     return (
-        <div className="row border" style={{ padding: '10px 0' }}>
+        <div className="row border py-2" style={{ padding: '10px 0' }}>
             <div name="left" className="col-2 p-0 border-end d-flex align-items-center">
                 <div className="row">
                     <div className="col-4">
@@ -133,10 +80,10 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div name="middle" className="col-7 d-flex align-items-center justify-content-between">
+            <div name="middle" className="col-7 d-flex align-items-center justify-content-between px-4">
                 <h1 name="role" style={{ fontFamily: 'Arial, sans-serif', fontWeight: 'bold' }}>{formatRole(role)}</h1>
                 {isAuthenticated && (
-                    <Typography variant="body2" sx={{ fontSize: '1.2rem', borderBottom: '2px solid #007bff' }}>{userData.fullName}</Typography>
+                    <Typography variant="body2" sx={{ fontSize: '1.6rem', borderBottom: '2px solid #007bff' }}>{userData.fullName}</Typography>
                 )}
             </div>
             <div name="right" className="col border-start">
@@ -145,37 +92,23 @@ const Header = () => {
                         <>
                             <div className="col d-flex flex-column align-items-center justify-content-center">
                                 <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
+                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
                                         onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                     />
                                 </div>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
-                                <Badge
-                                    badgeContent={notificationsCount} // Hiển thị số lượng thông báo
-                                    color={notificationsCount > 0 ? "error" : "default"} // Màu đỏ nếu có thông báo chưa đọc
-                                >
-                                    <NotificationsIcon
-                                        fontSize="large"
-                                        sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
-                                        onMouseEnter={(e) => { 
-                                            e.currentTarget.style.transform = 'scale(1.1)'; 
-                                            e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; 
-                                        }}
-                                        onMouseLeave={(e) => { 
-                                            e.currentTarget.style.transform = 'scale(1)'; 
-                                            e.currentTarget.style.boxShadow = 'none'; 
-                                        }}
-                                        onClick={() => {
-                                            navigate('/Nofi'); // Điều hướng đến trang thông báo
-                                            markNotificationsAsRead(); // Đánh dấu thông báo đã đọc
-                                        }}
-                                    />
-                                </Badge>
+                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
+                                    style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                                    onClick={handleNotificationClick}  // Điều hướng khi nhấp vào biểu tượng thông báo
+                                />
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="setting">
-                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  
+                                    style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 />

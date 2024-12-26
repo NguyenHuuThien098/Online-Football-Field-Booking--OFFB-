@@ -20,7 +20,7 @@ const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
                 localStorage.setItem('token', token);
-                localStorage.setItem('role', userData.role);
+               localStorage.setItem('role', userData.role);
                 localStorage.setItem('userId', userId);
 
                 if (userData.role === 'field_owner') {
