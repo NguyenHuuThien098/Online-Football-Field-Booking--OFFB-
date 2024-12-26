@@ -22,7 +22,11 @@ const Field = () => {
         images: '',
         operatingHours: ''
     });
-
+    const token = localStorage.getItem('token');
+    const ownerId = localStorage.getItem('userId');
+    useEffect(() => {
+        fetchFields();
+    }, []);
     const fetchFields = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -54,8 +58,14 @@ const Field = () => {
                 setError('Invalid data returned');
             }
         } catch (error) {
-            if (error.response && error.response.status === 403) {
-                setError('You do not have access to this resource.');
+            if (error.response) {
+                if (error.response.status === 403) {
+                    setError('You do not have access to this resource.');
+                } else if (error.response.status === 404) {
+                    setError('Resource not found.');
+                } else {
+                    setError('An error occurred while loading the list of fields and matches.');
+                }
             } else {
                 console.error("Error fetching fields and matches:", error);
                 setError('An error occurred while loading the list of fields and matches.');
@@ -64,10 +74,6 @@ const Field = () => {
             setLoading(false);
         }
     };
-    useEffect(() => {
-        fetchFields();
-    }, []);
-
     const scrollToAddField = () => {
         document.getElementById('add-field-section').scrollIntoView({ behavior: 'smooth' });
     };
@@ -75,8 +81,6 @@ const Field = () => {
     };
     const handleAddLargeField = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
             const response = await axios.post('http://localhost:5000/api/field-owner/large-field', {
                 ...newLargeField,
                 ownerId
@@ -94,13 +98,16 @@ const Field = () => {
                 operatingHours: ''
             });
         } catch (error) {
-            console.error("Error adding large field:", error);
-            setError('An error occurred while adding the large field.');
+            if (error.response && error.response.status === 404) {
+                setError('Resource not found.');
+            } else {
+                console.error("Error adding large field:", error);
+                setError('An error occurred while adding the large field.');
+            }
         }
     };
     const handleDeleteLargeField = async (largeFieldId) => {
         try {
-            const token = localStorage.getItem('token');
             await axios.delete(`http://localhost:5000/api/field-owner/large-field/${largeFieldId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -108,8 +115,12 @@ const Field = () => {
             });
             setFields(fields.filter(field => field.fieldId !== largeFieldId));
         } catch (error) {
-            console.error("Error deleting large field:", error);
-            setError('An error occurred while deleting the large field.');
+            if (error.response && error.response.status === 404) {
+                setError('Resource not found.');
+            } else {
+                console.error("Error deleting large field:", error);
+                setError('An error occurred while deleting the large field.');
+            }
         }
     };
 
@@ -122,9 +133,9 @@ const Field = () => {
                 Add New Large Field +
             </Button>
             <hr />
-            {fields.map((field, index) => (
-                <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
-                    <Grid item xs={12} sm={6}>
+            <Grid container spacing={2}>
+                {fields.map((field, index) => (
+                    <Grid item xs={12} sm={6} md={6} key={index}>
                         <Card key={field.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
                             <CardContent>
                                 <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{field.name || 'Unnamed Field'}</Typography>
@@ -141,8 +152,8 @@ const Field = () => {
                             </CardContent>
                         </Card>
                     </Grid>
-                </Grid>
-            ))}
+                ))}
+            </Grid>
             <Box id="add-field-section" sx={{ border: '1px solid #ccc', borderRadius: '8px', mt: 4, p: 3, color: 'white', boxShadow: 3 }}>
                 <Typography variant="h4" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>
                     Add New Large Field:
