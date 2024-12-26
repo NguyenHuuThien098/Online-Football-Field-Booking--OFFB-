@@ -9,7 +9,7 @@ const MainLayout = ({ children }) => {
     <div name="container" className={"w-100"}>
       {/* Header */}
       <div name="header" className={styles.stickyHeader}>
-        <Header role={role} />
+        <Header />
       </div>
       
       {/* Body */}

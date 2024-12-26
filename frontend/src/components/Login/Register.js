@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { signInWithGoogle, database } from '../firebase';
+import { signInWithGoogle, database } from '../../firebase';
 import { ref, set, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,7 +23,7 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
                 setUserRole(userData.role);
                 localStorage.setItem('token', token);
 
-                navigate(userData.role === 'field_owner' ? '/field-owner-dashboard' : '/player-page');
+                navigate(userData.role === 'field_owner' ? '/field-owner-dashboard' : '/');
                 return;
             }
 
@@ -38,7 +38,7 @@ const Register = ({ setIsAuthenticated, setUserRole }) => {
             setUserRole(role);
             localStorage.setItem('token', token);
 
-            navigate(role === 'field_owner' ? '/field-owner-dashboard' : '/player-page');
+            navigate(role === 'field_owner' ? '/field-owner-dashboard' : '/');
         } catch (error) {
             console.error("Lỗi khi đăng nhập bằng Google:", error);
             setError(error.message);
