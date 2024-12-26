@@ -14,8 +14,8 @@ import HistoryFieldBooked from "./components/LoginedUser/historyFieldBooked";
 import Login from "./pages/login";
 import Report from "./components/fieldOwner/report";
 import FieldDetail from "./components/common/FieldDetail";
-import FieldBookied from "./components/LoginedUser/fieldBooked"; // Import FieldBookied
-import Personal from "./components/LoginedUser/Personal"; // Import trang cá nhân
+import FieldBooked from "./components/LoginedUser/fieldBooked";
+import Personal from "./components/LoginedUser/Personal";
 import MainLayout from "./layouts/MainLayout";
 
 const App = () => {
@@ -68,7 +68,7 @@ const App = () => {
         <Route
           path="/login"
           element={
-            <Login 
+            <Login
               setIsAuthenticated={setIsAuthenticated}
               setUserRole={setUserRole}
             />
@@ -97,11 +97,11 @@ const App = () => {
           }
         />
         <Route
-          path="/fieldBookied"
+          path="/fieldBooked"
           element={
             <MainLayout>
               <ProtectedRoute
-                element={<FieldBookied />}
+                element={<FieldBooked />}
                 role={["player", "field_owner"]}
               />
             </MainLayout>
