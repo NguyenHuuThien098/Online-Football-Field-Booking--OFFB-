@@ -21,4 +21,6 @@ router.post('/accept',authenticateUser, authorizeRole(['field_owner']), joinmatc
 router.post('/reject',authenticateUser, authorizeRole(['field_owner']), joinmatchController.rejectPlayer);
 
 router.get('/:matchId/join-requests', authenticateUser, authorizeRole(['field_owner']),joinmatchController.getJoinRequests);
+
+router.get('/history/:playerId',joinmatchController.getPlayerMatchHistory);
 module.exports = router;

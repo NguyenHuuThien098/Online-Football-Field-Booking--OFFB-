@@ -174,7 +174,6 @@ exports.rejectPlayer = async (req, res) => {
     }
 };
 
-// Hàm để player hủy tham gia trận đấu
 exports.cancelJoinMatch = async (req, res) => {
     const { matchId, playerId } = req.body;
 
@@ -184,34 +183,39 @@ exports.cancelJoinMatch = async (req, res) => {
         if (!matchSnapshot.exists()) return res.status(404).json({ error: 'Không tìm thấy trận đấu' });
 
         const matchData = matchSnapshot.val();
+        const matchSlotRef = admin.database().ref(`matchSlots/${matchId}`);
+        const matchSlotSnapshot = await matchSlotRef.once('value');
+        const matchSlotData = matchSlotSnapshot.val() || [];
 
-        // Kiểm tra player có trong danh sách players (và trạng thái là 1)
-        if (matchData.players && matchData.players.includes(playerId)) {
-            // Player đã được xác nhận (trạng thái 1)
-            const playerIndex = matchData.players.indexOf(playerId);
-            if (playerIndex === -1) {
-                return res.status(400).json({ error: 'Player không phải là thành viên của trận đấu' });
-            }
+        // Kiểm tra nếu player có trong matchSlots và có trạng thái là 1 (đã tham gia)
+        const playerIndex = matchSlotData.findIndex(slot => slot.playerId === playerId);
+        if (playerIndex !== -1) {
+            // Nếu player có trong matchSlots, xóa player khỏi matchSlots
+            matchSlotData.splice(playerIndex, 1);
+            await matchSlotRef.set(matchSlotData);  // Cập nhật lại matchSlots
+        }
 
-            // Xóa player khỏi danh sách players và điều chỉnh số lượng người chơi còn lại
-            matchData.players.splice(playerIndex, 1);
-            matchData.remainingPlayerCount += 1;
-
-            await matchRef.update(matchData);  // Cập nhật lại danh sách players và remainingPlayerCount
-
+        // Kiểm tra nếu player có trong danh sách players (và trạng thái là 1)
+        const playerIndexInPlayers = matchData.players?.indexOf(playerId);
+        if (playerIndexInPlayers !== -1) {
+            // Xóa player khỏi danh sách players
+            matchData.players.splice(playerIndexInPlayers, 1);
+            matchData.remainingPlayerCount += 1;  // Điều chỉnh số lượng người chơi còn lại
         } else if (matchData.waitingList && matchData.waitingList.some(player => player.playerId === playerId && player.status === 1)) {
-            // Player có trong danh sách chờ và đã được chấp nhận (trạng thái 1)
+            // Nếu player có trong danh sách chờ và đã được chấp nhận (trạng thái 1)
             matchData.waitingList = matchData.waitingList.filter(player => player.playerId !== playerId);
-
-            await matchRef.update(matchData);  // Cập nhật lại danh sách chờ
         } else {
             return res.status(400).json({ error: 'Bạn không thể hủy tham gia nếu chưa được chấp nhận hoặc không có trong danh sách' });
         }
+
+        // Cập nhật lại matchRef với danh sách players và waitingList đã thay đổi
+        await matchRef.update(matchData);
+
         const fullName = await getPlayerName(playerId);
         // Gửi thông báo cho chủ sân nếu player hủy tham gia
         const ownerNotificationRef = admin.database().ref(`notifications/${matchData.ownerId}`).push();
         await ownerNotificationRef.set({
-            message: ` ${fullName} đã hủy tham gia trận đấu của bạn.`,
+            message: `${fullName} đã hủy tham gia trận đấu của bạn.`,
             matchId,
             timestamp: new Date().toISOString()
         });
@@ -221,8 +225,9 @@ exports.cancelJoinMatch = async (req, res) => {
         console.error('Lỗi khi hủy tham gia trận đấu:', error);
         res.status(500).json({ error: 'Không thể hủy tham gia trận đấu', details: error.message });
     }
-    
 };
+
+
 exports.getJoinRequests = async (req, res) => {
     const { matchId } = req.params; // matchId được truyền trong URL
 
@@ -261,3 +266,55 @@ const getPlayerName = async (userId) => {
         return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
     }
 };
+
+    exports.getPlayerMatchHistory = async (req, res) => {
+        const { playerId } = req.params; // Lấy playerId từ URL
+        
+        if (!playerId) {
+            return res.status(400).json({ error: 'Thiếu playerId' });
+        }   
+
+        try {
+            // Truy vấn matchSlots để lấy danh sách các trận đấu mà playerId có tham gia
+            const matchSlotsRef = admin.database().ref('matchSlots');
+            const matchSlotsSnapshot = await matchSlotsRef.once('value');
+            const matchSlotsData = matchSlotsSnapshot.val();
+
+            if (!matchSlotsData) {
+                return res.status(200).json({ message: 'Không có lịch sử tham gia', history: [] });
+            }
+
+            // Lọc các trận đấu có sự tham gia của player
+            const playerMatches = Object.keys(matchSlotsData).filter(matchId =>
+                matchSlotsData[matchId].some(slot => slot.playerId === playerId)
+            );
+
+            if (playerMatches.length === 0) {
+                return res.status(200).json({ message: 'Không có lịch sử tham gia', history: [] });
+            }
+
+            // Lấy thông tin chi tiết các trận đấu từ danh sách matches
+            const matchesRef = admin.database().ref('matches');
+            const matchesSnapshot = await matchesRef.once('value');
+            const matchesData = matchesSnapshot.val();
+
+            const history = playerMatches.map(matchId => {
+                const match = matchesData[matchId];
+                const slot = matchSlotsData[matchId].find(slot => slot.playerId === playerId);
+
+                return {
+                    matchId,
+                    name: match.name,
+                    location: match.location,
+                    time: match.time,
+                    status: slot.status, // Trạng thái: 0 (chờ phê duyệt), 1 (đã tham gia), 2 (bị từ chối)
+                    ownerId: match.ownerId,
+                };
+            });
+
+            return res.status(200).json({ history });
+        } catch (error) {
+            console.error('Lỗi khi lấy lịch sử trận đấu:', error);
+            return res.status(500).json({ error: 'Không thể lấy lịch sử trận đấu', details: error.message });
+        }
+    };

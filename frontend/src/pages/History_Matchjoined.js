@@ -4,42 +4,71 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const History_MatchJoined = () => {
     const [matches, setMatches] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [requests, setRequests] = useState({});
     const [loadingRequests, setLoadingRequests] = useState({});
-    const [processedRequests, setProcessedRequests] = useState({});  // Lưu trạng thái yêu cầu đã được xử lý
+    const [processedRequests, setProcessedRequests] = useState({});
+    const [isOwner, setIsOwner] = useState(false);
+    const [isPlayer, setIsPlayer] = useState(false);
+    const [playerMatchHistory, setPlayerMatchHistory] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    const getOwnerId = () => {
+    useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token) {
-            return localStorage.getItem('ownerId');
+        const userId = localStorage.getItem('userId');
+        const role = localStorage.getItem('role');
+        console.log('UserId:', userId);
+        console.log('Role:', role);
+        console.log('Token:', token);
+        if (token && userId) {
+            setIsOwner(role === 'field_owner');
+            setIsPlayer(role === 'player');
+        } else {
+            setIsOwner(false);
+            setIsPlayer(false);
         }
-        return null;
-    };
+    }, []);
 
     const fetchMatches = async () => {
-        const ownerId = getOwnerId();
+        const token = localStorage.getItem('token');
+        const ownerId = isOwner ? localStorage.getItem('ownerId') : null;
         if (!ownerId) {
             alert('Không tìm thấy thông tin người dùng!');
-            setLoading(false);
             return;
         }
 
         try {
             const response = await axios.get(`http://localhost:5000/api/matches/owner/${ownerId}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
             setMatches(response.data);
         } catch (error) {
             console.error('Lỗi khi lấy danh sách trận đấu:', error);
-        } finally {
-            setLoading(false);
+        }
+    };
+
+    const fetchPlayerMatchHistory = async (playerId) => {
+        const token = localStorage.getItem('token');
+        if (!playerId) {
+            alert('Không tìm thấy thông tin người dùng!');
+            return;
+        }
+        try {
+            const response = await axios.get(`http://localhost:5000/api/join/history/${playerId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const formattedHistory = response.data.history.map(history => ({
+                ...history,
+                time: new Date(history.time).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" }),
+            }));
+            setPlayerMatchHistory(formattedHistory);
+        } catch (error) {
+            console.error('Lỗi khi lấy lịch sử trận đấu:', error);
         }
     };
 
     const fetchRequests = async (matchId) => {
+        const token = localStorage.getItem('token');
         if (loadingRequests[matchId]) return;
         setLoadingRequests((prevState) => ({
             ...prevState,
@@ -53,13 +82,10 @@ const History_MatchJoined = () => {
 
         try {
             const response = await axios.get(`http://localhost:5000/api/join/${matchId}/join-requests`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
 
-            // Lọc các yêu cầu với ba trạng thái (0: Chờ xử lý, 1: Đã chấp nhận, 2: Đã từ chối)
-            const filteredRequests = response.data.pendingRequests.filter(request => [0, 1, 2].includes(request.status));
+            const filteredRequests = response.data.pendingRequests.filter(request => [0, 1].includes(request.status));
             setRequests((prevRequests) => ({
                 ...prevRequests,
                 [matchId]: filteredRequests,
@@ -75,14 +101,13 @@ const History_MatchJoined = () => {
     };
 
     const acceptPlayer = async (matchId, playerId) => {
+        const token = localStorage.getItem('token');
         try {
             await axios.post(
                 'http://localhost:5000/api/join/accept',
                 { matchId, playerId },
                 {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 }
             );
             alert('Đã chấp nhận player thành công!');
@@ -95,7 +120,6 @@ const History_MatchJoined = () => {
                 );
             });
 
-            // Cập nhật trạng thái yêu cầu là đã xử lý (để ẩn các nút chấp nhận và từ chối)
             setProcessedRequests((prevState) => ({
                 ...prevState,
                 [`${matchId}_${playerId}`]: 'accepted',
@@ -107,19 +131,17 @@ const History_MatchJoined = () => {
     };
 
     const rejectPlayer = async (matchId, playerId) => {
+        const token = localStorage.getItem('token');
         try {
             await axios.post(
                 'http://localhost:5000/api/join/reject',
                 { matchId, playerId },
                 {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 }
             );
             alert('Đã từ chối player thành công!');
 
-            // Cập nhật trạng thái yêu cầu là đã xử lý (để ẩn các nút chấp nhận và từ chối)
             setProcessedRequests((prevState) => ({
                 ...prevState,
                 [`${matchId}_${playerId}`]: 'rejected',
@@ -130,92 +152,182 @@ const History_MatchJoined = () => {
         }
     };
 
-    useEffect(() => {
-        fetchMatches();
-    }, []);
+    const handleCancelJoinMatch = async (matchId) => {
+        const token = localStorage.getItem('token');
+        const playerId = localStorage.getItem('userId');
+        if (!token) {
+            alert('Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.');
+            return;
+        }
+        if (!playerId) {
+            alert('Không tìm thấy ID người chơi. Vui lòng thử lại.');
+            return;
+        }
 
-    if (loading) {
-        return <div>Đang tải dữ liệu...</div>;
+        const confirmCancel = window.confirm('Bạn có chắc muốn hủy tham gia trận đấu này?');
+        if (!confirmCancel) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await axios.delete(
+                'http://localhost:5000/api/join/cancel',
+                {
+                    data: { matchId, playerId },
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            alert(response.data.message || 'Hủy tham gia thành công');
+            setPlayerMatchHistory((prevHistory) =>
+                prevHistory.filter((history) => history.matchId !== matchId)
+            );
+        } catch (err) {
+            console.error(err);
+            alert('Có lỗi khi hủy tham gia.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (isOwner) {
+            fetchMatches();
+        } else if (isPlayer) {
+            const playerId = localStorage.getItem('userId');
+            fetchPlayerMatchHistory(playerId);
+        }
+    }, [isOwner, isPlayer]);
+
+    if (!isOwner && !isPlayer) {
+        return null;
     }
 
     return (
-        <div className="container mt-5">
-            <h1>Quản lý trận đấu</h1>
-            {matches.length === 0 ? (
-                <p>Không có trận đấu nào.</p>
-            ) : (
-                matches.map((match) => (
-                    <div key={match.id}>
-                        <h3>Trận đấu: {match.ownerName} </h3>
-                        <p>Thời gian: {new Date(match.time).toLocaleString()}</p>
-                        <p>Ghi chú: {match.notes}</p>
-                        <p>Số lượng người chơi: {match.playerCount}</p>
-                        <p>Số lượng người chơi còn lại: {match.remainingPlayerCount}</p>
+    <div className="container mt-5">
+        <h1>{isOwner ? 'Quản lý trận đấu' : 'Lịch sử tham gia trận đấu'}</h1>
 
-                        <h4>Yêu cầu tham gia:</h4>
-                        <button
-                            className="btn btn-info"
-                            onClick={() => fetchRequests(match.id)}
-                        >
-                            Xem yêu cầu tham gia
-                        </button>
+        {isOwner && (
+            <>
+                {matches.length === 0 ? (
+                    <p>Không có trận đấu nào.</p>
+                ) : (
+                    matches.map((match) => (
+                        <div key={match.id} className="mb-4">
+                            <h3>Tên chủ trận đấu: {match.ownerName}</h3>
+                            <p>Thời gian: {new Date(match.time).toLocaleString()}</p>
+                            <p>Ghi chú: {match.notes}</p>
+                            <p>Số lượng người chơi: {match.playerCount}</p>
+                            <p>Số lượng người chơi còn lại: {match.remainingPlayerCount}</p>
 
-                        {requests[match.id] && requests[match.id].length > 0 ? (
-                            <table className="table table-striped table-hover mt-3">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Player ID</th>
-                                        <th scope="col">Actions</th>
-                                        <th scope="col">Trạng thái</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {requests[match.id].map((request, index) => (
-                                        <tr key={request.playerId}>
-                                            <th scope="row">{index + 1}</th>
-                                            <td>{request.playerId}</td>
-                                            <td>
-                                                {/* Ẩn nút nếu yêu cầu đã được xử lý */}
-                                                {processedRequests[`${match.id}_${request.playerId}`] !== 'accepted' && 
-                                                    processedRequests[`${match.id}_${request.playerId}`] !== 'rejected' && (
-                                                        <>
-                                                            <button
-                                                                className="btn btn-success me-2"
-                                                                onClick={() => acceptPlayer(match.id, request.playerId)}
-                                                            >
-                                                                Chấp nhận
-                                                            </button>
-                                                            <button
-                                                                className="btn btn-danger"
-                                                                onClick={() => rejectPlayer(match.id, request.playerId)}
-                                                            >
-                                                                Từ chối
-                                                            </button>
-                                                        </>
-                                                    )
-                                                }
-                                            </td>
-                                            <td>
-                                                {/* Hiển thị trạng thái */}
-                                                {request.status === 0 && <span className="text-warning">Chờ xử lý</span>}
-                                                {request.status === 1 && <span className="text-success">Đã chấp nhận</span>}
-                                                {request.status === 2 && <span className="text-danger">Đã từ chối</span>}
-                                            </td>
+                            <h4>Người chơi yêu cầu tham gia:</h4>
+                            <button
+                                className="btn btn-info"
+                                onClick={() => fetchRequests(match.id)}
+                            >
+                                Xem yêu cầu tham gia
+                            </button>
+
+                            {requests[match.id] && requests[match.id].length > 0 ? (
+                                <table className="table table-striped table-hover mt-3">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Player ID</th>
+                                            <th scope="col">Actions</th>
+                                            <th scope="col">Trạng thái</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        ) : loadingRequests[match.id] ? (
-                            <p>Đang tải yêu cầu...</p>
-                        ) : (
-                            <p>Không có yêu cầu tham gia nào.</p>
-                        )}
-                    </div>
-                ))
-            )}
-        </div>
-    );
+                                    </thead>
+                                    <tbody>
+                                        {requests[match.id].map((request, index) => (
+                                            <tr key={request.playerId}>
+                                                <th scope="row">{index + 1}</th>
+                                                <td>{request.playerId}</td>
+                                                <td>
+                                                    {processedRequests[`${match.id}_${request.playerId}`] !== 'accepted' &&
+                                                        processedRequests[`${match.id}_${request.playerId}`] !== 'rejected' && (
+                                                            <>
+                                                                <button
+                                                                    className="btn btn-success me-2"
+                                                                    onClick={() => acceptPlayer(match.id, request.playerId)}
+                                                                >
+                                                                    Chấp nhận
+                                                                </button>
+                                                                <button
+                                                                    className="btn btn-danger"
+                                                                    onClick={() => rejectPlayer(match.id, request.playerId)}
+                                                                >
+                                                                    Từ chối
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                </td>
+                                                <td>
+                                                    {request.status === 0 && (
+                                                        <span className="text-warning">Đang chờ xác nhận</span>
+                                                    )}
+                                                    {request.status === 1 && (
+                                                        <span className="text-success">Đã chấp nhận</span>
+                                                    )}
+                                                    {request.status === 2 && (
+                                                        <span className="text-danger">Đã từ chối</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : loadingRequests[match.id] ? (
+                                <p>Đang tải yêu cầu...</p>
+                            ) : (
+                                <p>Không có yêu cầu tham gia nào.</p>
+                            )}
+                        </div>
+                    ))
+                )}
+            </>
+        )}
+
+        {isPlayer && (
+            <>
+                {playerMatchHistory.length === 0 ? (
+                    <p>Không có dữ liệu</p>
+                ) : (
+                    <ul className="list-group">
+                        {playerMatchHistory.map((history, index) => (
+                            
+                            <li key={index} className="list-group-item">
+                                {index + 1}.
+                                <p><strong>Trận đấu:</strong> {history.matchId}</p>
+                                <p><strong>Thời gian trận đấu bắt đầu:</strong> {history.time}</p>
+                                
+                                <p>
+                                    <strong>Trạng thái:</strong>{' '}
+                                    {history.status === 1 ? (
+                                        <span className="text-success">Đã tham gia</span>
+                                    ) : history.status === 2 ? (
+                                        <span className="text-danger">Bị từ chối</span>
+                                    ) : (
+                                        <span className="text-warning">Đang chờ xác nhận</span>
+                                    )}
+                                </p>
+                                {history.status === 1 && (
+                                    <button
+                                        className="btn btn-danger"
+                                        onClick={() => handleCancelJoinMatch(history.matchId)}
+                                    >
+                                        Hủy tham gia
+                                    </button>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </>
+        )}
+    </div>
+);
+
 };
 
 export default History_MatchJoined;

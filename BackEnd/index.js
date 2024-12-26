@@ -40,8 +40,9 @@ app.use('/api/user', userRoutes); // Route cho thay đổi thông tin người d
 app.use('/api/admin', adminRoutes); // Route cho admin
 app.use('/api/matches', matchRoutes); // Sử dụng route cho trận đấu
 app.use('/api/confirmed', confirmdenyRouter); // Route cho xác nhận và từ chối
-app.use('/api/join', joinRouter);
 app.use('/api/notifications', notifications);
+app.use('/api/join', joinRouter);
+
 // Khởi động server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

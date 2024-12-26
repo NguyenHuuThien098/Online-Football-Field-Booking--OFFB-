@@ -19,6 +19,7 @@ import FieldBookied from "./pages/fieldBookied"; // Import FieldBookied
 import Personal from "./pages/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
 import Nofi from "./pages/Nofi";
+
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"

@@ -177,7 +177,7 @@ const JoinMatch = () => {
       >
         Tham gia trận đấu
       </button>
-      <button
+      {/* <button
         onClick={handleCancelJoinMatch}
         disabled={loading}
         style={{
@@ -193,7 +193,7 @@ const JoinMatch = () => {
         }}
       >
         Hủy tham gia
-      </button>
+      </button> */}
     </div>
   );
 };
