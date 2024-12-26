@@ -12,7 +12,18 @@ const FieldOwnerDashboard = () => {
     const handleTabChange = (event, newValue) => {
         setTabIndex(newValue);
     };
-
+    const ownerId = localStorage.getItem('userId');
+    const role = localStorage.getItem('userRole');
+    if (!ownerId) {
+        setError('Owner ID not found');
+        setLoading(false);
+        return;
+    }
+    if (role !== 'field_owner') {
+        setError('Not an owner');
+        setLoading(false);
+        return;
+    }
     return (
         <>
             <Typography variant="h3" align="center" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}>

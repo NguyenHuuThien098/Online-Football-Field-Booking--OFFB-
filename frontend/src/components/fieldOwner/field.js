@@ -107,6 +107,8 @@ const Field = () => {
         }
     };
     const handleDeleteLargeField = async (largeFieldId) => {
+        // console.log(largeFieldId);
+        // return;
         try {
             await axios.delete(`http://localhost:5000/api/field-owner/large-field/${largeFieldId}`, {
                 headers: {
@@ -133,6 +135,7 @@ const Field = () => {
                 Add New Large Field +
             </Button>
             <hr />
+            {/* {console.log(fields)} */}
             <Grid container spacing={2}>
                 {fields.map((field, index) => (
                     <Grid item xs={12} sm={6} md={6} key={index}>
@@ -143,10 +146,10 @@ const Field = () => {
                                 <Typography variant="body1">Contact Number: {field.ownerPhone}</Typography>
                                 <Typography variant="body1">Operating Hours: {field.operatingHours}</Typography>
                                 <Typography variant="body1">Description: {field.otherInfo}</Typography>
-                                <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.fieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
+                                <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.largeFieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                     Update
                                 </Button>
-                                <Button variant="contained" onClick={() => handleDeleteLargeField(field.fieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
+                                <Button variant="contained" onClick={() => handleDeleteLargeField(field.largeFieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                     Delete
                                 </Button>
                             </CardContent>
