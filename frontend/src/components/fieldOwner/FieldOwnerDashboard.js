@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
 import LargeField from './Field/Field';
-import Match from './Match';
+import Match from './Match/Match';
 const FieldOwnerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
