@@ -25,8 +25,8 @@ const App = () => {
   const [userRole, setUserRole] = useState(localStorage.getItem("userRole"));
 
   useEffect(() => {
-    localStorage.setItem("isAuthenticated", isAuthenticated);
-    localStorage.setItem("userRole", userRole);
+    localStorage.setItem("isAuthenticated", isAuthenticated.toString());
+    localStorage.setItem("userRole", userRole || "");
   }, [isAuthenticated, userRole]);
 
   const ProtectedRoute = ({ element, role }) => {
@@ -47,10 +47,7 @@ const App = () => {
           path="/"
           element={
             <MainLayout>
-              <AvailableField
-                setIsAuthenticated={setIsAuthenticated}
-                setUserRole={setUserRole}
-              />
+              <AvailableField />
             </MainLayout>
           }
         />
@@ -58,17 +55,14 @@ const App = () => {
           path="/openMatch"
           element={
             <MainLayout>
-              <OpenMatch
-                setIsAuthenticated={setIsAuthenticated}
-                setUserRole={setUserRole}
-              />
+              <OpenMatch />
             </MainLayout>
           }
         />
         <Route
           path="/login"
           element={
-            <Login 
+            <Login
               setIsAuthenticated={setIsAuthenticated}
               setUserRole={setUserRole}
             />
@@ -111,7 +105,10 @@ const App = () => {
           path="/personal"
           element={
             <MainLayout>
-              <ProtectedRoute element={<Personal />} />
+              <ProtectedRoute
+                element={<Personal />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />
@@ -119,7 +116,10 @@ const App = () => {
           path="/fieldDetail"
           element={
             <MainLayout>
-              <ProtectedRoute element={<FieldDetail />} />
+              <ProtectedRoute
+                element={<FieldDetail />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />
@@ -127,7 +127,9 @@ const App = () => {
           path="/Report"
           element={
             <MainLayout>
-              <ProtectedRoute element={<Report />} role={["field_owner"]} />
+              <ProtectedRoute
+                element={<Report />}
+                role={["field_owner"]} />
             </MainLayout>
           }
         />
@@ -135,7 +137,10 @@ const App = () => {
           path="/historyMatchJoined"
           element={
             <MainLayout>
-              <ProtectedRoute element={<HistoryMatchJoined />} />
+              <ProtectedRoute
+                element={<HistoryMatchJoined />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />
@@ -143,7 +148,10 @@ const App = () => {
           path="/historyFieldBooked"
           element={
             <MainLayout>
-              <ProtectedRoute element={<HistoryFieldBooked />} />
+              <ProtectedRoute
+                element={<HistoryFieldBooked />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />

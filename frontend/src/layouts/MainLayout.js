@@ -4,7 +4,7 @@ import Sidebar from "../components/common/Sidebar";
 import styles from "./MainLayout.module.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const MainLayout = ({ children, role }) => {
+const MainLayout = ({ children }) => {
   return (
     <div name="container" className={"w-100"}>
       {/* Header */}
