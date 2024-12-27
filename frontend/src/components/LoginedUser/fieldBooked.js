@@ -7,7 +7,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 const FieldBooked = () => {
     const location = useLocation();  // Receive data from state
     const navigate = useNavigate();
-
     const { field } = location.state || {};  // Get field from state
 
     const [userId, setUserId] = useState('');
@@ -66,10 +65,10 @@ const FieldBooked = () => {
         }
 
         const details = selectedSlot ? {
-                  ...bookingDetails,
-                  startTime: selectedSlot.split('-')[0],
-                  endTime: selectedSlot.split('-')[1],
-              }
+            ...bookingDetails,
+            startTime: selectedSlot.split('-')[0],
+            endTime: selectedSlot.split('-')[1],
+        }
             : bookingDetails;
 
         if (!details.date || !details.startTime || !details.endTime) {
@@ -190,9 +189,8 @@ const FieldBooked = () => {
                                     required
                                     inputProps={{ style: { fontSize: '1.2rem' } }}
                                 >
-                                    <option value="5">5 People</option>
-                                    <option value="7">7 People</option>
-                                    <option value="11">11 People</option>
+                                    <option value="5">{field.type}</option>
+
                                 </TextField>
                             </Grid>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>

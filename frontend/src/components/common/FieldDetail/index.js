@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Row, Col, ListGroup } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getDatabase, ref, get } from 'firebase/database'; // Import Firebase functions
+import { getDatabase, ref, get, set } from 'firebase/database'; // Import Firebase functions
 import { IconButton, Box } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import axios from 'axios';
@@ -17,11 +17,11 @@ const FieldDetail = () => {
     const [smallField, setSmallField] = useState(null); // State to store small field info
 
     useEffect(() => {
-        if (field?.ownerId) {
-            fetchOwnerInfo(field.ownerId); // Fetch owner info when ownerId is available
-        }
         if (field?.largeFieldId) {
             fetchLargeField(field.largeFieldId); // Fetch large field info when largeFieldId is available
+        }
+        if (largeField?.ownerId) {
+            fetchOwnerInfo(largeField.ownerId); // Fetch owner info when ownerId is available
         }
         if (field?.smallFieldId) {
             fetchSmallField(field.smallFieldId); // Fetch small field info when smallFieldId is available
@@ -30,17 +30,14 @@ const FieldDetail = () => {
 
     const fetchOwnerInfo = async (ownerId) => {
         try {
-            const db = getDatabase();
-            const userRef = ref(db, `users/${ownerId}`);
-            const snapshot = await get(userRef);
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                setOwnerName(userData.fullName || "Unknown");
-                setOwnerPhone(userData.phoneNumber || "Not available");
-            } else {
-                setOwnerName("Unknown");
-                setOwnerPhone("Not available");
-            }
+            const response = await axios.get(`http://localhost:5000/api/admin/users/${ownerId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log("Owner info:", response.data);
+            setOwnerName(response.data.fullName || "Unknown"); // Get name or display "Unknown"
+            setOwnerPhone(response.data.phoneNumber || "Not available"); // Get phone number or display "Not available"
         } catch (error) {
             console.error("Error fetching owner info:", error);
             setOwnerName("Unknown");
@@ -154,20 +151,19 @@ const FieldDetail = () => {
             <Row className="justify-content-center">
                 <Col md={8}>
                     <Box sx={{ position: 'relative' }}>
-                        <IconButton
-                            onClick={handleBackClick}
-                            sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white', margin: '16px 0' }}
-                        >
-                            <ArrowBackIcon />
-                        </IconButton>
                         <Card className="shadow rounded">
                             <Card.Img variant="top" src={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'} rounded />
                             <Card.Body>
+                                <IconButton
+                                    onClick={handleBackClick}
+                                    sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white', margin: '16px 0' }}
+                                >
+                                    <ArrowBackIcon />
+                                </IconButton>
                                 <Card.Title>{field.name}</Card.Title>
                                 <Card.Text>
                                     <b>Owner:</b> {ownerName || "Loading..."} <br />
                                     <b>Phone:</b> {ownerPhone || "Loading..."} <br />
-                                    <b>Address:</b> {field.location || "Loading..."} <br />
                                     <b>Large field name:</b> {largeField?.name || "Loading..."} <br />
                                     <b>Large field address:</b> {largeField?.address || "Loading..."} <br />
                                     <b>Large field operating hours:</b> {largeField?.operatingHours || "Loading..."} <br />
