@@ -11,20 +11,14 @@ const FieldDetail = () => {
     const [ownerName, setOwnerName] = useState(null); // Store owner's name
     const [ownerPhone, setOwnerPhone] = useState(null); // Store owner's phone number
     const [largeField, setLargeField] = useState(null); // State to store large field info
+    const [smallField, setSmallField] = useState(null); // State to store small field info
 
     useEffect(() => {
-        if (field?.ownerId) {
-            fetchOwnerInfo(field.ownerId); // Fetch owner info when ownerId is available
-        } else {
-            // Fallback data if no ownerId is available
-            setOwnerName("Default Owner");
-            setOwnerPhone("000-000-0000");
-        }
         if (field?.largeFieldId) {
             fetchLargeField(field.largeFieldId); // Fetch large field info when largeFieldId is available
-        } else {
-            // Fallback data if no largeFieldId is available
-            setLargeField({ name: "Default Large Field", address: "Default Address" });
+        }
+        if (field?.smallFieldId) {
+            fetchSmallField(field.id); // Fetch small field info when smallFieldId is available
         }
     }, [field]);
 
@@ -61,6 +55,22 @@ const FieldDetail = () => {
             }
         } catch (error) {
             console.error("Error fetching large field info:", error);
+        }
+    };
+
+    const fetchSmallField = async (smallFieldId) => {
+        try {
+            const db = getDatabase();
+            const fieldRef = ref(db, `field-owner/small-field/${smallFieldId}`);
+            const snapshot = await get(fieldRef);
+            if (snapshot.exists()) {
+                const fieldData = snapshot.val();
+                setSmallField(fieldData);
+            } else {
+                console.error("No small field data available");
+            }
+        } catch (error) {
+            console.error("Error fetching small field info:", error);
         }
     };
 
@@ -143,9 +153,11 @@ const FieldDetail = () => {
                             <Card.Text>
                                 <b>Owner:</b> {ownerName || "Loading..."} <br />
                                 <b>Phone:</b> {ownerPhone || "Loading..."} <br />
-                                <b>Address:</b> {field.location || "Default Address"} <br />
-                                <b>Large field name:</b> {largeField?.name || "Default Large Field"} <br />
-                                <b>Large field address:</b> {largeField?.address || "Default Address"}
+                                <b>Address:</b> {field.location || "Loading..."} <br />
+                                <b>Large field name:</b> {largeField?.name || "Loading..."} <br />
+                                <b>Large field address:</b> {largeField?.address || "Loading..."} <br />
+                                <b>Small field name:</b> {smallField?.name || "Error"} <br />
+                                <b>Small field address:</b> {smallField?.address || "Error"}
                             </Card.Text>
                             <div className="d-flex justify-content-end mb-3">
                                 <Button variant="primary" onClick={handleBookField}>

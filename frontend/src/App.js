@@ -18,6 +18,7 @@ import FieldDetail from "./components/common/FieldDetail";
 import FieldBookied from "./components/LoginedUser/fieldBooked"; // Import FieldBookied
 import Personal from "./components/LoginedUser/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
+import SmallFieldDetail from "./components/fieldOwner/Field/SmallFieldDetail"; // Import SmallFieldDetail
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -152,6 +153,17 @@ const App = () => {
             <MainLayout>
               <ProtectedRoute
                 element={<LargeField />}
+                role={["field_owner"]}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/smallField/:fieldId"
+          element={
+            <MainLayout>
+              <ProtectedRoute
+                element={<SmallFieldDetail />}
                 role={["field_owner"]}
               />
             </MainLayout>
