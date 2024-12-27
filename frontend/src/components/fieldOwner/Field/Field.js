@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
+import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 const Field = () => {
     const [fields, setFields] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -22,6 +22,9 @@ const Field = () => {
         images: '',
         operatingHours: ''
     });
+    const [deletingFieldId, setDeletingFieldId] = useState(null);
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [fieldToDelete, setFieldToDelete] = useState(null);
     const token = localStorage.getItem('token');
     const ownerId = localStorage.getItem('userId');
     useEffect(() => {
@@ -107,15 +110,14 @@ const Field = () => {
         }
     };
     const handleDeleteLargeField = async (largeFieldId) => {
-        // console.log(largeFieldId);
-        // return;
+        setDeletingFieldId(largeFieldId);
         try {
             await axios.delete(`http://localhost:5000/api/field-owner/large-field/${largeFieldId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setFields(fields.filter(field => field.fieldId !== largeFieldId));
+            setFields(fields.filter(field => field.largeFieldId !== largeFieldId));
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 setError('Resource not found.');
@@ -123,7 +125,20 @@ const Field = () => {
                 console.error("Error deleting large field:", error);
                 setError('An error occurred while deleting the large field.');
             }
+        } finally {
+            setDeletingFieldId(null);
+            setConfirmDelete(false);
         }
+    };
+
+    const handleConfirmDelete = (largeFieldId) => {
+        setFieldToDelete(largeFieldId);
+        setConfirmDelete(true);
+    };
+
+    const handleCancelDelete = () => {
+        setFieldToDelete(null);
+        setConfirmDelete(false);
     };
 
     return (
@@ -149,8 +164,8 @@ const Field = () => {
                                 <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.largeFieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
                                     Update
                                 </Button>
-                                <Button variant="contained" onClick={() => handleDeleteLargeField(field.largeFieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
-                                    Delete
+                                <Button variant="contained" onClick={() => handleConfirmDelete(field.largeFieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }} disabled={deletingFieldId === field.largeFieldId}>
+                                    {deletingFieldId === field.largeFieldId ? <CircularProgress size={24} /> : 'Delete'}
                                 </Button>
                             </CardContent>
                         </Card>
@@ -215,6 +230,22 @@ const Field = () => {
                     </Button>
                 </form>
             </Box>
+            <Dialog open={confirmDelete} onClose={handleCancelDelete}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this field? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancelDelete} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={() => handleDeleteLargeField(fieldToDelete)} color="primary" autoFocus>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };
