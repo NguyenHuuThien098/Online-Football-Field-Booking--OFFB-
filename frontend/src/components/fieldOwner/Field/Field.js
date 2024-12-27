@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
+import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider } from '@mui/material';
 const Field = () => {
-    const [fields, setFields] = useState([]);
+    const [largeFields, setLargeFields] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [newField, setNewField] = useState({
@@ -27,10 +27,11 @@ const Field = () => {
     const [fieldToDelete, setFieldToDelete] = useState(null);
     const token = localStorage.getItem('token');
     const ownerId = localStorage.getItem('userId');
+    const navigate = useNavigate();
     useEffect(() => {
-        fetchFields();
+        fetchLargeFields();
     }, []);
-    const fetchFields = async () => {
+    const fetchLargeFields = async () => {
         try {
             const token = localStorage.getItem('token');
             const ownerId = localStorage.getItem('userId');
@@ -45,18 +46,18 @@ const Field = () => {
                 setLoading(false);
                 return;
             }
-            // Fetch fields
-            const fieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
+            // Fetch large fields
+            const largeFieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            const fieldsData = fieldsResponse.data;
-            if (Array.isArray(fieldsData)) {
-                if (fieldsData.length === 0) {
-                    setError('No fields found');
+            const largeFieldsData = largeFieldsResponse.data;
+            if (Array.isArray(largeFieldsData)) {
+                if (largeFieldsData.length === 0) {
+                    setError('No large fields found');
                 }
-                setFields(fieldsData);
+                setLargeFields(largeFieldsData);
             } else {
                 setError('Invalid data returned');
             }
@@ -92,7 +93,7 @@ const Field = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setFields([...fields, response.data.largeField]);
+            setLargeFields([...largeFields, response.data.largeField]);
             setNewLargeField({
                 name: '',
                 address: '',
@@ -117,7 +118,7 @@ const Field = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setFields(fields.filter(field => field.largeFieldId !== largeFieldId));
+            setLargeFields(largeFields.filter(largeField => largeField.largeFieldId !== largeFieldId));
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 setError('Resource not found.');
@@ -140,35 +141,40 @@ const Field = () => {
         setFieldToDelete(null);
         setConfirmDelete(false);
     };
-
+    const handleLargeFieldDetail = (largeField) => {
+        navigate(`/largeField/${largeField.largeFieldId}`, { state: largeField });
+    };
     return (
         <div>
             <Typography variant="h3" gutterBottom align="center" sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, marginTop: 2, borderRadius: 1 }}>
-                Your Fields
+                Your Large Fields
             </Typography>
+            <Divider sx={{ marginBottom: 4, borderBottomWidth: 2 }} />
             <Button variant="contained" color="primary" onClick={scrollToAddField} sx={{ my: 2, width: '100%', fontSize: '1.6rem', backgroundColor: 'green', color: 'white', padding: 2, borderRadius: 1 }}>
                 Add New Large Field +
             </Button>
             <hr />
-            {/* {console.log(fields)} */}
             <Grid container spacing={2}>
-                {fields.map((field, index) => (
+                {largeFields.map((largeField, index) => (
                     <Grid item xs={12} sm={6} md={6} key={index}>
-                        <Card key={field.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
-                            <CardContent>
-                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{field.name || 'Unnamed Field'}</Typography>
-                                <Typography variant="body1">Location: {field.address}</Typography>
-                                <Typography variant="body1">Contact Number: {field.ownerPhone}</Typography>
-                                <Typography variant="body1">Operating Hours: {field.operatingHours}</Typography>
-                                <Typography variant="body1">Description: {field.otherInfo}</Typography>
-                                <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.largeFieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
-                                    Update
-                                </Button>
-                                <Button variant="contained" onClick={() => handleConfirmDelete(field.largeFieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }} disabled={deletingFieldId === field.largeFieldId}>
-                                    {deletingFieldId === field.largeFieldId ? <CircularProgress size={24} /> : 'Delete'}
-                                </Button>
-                            </CardContent>
-                        </Card>
+                        <div onClick={() => handleLargeFieldDetail(largeField)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
+                            <Card key={largeField.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
+                                <CardContent>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center' }}>{largeField.name || 'Unnamed Field'}</Typography>
+                                    <Divider sx={{ marginBottom: 4, borderBottomWidth: 2 }} />
+                                    <Typography variant="body1">Location: {largeField.address}</Typography>
+                                    <Typography variant="body1">Contact Number: {largeField.ownerPhone}</Typography>
+                                    <Typography variant="body1">Operating Hours: {largeField.operatingHours}</Typography>
+                                    <Typography variant="body1">Description: {largeField.otherInfo}</Typography>
+                                    <Button variant="contained" color="primary" onClick={() => handleUpdateField(largeField.largeFieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
+                                        Update
+                                    </Button>
+                                    <Button variant="contained" onClick={() => handleConfirmDelete(largeField.largeFieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }} disabled={deletingFieldId === largeField.largeFieldId}>
+                                        {deletingFieldId === largeField.largeFieldId ? <CircularProgress size={24} /> : 'Delete'}
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </Grid>
                 ))}
             </Grid>
