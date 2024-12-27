@@ -10,7 +10,7 @@ const guestRoutes = require('./routes/guestRoutes');
 const historyRoutes = require('./routes/histotyRoutes'); // Sửa lại tên file đúng
 const userRoutes = require('./routes/userRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const matchRoutes = require('./routes/matchRoutes'); // Thêm import cho matchRoutes
+// const matchRoutes = require('./routes/matchRoutes'); // Remove import for matchRoutes
 const confirmdenyRouter = require('./routes/confirmdenyRouter');
 const joinRouter = require('./routes/joinRouter');
 const notifications = require('./routes/notifications');
@@ -38,7 +38,7 @@ app.use('/api/guest', guestRoutes); // Route cho khách
 app.use('/api/history', historyRoutes); // Route cho lịch sử đặt sân
 app.use('/api/user', userRoutes); // Route cho thay đổi thông tin người dùng
 app.use('/api/admin', adminRoutes); // Route cho admin
-app.use('/api/matches', matchRoutes); // Sử dụng route cho trận đấu
+// app.use('/api/matches', matchRoutes); // Remove usage of matchRoutes
 app.use('/api/confirmed', confirmdenyRouter); // Route cho xác nhận và từ chối
 app.use('/api/notifications', notifications);
 app.use('/api/join', joinRouter);

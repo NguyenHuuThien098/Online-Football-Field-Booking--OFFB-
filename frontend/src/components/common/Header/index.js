@@ -63,6 +63,8 @@ const Header = () => {
                 return 'Field Owner';
             case 'player':
                 return 'Player';
+            case 'admin':
+                return 'Admin';
             default:
                 return 'Guest';
         }
@@ -92,7 +94,7 @@ const Header = () => {
                         <>
                             <div className="col d-flex flex-column align-items-center justify-content-center">
                                 <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
+                                    <img src={userData.image || defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
                                         onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                         onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                     />
@@ -100,7 +102,7 @@ const Header = () => {
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
 
-                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
 
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
@@ -109,7 +111,7 @@ const Header = () => {
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="setting">
 
-                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+                                <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
 
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
@@ -131,7 +133,7 @@ const Header = () => {
                     ) : (
                         <div className="col d-flex flex-column align-items-center justify-content-center">
                             <div name="avatar" onClick={() => navigate('/personal')} style={{ cursor: 'pointer' }}>
-                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }} 
+                                <img src={defaultAvatar} className={style.icon + " img-fluid d-block icon-homepage"} alt="avatar" style={{ width: 50, height: 50, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 />
