@@ -1,2 +1,2 @@
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd frontend; npm start; pause"
-Start-Process powershell -ArgumentList "-NoExit","-Command","cd Backend; npm run dev; pause"
+Start-Process cmd -ArgumentList "/K","cd frontend && npm start && pause"
+Start-Process cmd -ArgumentList "/K","cd Backend && npm run dev && pause"
