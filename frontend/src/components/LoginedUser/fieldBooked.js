@@ -93,7 +93,7 @@ const FieldBooked = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             alert('Field booking request sent successfully!');
-            navigate('/player-page');
+            navigate('/');
         } catch (error) {
             console.error('Field booking error:', error);
 

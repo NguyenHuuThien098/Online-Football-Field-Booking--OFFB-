@@ -19,7 +19,8 @@ import FieldBookied from "./components/LoginedUser/fieldBooked"; // Import Field
 import Personal from "./components/LoginedUser/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
 import SmallField from "./components/fieldOwner/Field/SmallField"; // Import SmallFieldDetail
-
+import Nofi from "./pages/Nofi";
+import Join_match from "./pages/join_match";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
@@ -45,6 +46,22 @@ const App = () => {
     <Router>
       <Routes>
         {/* Public Routes */}
+        <Route
+          path="/Join_match"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<Join_match />} />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/Nofi"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<Nofi />} />
+            </MainLayout>
+          }
+        />
         <Route
           path="/"
           element={
@@ -113,6 +130,15 @@ const App = () => {
             </MainLayout>
           }
         />
+{/* <Route
+          path="/History_FieldBooked"
+          element={
+            <MainLayout>
+              <ProtectedRoute element={<History_FieldBooked />} />
+            </MainLayout>
+          }
+        /> */}
+
         <Route
           path="/historyMatchJoined"
           element={

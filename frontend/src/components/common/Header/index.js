@@ -31,6 +31,10 @@ const Header = () => {
         setAnchorEl(null);
     };
 
+    const handleNotificationClick = () => {
+        navigate('/Nofi');  // Chuyển đến trang thông báo
+    };
+
     useEffect(() => {
         setRole(localStorage.getItem("userRole"));
 
@@ -95,13 +99,18 @@ const Header = () => {
                                 </div>
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="notification">
+
                                 <NotificationsIcon fontSize="large" sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+                                    onClick={handleNotificationClick}  // Điều hướng khi nhấp vào biểu tượng thông báo
                                 />
                             </div>
                             <div className="col d-flex align-items-center justify-content-center" name="setting">
+
                                 <SettingsIcon fontSize="large" onClick={handleSettingsClick} sx={{ transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}  style={{ width: 65, height: 65, borderRadius: '50%', objectFit: 'cover', border: '2px solid #007bff', transition: 'transform 0.3s ease, box-shadow 0.3s ease' }}
+
                                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
                                 />

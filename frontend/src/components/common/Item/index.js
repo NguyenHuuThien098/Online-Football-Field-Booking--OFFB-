@@ -50,9 +50,46 @@ const Item = ({ field, match }) => {
 
   const handleBookingClick = () => {
     if (field) {
-      navigate(`/fieldDetail/`, { state: field }); // Navigate to field detail page
+      navigate(`/fieldDetail/`, { state: field }); // Chuyển đến trang chi tiết sân
     }
   };
+  const handleJoinClick = () => {
+    if (match) {
+      navigate(`/join_match`, { state: match }); // Chuyển hướng đến trang join_match với dữ liệu trận đấu
+    }
+  };
+
+  // const availableTimeSlots = () => {
+  //   const today = new Date().toISOString().slice(0, 10); // Get today's date
+  //   const availableSlots = [];
+
+  //   for (const date in field.bookingSlots) {
+  //     if (date >= today && field.bookingSlots[date]["15:00-16:00"]) {
+  //       availableSlots.push(date);
+  //     }
+  //   }
+
+  //   if (availableSlots.length > 0) {
+  //     return (
+  //       <div>
+  //         <Typography variant="h6" color="primary">
+  //           Available on:
+  //         </Typography>
+  //         <div sx={{ display: 'flex', flexWrap: 'wrap' }}>
+  //           {availableSlots.map((date) => (
+  //             <Chip key={date} label={date} sx={{ marginRight: 1 }} />
+  //           ))}
+  //         </div>
+  //       </div>
+  //     );
+  //   } else {
+  //     return (
+  //       <Typography variant="h6" color="#f44336">
+  //         Currently unavailable
+  //       </Typography>
+  //     );
+  //   }
+  // };
 
   const formatDateTime = (dateTimeString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -149,10 +186,9 @@ const Item = ({ field, match }) => {
             Time: {formatDateTime(match.time) || "Time"}
           </Typography>
           <div>
-
           </div>
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" sx={{ width: 150, height: 40 }}>
+            <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleJoinClick}>
               Join
             </Button>
           </Box>

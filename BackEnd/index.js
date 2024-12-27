@@ -13,6 +13,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const matchRoutes = require('./routes/matchRoutes'); // Thêm import cho matchRoutes
 const confirmdenyRouter = require('./routes/confirmdenyRouter');
 const joinRouter = require('./routes/joinRouter');
+const notifications = require('./routes/notifications');
 // Middleware để log các yêu cầu
 app.use((req, res, next) => {
     console.log(`Received ${req.method} request for '${req.url}'`);
@@ -39,7 +40,9 @@ app.use('/api/user', userRoutes); // Route cho thay đổi thông tin người d
 app.use('/api/admin', adminRoutes); // Route cho admin
 app.use('/api/matches', matchRoutes); // Sử dụng route cho trận đấu
 app.use('/api/confirmed', confirmdenyRouter); // Route cho xác nhận và từ chối
+app.use('/api/notifications', notifications);
 app.use('/api/join', joinRouter);
+
 // Khởi động server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

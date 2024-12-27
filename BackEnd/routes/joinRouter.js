@@ -13,7 +13,7 @@ router.post('/joinm', authenticateUser, authorizeRole(['player']), joinmatchCont
 
 router.delete('/cancel', authenticateUser, authorizeRole(['player']), joinmatchController.cancelJoinMatch);
 
-
+    
 // Định tuyến cho chủ sân chấp nhận player tham gia
 router.post('/accept',authenticateUser, authorizeRole(['field_owner']), joinmatchController.acceptPlayer);
 
@@ -21,4 +21,6 @@ router.post('/accept',authenticateUser, authorizeRole(['field_owner']), joinmatc
 router.post('/reject',authenticateUser, authorizeRole(['field_owner']), joinmatchController.rejectPlayer);
 
 router.get('/:matchId/join-requests', authenticateUser, authorizeRole(['field_owner']),joinmatchController.getJoinRequests);
+
+router.get('/history/:playerId',joinmatchController.getPlayerMatchHistory);
 module.exports = router;
