@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Container, Card, CardContent, TextField, Button, Typography, Grid, Box, Modal } from '@mui/material';
+import { Container, Card, CardContent, TextField, Button, Typography, Grid, Box, Modal, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const FieldBooked = () => {
     const location = useLocation();  // Receive data from state
@@ -120,81 +121,93 @@ const FieldBooked = () => {
         navigate('/');
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     return (
         <Container maxWidth="sm" sx={{ mt: 5 }}>
-            <Card sx={{ boxShadow: 3 }}>
-                <CardContent>
-                    <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1, fontSize: '2rem' }}>
-                        Book Field
-                    </Typography>
-                    <Typography variant="h6" gutterBottom sx={{ fontSize: '1.5rem' }}>
-                        Field: {field?.name || 'Unknown'}
-                    </Typography>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                            <TextField
-                                label="Date"
-                                type="date"
-                                value={bookingDetails.date}
-                                onChange={(e) => handleBookingChange('date', e.target.value)}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                                required
-                                inputProps={{ style: { fontSize: '1.2rem' } }}
-                            />
+            <Box sx={{ position: 'relative' }}>
+                <IconButton
+                    onClick={handleBackClick}
+                    sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white' }}
+                >
+                    <ArrowBackIcon />
+                </IconButton>
+                <Card sx={{ boxShadow: 3 }}>
+                    <CardContent>
+                        <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1, fontSize: '2rem' }}>
+                            Book Field
+                        </Typography>
+                        <Typography variant="h6" gutterBottom sx={{ fontSize: '1.5rem' }}>
+                            Field: {field?.name || 'Unknown'}
+                        </Typography>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Date"
+                                    type="date"
+                                    value={bookingDetails.date}
+                                    onChange={(e) => handleBookingChange('date', e.target.value)}
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    required
+                                    inputProps={{ style: { fontSize: '1.2rem' } }}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    label="Start Time"
+                                    type="time"
+                                    value={bookingDetails.startTime}
+                                    onChange={(e) => handleBookingChange('startTime', e.target.value)}
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    required
+                                    inputProps={{ style: { fontSize: '1.2rem' } }}
+                                />
+                            </Grid>
+                            <Grid item xs={6}>
+                                <TextField
+                                    label="End Time"
+                                    type="time"
+                                    value={bookingDetails.endTime}
+                                    onChange={(e) => handleBookingChange('endTime', e.target.value)}
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true }}
+                                    required
+                                    inputProps={{ style: { fontSize: '1.2rem' } }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    label="Number of People"
+                                    select
+                                    SelectProps={{ native: true }}
+                                    value={bookingDetails.numberOfPeople}
+                                    onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
+                                    fullWidth
+                                    required
+                                    inputProps={{ style: { fontSize: '1.2rem' } }}
+                                >
+                                    <option value="5">5 People</option>
+                                    <option value="7">7 People</option>
+                                    <option value="11">11 People</option>
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading} sx={{ fontSize: '1.2rem' }}>
+                                    Confirm Booking
+                                </Button>
+                                <Button variant="contained" sx={{ backgroundColor: 'red', fontSize: '1.2rem' }} onClick={handleCancel} disabled={isLoading}>
+                                    Cancel
+                                </Button>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                label="Start Time"
-                                type="time"
-                                value={bookingDetails.startTime}
-                                onChange={(e) => handleBookingChange('startTime', e.target.value)}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                                required
-                                inputProps={{ style: { fontSize: '1.2rem' } }}
-                            />
-                        </Grid>
-                        <Grid item xs={6}>
-                            <TextField
-                                label="End Time"
-                                type="time"
-                                value={bookingDetails.endTime}
-                                onChange={(e) => handleBookingChange('endTime', e.target.value)}
-                                fullWidth
-                                InputLabelProps={{ shrink: true }}
-                                required
-                                inputProps={{ style: { fontSize: '1.2rem' } }}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                label="Number of People"
-                                select
-                                SelectProps={{ native: true }}
-                                value={bookingDetails.numberOfPeople}
-                                onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
-                                fullWidth
-                                required
-                                inputProps={{ style: { fontSize: '1.2rem' } }}
-                            >
-                                <option value="5">5 People</option>
-                                <option value="7">7 People</option>
-                                <option value="11">11 People</option>
-                            </TextField>
-                        </Grid>
-                        <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading} sx={{ fontSize: '1.2rem' }}>
-                                Confirm Booking
-                            </Button>
-                            <Button variant="contained" sx={{ backgroundColor: 'red', fontSize: '1.2rem' }} onClick={handleCancel} disabled={isLoading}>
-                                Cancel
-                            </Button>
-                        </Grid>
-                    </Grid>
-                    {error && <Typography color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>{error}</Typography>}
-                </CardContent>
-            </Card>
+                        {error && <Typography color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>{error}</Typography>}
+                    </CardContent>
+                </Card>
+            </Box>
 
             <Modal open={showModal} onClose={() => setShowModal(false)}>
                 <Box sx={{

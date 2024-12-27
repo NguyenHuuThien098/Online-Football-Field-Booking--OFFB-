@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card, CardContent, CardMedia, Typography, Box } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Box, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const SmallField = () => {
     const navigate = useNavigate();
@@ -12,8 +13,18 @@ const SmallField = () => {
 
     const { name, address, image, type, price, description, isAvailable } = field;
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     return (
-        <Box sx={{ padding: 2 }}>
+        <Box sx={{ padding: 2, position: 'relative' }}>
+            <IconButton
+                onClick={handleBackClick}
+                sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white' }}
+            >
+                <ArrowBackIcon />
+            </IconButton>
             <Card>
                 <CardMedia
                     component="img"

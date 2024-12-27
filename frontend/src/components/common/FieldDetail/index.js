@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Row, Col, ListGroup } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDatabase, ref, get } from 'firebase/database'; // Import Firebase functions
+import { IconButton, Box } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const FieldDetail = () => {
     const location = useLocation();
@@ -138,18 +140,28 @@ const FieldDetail = () => {
         }
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     if (!field) {
         return <p>No field information. Please go back to the previous page.</p>;
     }
 
     return (
-        <Container className="mt-5">
+        <>
             <Row className="justify-content-center">
                 <Col md={8}>
                     <Card className="shadow rounded">
                         <Card.Img variant="top" src={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'} rounded />
                         <Card.Body>
                             <Card.Title>{field.name}</Card.Title>
+                            <IconButton
+                                onClick={handleBackClick}
+                                sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white' }}
+                            >
+                                <ArrowBackIcon />
+                            </IconButton>
                             <Card.Text>
                                 <b>Owner:</b> {ownerName || "Loading..."} <br />
                                 <b>Phone:</b> {ownerPhone || "Loading..."} <br />
@@ -188,7 +200,7 @@ const FieldDetail = () => {
                     </Card>
                 </Col>
             </Row>
-        </Container>
+        </>
     );
 };
 
