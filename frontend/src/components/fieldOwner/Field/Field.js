@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider } from '@mui/material';
 const Field = () => {
     const [largeFields, setLargeFields] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -149,18 +149,19 @@ const Field = () => {
             <Typography variant="h3" gutterBottom align="center" sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, marginTop: 2, borderRadius: 1 }}>
                 Your Large Fields
             </Typography>
+            <Divider sx={{ marginBottom: 4, borderBottomWidth: 2 }} />
             <Button variant="contained" color="primary" onClick={scrollToAddField} sx={{ my: 2, width: '100%', fontSize: '1.6rem', backgroundColor: 'green', color: 'white', padding: 2, borderRadius: 1 }}>
                 Add New Large Field +
             </Button>
             <hr />
-            {/* {console.log(fields)} */}
             <Grid container spacing={2}>
                 {largeFields.map((largeField, index) => (
                     <Grid item xs={12} sm={6} md={6} key={index}>
                         <div onClick={() => handleLargeFieldDetail(largeField)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
                             <Card key={largeField.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
                                 <CardContent>
-                                    <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{largeField.name || 'Unnamed Field'}</Typography>
+                                    <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center' }}>{largeField.name || 'Unnamed Field'}</Typography>
+                                    <Divider sx={{ marginBottom: 4, borderBottomWidth: 2 }} />
                                     <Typography variant="body1">Location: {largeField.address}</Typography>
                                     <Typography variant="body1">Contact Number: {largeField.ownerPhone}</Typography>
                                     <Typography variant="body1">Operating Hours: {largeField.operatingHours}</Typography>

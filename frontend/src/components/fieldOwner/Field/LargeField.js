@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, CardMedia, Typography, Box, IconButton, TextField, Grid, MenuItem } from '@mui/material';
+import { Button, Card, CardContent, CardMedia, Typography, Box, IconButton, TextField, Grid, MenuItem, Divider } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -114,6 +114,7 @@ const LargeField = () => {
                 <Typography variant="h2" component="div" sx={{ textAlign: 'center', marginBottom: 4 }}>
                     {largeField.name}
                 </Typography>
+                <Divider sx={{ marginBottom: 4, borderBottomWidth: 2 }} />
                 <IconButton
                     onClick={handleBackClick}
                     sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white' }}
@@ -128,9 +129,6 @@ const LargeField = () => {
                         alt={largeField.images ? largeField.name : "Default Image"}
                     />
                     <CardContent>
-                        <Typography variant="h4" component="div">
-                            {largeField.name}
-                        </Typography>
                         <Typography variant="body1" color="text.secondary">
                             {largeField.address}
                         </Typography>
