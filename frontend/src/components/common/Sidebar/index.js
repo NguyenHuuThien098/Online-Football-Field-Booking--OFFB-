@@ -14,6 +14,18 @@ const Sidebar = () => {
   const location = useLocation();
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const role = localStorage.getItem('userRole');
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const styles = {
     link: {
@@ -35,6 +47,7 @@ const Sidebar = () => {
       display: 'flex',
       alignItems: 'center',
       position: 'relative',
+      fontStyle: 'italic',
     },
     underline: {
       content: '""',
@@ -58,12 +71,25 @@ const Sidebar = () => {
     activeHover: {
       backgroundColor: '#80bfff',
     },
+    nestedLink: {
+      textDecoration: 'none',
+      padding: '10px 40px', // Increased padding to indent
+      color: '#000',
+      display: 'flex',
+      alignItems: 'center',
+      position: 'relative',
+      transition: 'background-color 0.3s ease',
+    },
+  };
+
+  const sidebarStyle = {
+    boxShadow: '3px 0 5px -2px rgba(0,0,0,0.2)', // Add shadow only on the right side
   };
 
   const isHistoryActive = location.pathname.startsWith('/History');
 
   return (
-    <nav className="nav flex-column">
+    <nav className="nav flex-column" style={sidebarStyle}>
       <Link
         className="btn"
         to="/"
@@ -134,33 +160,33 @@ const Sidebar = () => {
               <div className="nav flex-column">
                 <Link
                   className="btn"
-                  to="/History_FieldBooked"
-                  style={location.pathname === '/History_FieldBooked' ? styles.activeLink : styles.link}
+                  to="/historyFieldBooked"
+                  style={location.pathname === '/historyFieldBooked' ? styles.activeLink : styles.nestedLink}
                   onMouseEnter={(e) => {
-                    if (location.pathname !== '/History_FieldBooked') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+                    if (location.pathname !== '/historyFieldBooked') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
                   }}
                   onMouseLeave={(e) => {
-                    if (location.pathname !== '/History_FieldBooked') e.currentTarget.style.backgroundColor = '';
+                    if (location.pathname !== '/historyFieldBooked') e.currentTarget.style.backgroundColor = '';
                   }}
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Field booked
-                  <span style={{ ...styles.underline, ...(location.pathname === '/History_FieldBooked' && styles.activeUnderline) }}></span>
+                  <span style={{ ...styles.underline, ...(location.pathname === '/historyFieldBooked' && styles.activeUnderline) }}></span>
                 </Link>
                 <Link
                   className="btn"
-                  to="/History_MatchJoined"
-                  style={location.pathname === '/History_MatchJoined' ? styles.activeLink : styles.link}
+                  to="/historyMatchJoined"
+                  style={location.pathname === '/historyMatchJoined' ? styles.activeLink : styles.nestedLink}
                   onMouseEnter={(e) => {
-                    if (location.pathname !== '/History_MatchJoined') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+                    if (location.pathname !== '/historyMatchJoined') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
                   }}
                   onMouseLeave={(e) => {
-                    if (location.pathname !== '/History_MatchJoined') e.currentTarget.style.backgroundColor = '';
+                    if (location.pathname !== '/historyMatchJoined') e.currentTarget.style.backgroundColor = '';
                   }}
                 >
                   <HistoryIcon sx={{ mr: 1 }} />
                   Match joined
-                  <span style={{ ...styles.underline, ...(location.pathname === '/History_MatchJoined' && styles.activeUnderline) }}></span>
+                  <span style={{ ...styles.underline, ...(location.pathname === '/historyMatchJoined' && styles.activeUnderline) }}></span>
                 </Link>
               </div>
             </div>

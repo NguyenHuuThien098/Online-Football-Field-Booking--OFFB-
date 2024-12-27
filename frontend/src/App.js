@@ -5,21 +5,20 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import FieldOwnerDashboard from "./components/FieldOwnerDashboard";
-import Register from "./components/Register";
-import AvailableField from "./pages/availableField";
-import OpenMatch from "./pages/openMatch";
-import History_MatchJoined from "./pages/History_Matchjoined";
-import History_FieldBooked from "./pages/History_FieldBooked";
-import Join_match from "./pages/Join_match";
+import FieldOwnerDashboard from "./components/fieldOwner/FieldOwnerDashboard";
+import Register from "./components/Login/Register";
+import AvailableField from "./components/common/AvailableField";
+import OpenMatch from "./components/common/OpenMatch";
+import HistoryMatchJoined from "./components/LoginedUser/historyMatchjoined";
+import HistoryFieldBooked from "./components/LoginedUser/historyFieldBooked";
 import Login from "./pages/login";
-import Report from "./pages/report";
+import Report from "./components/fieldOwner/report";
 import FieldDetail from "./components/common/FieldDetail";
-import FieldBookied from "./pages/fieldBookied"; // Import FieldBookied
-import Personal from "./pages/Personal"; // Import trang cá nhân
+import FieldBookied from "./components/LoginedUser/fieldBooked"; // Import FieldBookied
+import Personal from "./components/LoginedUser/Personal"; // Import trang cá nhân
 import MainLayout from "./layouts/MainLayout";
 import Nofi from "./pages/Nofi";
-
+import Join_match from "./pages/join_match";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
@@ -27,8 +26,8 @@ const App = () => {
   const [userRole, setUserRole] = useState(localStorage.getItem("userRole"));
 
   useEffect(() => {
-    localStorage.setItem("isAuthenticated", isAuthenticated);
-    localStorage.setItem("userRole", userRole);
+    localStorage.setItem("isAuthenticated", isAuthenticated.toString());
+    localStorage.setItem("userRole", userRole || "");
   }, [isAuthenticated, userRole]);
 
   const ProtectedRoute = ({ element, role }) => {
@@ -65,10 +64,7 @@ const App = () => {
           path="/"
           element={
             <MainLayout>
-              <AvailableField
-                setIsAuthenticated={setIsAuthenticated}
-                setUserRole={setUserRole}
-              />
+              <AvailableField />
             </MainLayout>
           }
         />
@@ -76,17 +72,14 @@ const App = () => {
           path="/openMatch"
           element={
             <MainLayout>
-              <OpenMatch
-                setIsAuthenticated={setIsAuthenticated}
-                setUserRole={setUserRole}
-              />
+              <OpenMatch />
             </MainLayout>
           }
         />
         <Route
           path="/login"
           element={
-            <Login 
+            <Login
               setIsAuthenticated={setIsAuthenticated}
               setUserRole={setUserRole}
             />
@@ -129,7 +122,10 @@ const App = () => {
           path="/personal"
           element={
             <MainLayout>
-              <ProtectedRoute element={<Personal />} />
+              <ProtectedRoute
+                element={<Personal />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />
@@ -137,32 +133,51 @@ const App = () => {
           path="/fieldDetail"
           element={
             <MainLayout>
-              <ProtectedRoute element={<FieldDetail />} />
+              <ProtectedRoute
+                element={<FieldDetail />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />
-        <Route
-          path="/History_MatchJoined"
-          element={
-            <MainLayout>
-              <ProtectedRoute element={<History_MatchJoined />} />
-            </MainLayout>
-          }
-        />
-<Route
+{/* <Route
           path="/History_FieldBooked"
           element={
             <MainLayout>
               <ProtectedRoute element={<History_FieldBooked />} />
             </MainLayout>
           }
-        />
+        /> */}
 
         <Route
           path="/Report"
           element={
             <MainLayout>
-              <ProtectedRoute element={<Report />} role={["field_owner"]} />
+              <ProtectedRoute
+                element={<Report />}
+                role={["field_owner"]} />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/historyMatchJoined"
+          element={
+            <MainLayout>
+              <ProtectedRoute
+                element={<HistoryMatchJoined />}
+                role={["player", "field_owner"]}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/historyFieldBooked"
+          element={
+            <MainLayout>
+              <ProtectedRoute
+                element={<HistoryFieldBooked />}
+                role={["player", "field_owner"]}
+              />
             </MainLayout>
           }
         />

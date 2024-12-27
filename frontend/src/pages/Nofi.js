@@ -78,11 +78,11 @@ const Nofi = () => {
                         <li key={notification.id} className="notification-item">
                             <p><strong>Thông báo:</strong> {notification.message}</p>
                             {(notification.message.includes("đã yêu cầu đặt sân") || notification.message.includes("xác nhận")) && (
-    <button onClick={() => navigate("/History_FieldBooked")}>Xem lịch sử đặt sân</button>
+    <button onClick={() => navigate("/historyFieldBooked")}>Xem lịch sử đặt sân</button>
 )}
 
 {(notification.message.includes("đã yêu cầu tham gia trận đấu") || notification.message.includes("chấp nhận")) && (
-    <button onClick={() => navigate("/History_Matchjoined")}>Xem lịch sử tham gia trận đấu</button>
+    <button onClick={() => navigate("/historyMatchjoined")}>Xem lịch sử tham gia trận đấu</button>
 )}
 
                         </li>

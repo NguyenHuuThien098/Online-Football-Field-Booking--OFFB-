@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import SearchTool from "../components/common/SearchTool";
-import Item from "../components/common/Item";
+import SearchTool from "../SearchTool";
+import Item from "../Item";
 import axios from "axios";
 import Compressor from 'compressorjs';
 import { Container, Row, Col } from 'react-bootstrap';
@@ -8,22 +8,19 @@ import { Typography, Paper } from '@mui/material';
 import { Card } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-
-
 const Hover = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
   display: 'flex',
   transition: 'transform 0.3s linear',
   '&:active': {
     transform: 'scale(0.99)', // Subtle hover scale effect
-    boxShadow: theme.shadows[5], // Áp dụng hiệu ứng đổ bóng từ theme
+    boxShadow: theme.shadows[5], // Apply shadow effect from theme
   },
-
 }));
 
-const AvailableField = () => {
-  const [fields, setFields] = useState([]); // Danh sách sân
-  const [matches, setMatches] = useState([]); // Danh sách trận đấu
+const OpenMatch = () => {
+  const [fields, setFields] = useState([]); // List of fields
+  const [matches, setMatches] = useState([]); // List of matches
   const [searchParams, setSearchParams] = useState({
     name: "",
     date: "",
@@ -39,11 +36,11 @@ const AvailableField = () => {
   const role = localStorage.getItem("userRole");
   
   useEffect(() => {
-    fetchDefaultFields(); // Tải danh sách sân mặc định
-    fetchMatches(); // Tải danh sách trận đấu
+    fetchDefaultFields(); // Load default fields
+    fetchMatches(); // Load matches
   }, []);
 
-  // Lấy danh sách sân mặc định
+  // Fetch default fields
   const fetchDefaultFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
@@ -53,13 +50,13 @@ const AvailableField = () => {
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching default fields:", error);
-      setErrorFields("Có lỗi xảy ra khi tải danh sách sân.");
+      setErrorFields("An error occurred while loading the list of fields.");
     } finally {
       setLoadingFields(false);
     }
   };
 
-  // Lấy danh sách trận đấu
+  // Fetch matches
   const fetchMatches = async () => {
     setLoadingMatches(true);
     setErrorMatches("");
@@ -69,13 +66,13 @@ const AvailableField = () => {
       setMatches(response.data);
     } catch (error) {
       console.error("Error fetching matches:", error);
-      setErrorMatches("Có lỗi xảy ra khi tải danh sách trận đấu.");
+      setErrorMatches("An error occurred while loading the list of matches.");
     } finally {
       setLoadingMatches(false);
     }
   };
 
-// Tìm kiếm sân
+  // Search fields
   const searchFields = async () => {
     setLoadingFields(true);
     setErrorFields("");
@@ -83,7 +80,7 @@ const AvailableField = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        setErrorFields("Bạn cần đăng nhập để tìm kiếm.");
+        setErrorFields("You need to log in to search.");
         return;
       }
 
@@ -94,7 +91,7 @@ const AvailableField = () => {
       setFields(response.data);
     } catch (error) {
       console.error("Error searching fields:", error);
-      setErrorFields("Có lỗi xảy ra khi tìm kiếm sân.");
+      setErrorFields("An error occurred while searching for fields.");
     } finally {
       setLoadingFields(false);
     }
@@ -110,48 +107,44 @@ const AvailableField = () => {
           />
         </Hover>
 
-
         {/* Fields Section */}
 
         <Container
           className="shadow p-4 mt-5 border-top border-primary"
           style={{ background: "white", borderRadius: '50px' }}
-          sx={{
-
-          }}
         >
+          {/* Matches Section */}
 
           <Paper
-            className="w-100 mt-2"
+            className="w-100"
             elevation={3}
             sx={{
               borderRadius: '8px',
               textAlign: 'center',
-              backgroundColor: '#1976d2', // Đặt màu nền tại đây
-              // border: "2px solid gray"
+              backgroundColor: '#1976d2', // Set background color here
             }}
           >
             <Typography variant="h2" component="h2" color="white" className="mt-4">
-              Danh sách sân bóng
+              Open Matches List
             </Typography>
           </Paper>
 
-          {loadingFields ? (
-            <p className="text-center">Đang tải danh sách sân...</p>
-          ) : errorFields ? (
-            <p style={{ color: "red" }} className="text-center">{errorFields}</p>
-          ) : fields.length > 0 ? (
+          {loadingMatches ? (
+            <p className="text-center">Loading matches...</p>
+          ) : errorMatches ? (
+            <p style={{ color: "red" }} className="text-center">{errorMatches}</p>
+          ) : matches.length > 0 ? (
             <div className="d-flex flex-wrap justify-content-center">
-              {fields.map((field) => (
-                <Item key={field.fieldId} field={field} />
+              {matches.map((match) => (
+                <Item key={match.id} match={match} />
               ))}
             </div>
           ) : (
-            <p className="text-center">Không tìm thấy sân nào.</p>
+            <p className="text-center">No open matches found.</p>
           )}
         </Container>
       </div>
   );
 };
 
-export default AvailableField;
+export default OpenMatch;
