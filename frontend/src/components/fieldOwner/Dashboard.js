@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
 import LargeField from './Field/Field';
 import Match from './Match/Match';
-const FieldOwnerDashboard = () => {
+const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [tabIndex, setTabIndex] = useState(0);
@@ -34,4 +34,4 @@ const FieldOwnerDashboard = () => {
     );
 };
 
-export default FieldOwnerDashboard;
+export default Dashboard;
