@@ -121,22 +121,23 @@ const LargeField = () => {
                 >
                     <ArrowBackIcon />
                 </IconButton>
-                <Card sx={{ marginTop: 6 }}>
+                <Card sx={{ marginTop: 6, display: 'flex' }}>
                     <CardMedia
                         component="img"
                         height="300"
                         image={fieldImage}
                         alt={largeField.images ? largeField.name : "Default Image"}
+                        sx={{ borderRadius: 2, width: '40%' }}
                     />
-                    <CardContent>
-                        <Typography variant="body1" color="text.secondary">
-                            {largeField.address}
+                    <CardContent sx={{ width: '60%' }}>
+                        <Typography variant="h6" color="text.secondary">
+                            Address: {largeField.address}
                         </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                            {largeField.otherInfo}
+                        <Typography variant="h6" color="text.secondary">
+                            Describe: {largeField.otherInfo}
                         </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                            {largeField.operatingHours}
+                        <Typography variant="h6" color="text.secondary">
+                            Operating Hours: {largeField.operatingHours}
                         </Typography>
                     </CardContent>
                 </Card>
@@ -146,13 +147,14 @@ const LargeField = () => {
                     </Typography>
                     <Grid container spacing={2}>
                         {smallFields.map((smallField, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                                 <Card onClick={() => handleSmallFieldDetail(smallField)}>
                                     <CardMedia
                                         component="img"
                                         height="140"
                                         image={(smallField.images && smallField.images.length > 0) ? smallField.images[0] : defaultImage}
                                         alt={smallField.name}
+                                        sx={{ borderRadius: 2 }}
                                     />
                                     <CardContent>
                                         <Typography variant="h6">{smallField.name}</Typography>
