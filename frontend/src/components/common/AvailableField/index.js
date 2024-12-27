@@ -73,8 +73,7 @@ const AvailableField = () => {
       setLoadingFields(false);
     }
   };
-  console.log(fields);
-  
+
   return (
     <div className="bg-light p-3">
       <Hover>
