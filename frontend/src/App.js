@@ -5,7 +5,8 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import FieldOwnerDashboard from "./components/fieldOwner/FieldOwnerDashboard";
+import Dashboard from "./components/fieldOwner/Dashboard";
+import LargeField from "./components/fieldOwner/Field/LargeField";
 import Register from "./components/Login/Register";
 import AvailableField from "./components/common/AvailableField";
 import OpenMatch from "./components/common/OpenMatch";
@@ -77,19 +78,7 @@ const App = () => {
             />
           }
         />
-
-        {/* Protected Routes */}
-        <Route
-          path="/field-owner-dashboard"
-          element={
-            <MainLayout>
-              <ProtectedRoute
-                element={<FieldOwnerDashboard />}
-                role={["field_owner"]}
-              />
-            </MainLayout>
-          }
-        />
+        {/* Logined */}
         <Route
           path="/fieldBookied"
           element={
@@ -124,16 +113,6 @@ const App = () => {
           }
         />
         <Route
-          path="/Report"
-          element={
-            <MainLayout>
-              <ProtectedRoute
-                element={<Report />}
-                role={["field_owner"]} />
-            </MainLayout>
-          }
-        />
-        <Route
           path="/historyMatchJoined"
           element={
             <MainLayout>
@@ -152,6 +131,39 @@ const App = () => {
                 element={<HistoryFieldBooked />}
                 role={["player", "field_owner"]}
               />
+            </MainLayout>
+          }
+        />
+        {/* Field owner */}
+        <Route
+          path="/field-owner-dashboard"
+          element={
+            <MainLayout>
+              <ProtectedRoute
+                element={<Dashboard />}
+                role={["field_owner"]}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/largeField/:fieldId"
+          element={
+            <MainLayout>
+              <ProtectedRoute
+                element={<LargeField />}
+                role={["field_owner"]}
+              />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/Report"
+          element={
+            <MainLayout>
+              <ProtectedRoute
+                element={<Report />}
+                role={["field_owner"]} />
             </MainLayout>
           }
         />
