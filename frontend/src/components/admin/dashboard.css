@@ -1,0 +1,103 @@
+.admin-dashboard {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.admin-dashboard h1, .admin-dashboard h2 {
+    color: #bb86fc;
+    text-align: center;
+    background-color: #333333;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.admin-dashboard ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.admin-dashboard li {
+    background-color: #1f1f1f;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.admin-dashboard li:hover {
+    background-color: #333333;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-list-header, .user-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #333333;
+}
+
+.user-list-header {
+    font-weight: bold;
+    background-color: #1f1f1f;
+}
+
+.user-list-item {
+    background-color: #1f1f1f;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+.user-list-item:hover {
+    background-color: #333333;
+}
+
+.user-list-header span, .user-list-item span {
+    flex: 1;
+    text-align: center;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+}
+
+.user-table caption {
+    caption-side: top;
+    color: #bb86fc;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.user-table th, .user-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #333333;
+}
+
+.user-table th {
+    background-color: #1f1f1f;
+    font-weight: bold;
+}
+
+.user-table tr:nth-child(even) {
+    background-color: #1f1f1f;
+}
+
+.user-table tr:hover {
+    background-color: #333333;
+}
+
+.user-table td button {
+    margin-right: 5px;
+}
+
+.add-user-button {
+    margin-bottom: 10px;
+}

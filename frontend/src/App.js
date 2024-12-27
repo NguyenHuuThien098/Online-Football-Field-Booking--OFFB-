@@ -21,6 +21,8 @@ import MainLayout from "./layouts/MainLayout";
 import SmallField from "./components/fieldOwner/Field/SmallField"; // Import SmallFieldDetail
 import Nofi from "./pages/Nofi";
 import Join_match from "./pages/join_match";
+import AdminDashboard from "./components/admin/dashboard"; // Import AdminDashboard
+
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
@@ -130,7 +132,7 @@ const App = () => {
             </MainLayout>
           }
         />
-{/* <Route
+        {/* <Route
           path="/History_FieldBooked"
           element={
             <MainLayout>
@@ -203,6 +205,16 @@ const App = () => {
                 element={<Report />}
                 role={["field_owner"]} />
             </MainLayout>
+          }
+        />
+        {/* Admin */}
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute
+              element={<AdminDashboard />}
+              role={["admin"]}
+            />
           }
         />
       </Routes>
