@@ -102,10 +102,7 @@ const LargeField = () => {
     };
 
     const handleSmallFieldDetail = (smallField) => {
-        navigate({
-            pathname: `/smallField/${smallField.id}`,
-            state: { field: smallField }
-        });
+        navigate(`/smallField/${smallField.id}`, { state: { field: smallField } });
     };
 
     const defaultImage = "https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg";
