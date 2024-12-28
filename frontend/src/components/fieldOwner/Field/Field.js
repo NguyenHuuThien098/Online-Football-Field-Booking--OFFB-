@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, CardMedia, IconButton, Menu, MenuItem, Backdrop } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import checkFieldOwner from '../function/checkFieldOwner';
 
 const Field = () => {
     const [largeFields, setLargeFields] = useState([]);
@@ -32,19 +33,7 @@ const Field = () => {
 
     const fetchLargeFields = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
-            const role = localStorage.getItem('userRole');
-            if (!ownerId) {
-                setError('Owner ID not found');
-                setLoading(false);
-                return;
-            }
-            if (role !== 'field_owner') {
-                setError('Not an owner');
-                setLoading(false);
-                return;
-            }
+            checkFieldOwner();
             // Fetch large fields
             const largeFieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
                 headers: {

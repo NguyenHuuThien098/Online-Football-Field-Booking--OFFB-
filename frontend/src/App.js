@@ -38,7 +38,7 @@ const App = () => {
 
   const ProtectedRoute = ({ element, role }) => {
     if (!isAuthenticated) {
-      return <Navigate to="/login" />;
+      return <Navigate to="/" />;
     }
     if (role && !role.includes(userRole)) {
       return <Navigate to="/" />;
