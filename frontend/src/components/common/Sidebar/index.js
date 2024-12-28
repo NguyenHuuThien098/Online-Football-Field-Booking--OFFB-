@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Collapse } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import style from "./Sidebar.module.scss";
@@ -14,8 +14,12 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const role = localStorage.getItem('userRole');
   const [imagePreview, setImagePreview] = useState(null);
+
+  const [role, setRole] = useState('');
+  useEffect(() => {
+    setRole(localStorage.getItem('userRole'));
+  }, [role]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
