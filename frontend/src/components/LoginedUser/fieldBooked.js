@@ -32,7 +32,6 @@ const FieldBooked = () => {
 
         if (!storedUserId || !storedToken) {
             alert('You need to log in to book a field.');
-            navigate('/login');
             return;
         }
 

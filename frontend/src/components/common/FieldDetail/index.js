@@ -80,7 +80,6 @@ const FieldDetail = () => {
         if (!token) {
             // If not logged in, redirect to login page
             alert('You need to log in to book a field.');
-            navigate('/login');
             return;
         }
 

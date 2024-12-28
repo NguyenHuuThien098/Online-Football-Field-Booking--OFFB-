@@ -7,21 +7,13 @@ import { Typography, Menu, MenuItem } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate } from "react-router-dom";
-
+import handleLogout from "../../UserManagerment/logout"
 const Header = () => {
     const [role, setRole] = useState('');
     const [userData, setUserData] = useState({});
     const [anchorEl, setAnchorEl] = useState(null);
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     const navigate = useNavigate();
-
-    const handleLogout = () => {
-        localStorage.setItem('isAuthenticated', 'false');
-        localStorage.setItem('token', '');
-        localStorage.setItem('userRole', '');
-        localStorage.setItem('userId', '');
-        window.location.reload();
-    };
 
     const handleSettingsClick = (event) => {
         setAnchorEl(event.currentTarget);

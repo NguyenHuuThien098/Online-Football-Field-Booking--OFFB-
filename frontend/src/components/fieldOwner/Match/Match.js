@@ -17,7 +17,6 @@ const Match = () => {
         questions: '',
         type: '5 person'
     });
-    const [tabIndex, setTabIndex] = useState(0);
 
     const fetchMatches = async () => {
         try {
@@ -41,7 +40,7 @@ const Match = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(matchesResponse);
+            console.log(matchesResponse.data);
             const matchesData = matchesResponse.data;
             if (Array.isArray(matchesData)) {
                 setMatches(matchesData);
@@ -137,10 +136,6 @@ const Match = () => {
             console.error("Error deleting match:", error);
             setError('An error occurred while deleting the match.');
         }
-    };
-
-    const handleTabChange = (event, newValue) => {
-        setTabIndex(newValue);
     };
 
     return (

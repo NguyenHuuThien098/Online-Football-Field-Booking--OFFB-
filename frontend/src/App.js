@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,7 +8,7 @@ import {
 } from "react-router-dom";
 import Dashboard from "./components/fieldOwner/Dashboard";
 import LargeField from "./components/fieldOwner/Field/LargeField";
-import Register from "./components/Login/Register";
+import Register from "./components/UserManagerment/Register";
 import AvailableField from "./components/common/AvailableField";
 import OpenMatch from "./components/common/OpenMatch";
 import HistoryMatchJoined from "./components/LoginedUser/historyMatchjoined";
@@ -23,6 +24,7 @@ import Nofi from "./pages/Nofi";
 import Join_match from "./pages/join_match";
 import AdminDashboard from "./components/admin/dashboard"; // Import AdminDashboard
 
+import handleLogout from "./components/UserManagerment/logout";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     localStorage.getItem("isAuthenticated") === "true"
@@ -43,6 +45,33 @@ const App = () => {
     }
     return element;
   };
+
+  const checkTokenValidity = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const response = await axios.get('http://localhost:5000/api/auth/check-token', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.status === 300) {
+        console.log('Token is valid');
+        return true;
+      }
+    } catch (error) {
+      alert('Token is invalid');
+      handleLogout();
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    checkTokenValidity();
+  }, []);
 
   return (
     <Router>

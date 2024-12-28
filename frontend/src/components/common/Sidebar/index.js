@@ -95,7 +95,6 @@ const Sidebar = () => {
 
   return (
     <nav className="nav flex-column">
-      {console.log(role)}
       <Link
         className="btn"
         to="/"
