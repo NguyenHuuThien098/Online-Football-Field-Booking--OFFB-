@@ -34,6 +34,7 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem("isAuthenticated", isAuthenticated.toString());
     localStorage.setItem("userRole", userRole || "");
+    checkTokenValidity();
   }, [isAuthenticated, userRole]);
 
   const ProtectedRoute = ({ element, role }) => {
@@ -58,21 +59,17 @@ const App = () => {
           'Authorization': `Bearer ${token}`
         }
       });
-      if (response.status === 300) {
+      if (response.status === 200) {
         console.log('Token is valid');
         return true;
+      } else if (response.status === 401) {
+        console.log('Token is invalid');
+        handleLogout();
       }
     } catch (error) {
-      alert('Token is invalid');
-      handleLogout();
       return false;
     }
   };
-
-  useEffect(() => {
-    checkTokenValidity();
-  }, []);
-
   return (
     <Router>
       <Routes>

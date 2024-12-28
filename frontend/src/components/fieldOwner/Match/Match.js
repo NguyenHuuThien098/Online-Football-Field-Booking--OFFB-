@@ -7,6 +7,27 @@ const Match = () => {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const token = localStorage.getItem('token');
+    const ownerId = localStorage.getItem('userId');
+    const [owner, setOwner] = useState({ fullName: '' });
+
+    const fetchUserInformation = async () => {
+        const token = localStorage.getItem('token');
+        const response = await axios.get("http://localhost:5000/api/user/me", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        setOwner(response.data);
+        setNewMatch((prevMatch) => ({ ...prevMatch, ownerName: response.data.fullName }));
+    };
+
+    useEffect(() => {
+        if (!owner.fullName) {
+            fetchUserInformation();
+        }
+    }, [owner.fullName]);
+
     const [newMatch, setNewMatch] = useState({
         address: '',
         time: '',
@@ -16,8 +37,6 @@ const Match = () => {
         questions: '',
         type: '5 person'
     });
-    const token = localStorage.getItem('token');
-    const ownerId = localStorage.getItem('userId');
 
     const fetchMatches = async () => {
         try {
@@ -57,9 +76,8 @@ const Match = () => {
 
     const handleAddMatch = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
-            const response = await axios.post('http://localhost:5000/api/matches', {
+            checkFieldOwner();
+            const response = await axios.post('http://localhost:5000/api/matches/', {
                 ...newMatch,
                 ownerId
             }, {
@@ -85,8 +103,7 @@ const Match = () => {
 
     const handleUpdateMatch = async (matchId) => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
+            checkFieldOwner();
             const response = await axios.put(`http://localhost:5000/api/matches/${matchId}`, {
                 ...newMatch,
                 ownerId
@@ -113,7 +130,6 @@ const Match = () => {
 
     const handleDeleteMatch = async (matchId) => {
         try {
-            const token = localStorage.getItem('token');
             await axios.delete(`http://localhost:5000/api/matches/${matchId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
