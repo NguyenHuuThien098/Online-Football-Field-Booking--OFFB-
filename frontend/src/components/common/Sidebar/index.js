@@ -83,14 +83,14 @@ const Sidebar = () => {
     },
   };
 
-  const sidebarStyle = {
-    boxShadow: '3px 0 5px -2px rgba(0,0,0,0.2)', // Add shadow only on the right side
-  };
+  // const sidebarStyle = {
+  //   boxShadow: '3px 0 5px -2px rgba(0,0,0,0.2)', // Add shadow only on the right side
+  // };
 
   const isHistoryActive = location.pathname.startsWith('/History');
 
   return (
-    <nav className="nav flex-column" style={sidebarStyle}>
+    <nav className="nav flex-column">
       <Link
         className="btn"
         to="/"

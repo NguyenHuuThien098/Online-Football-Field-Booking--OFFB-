@@ -3,7 +3,6 @@
   top: 0;
   z-index: 1000;
   background-color: white;
-  box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.1); // Shadow downwards
 }
 
 .stickySidebar {
@@ -12,7 +11,6 @@
   z-index: 1000;
   width: 16.8%;
   background-color: white;
-  box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.1); // Shadow to the right
 }
 
 .content {

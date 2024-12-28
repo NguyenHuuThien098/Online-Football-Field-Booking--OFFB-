@@ -105,7 +105,7 @@ const App = () => {
             <MainLayout>
               <ProtectedRoute
                 element={<FieldBookied />}
-                role={["player", "field_owner"]}
+                role={["player", "field_owner", "admin"]}
               />
             </MainLayout>
           }
@@ -116,7 +116,7 @@ const App = () => {
             <MainLayout>
               <ProtectedRoute
                 element={<Personal />}
-                role={["player", "field_owner"]}
+                role={["player", "field_owner", "admin"]}
               />
             </MainLayout>
           }
@@ -127,7 +127,7 @@ const App = () => {
             <MainLayout>
               <ProtectedRoute
                 element={<FieldDetail />}
-                role={["player", "field_owner"]}
+                role={["player", "field_owner", "admin"]}
               />
             </MainLayout>
           }
@@ -147,7 +147,7 @@ const App = () => {
             <MainLayout>
               <ProtectedRoute
                 element={<HistoryMatchJoined />}
-                role={["player", "field_owner"]}
+                role={["player", "field_owner", "admin"]}
               />
             </MainLayout>
           }
@@ -158,7 +158,7 @@ const App = () => {
             <MainLayout>
               <ProtectedRoute
                 element={<HistoryFieldBooked />}
-                role={["player", "field_owner"]}
+                role={["player", "field_owner", "admin"]}
               />
             </MainLayout>
           }
