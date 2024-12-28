@@ -41,6 +41,7 @@ const Match = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(matchesResponse);
             const matchesData = matchesResponse.data;
             if (Array.isArray(matchesData)) {
                 setMatches(matchesData);
