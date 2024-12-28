@@ -123,24 +123,24 @@ const HistoryFieldBooked = () => {
 
     const fetchBookings = async (userId, token, role) => {
         setIsLoading(true);
-        try {   
+        try {
             let bookingsData = [];
-    
+
             const db = getDatabase();
             const largeFieldsRef = ref(db, 'largeFields');
             const usersRef = ref(db, 'users');
             const bookingsRef = ref(db, 'bookings');
-    
+
             const [largeFieldsSnapshot, usersSnapshot, bookingsSnapshot] = await Promise.all([
                 get(largeFieldsRef),
                 get(usersRef),
                 get(bookingsRef),
             ]);
-    
+
             const largeFieldsData = largeFieldsSnapshot.exists() ? largeFieldsSnapshot.val() : {};
             const usersData = usersSnapshot.exists() ? usersSnapshot.val() : {};
             const bookingsDataRaw = bookingsSnapshot.exists() ? bookingsSnapshot.val() : {};
-    
+
             // Create smallFieldsData from largeFields
             const smallFieldsData = {};
             Object.keys(largeFieldsData).forEach(largeFieldId => {
@@ -155,18 +155,18 @@ const HistoryFieldBooked = () => {
                     });
                 }
             });
-    
+
             // Case for role 'field_owner'
             if (role === 'field_owner') {
                 const response = await axios.get(`http://localhost:5000/api/confirmed/owner/${userId}/bookings`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-    
+
                 bookingsData = response.data.data.flatMap(field =>
                     field.bookings.filter(booking => booking.status === '0').map(booking => {
                         const smallField = smallFieldsData[booking.smallFieldId] || {};
                         const userInfo = usersData[booking.userId] || {};
-    
+
                         return {
                             bookingId: booking.bookingId,
                             fieldName: smallField.largeFieldName || 'Large field name not available',
@@ -190,7 +190,7 @@ const HistoryFieldBooked = () => {
                         const booking = bookingsDataRaw[key];
                         const smallField = smallFieldsData[booking.smallFieldId] || {};
                         const userInfo = usersData[booking.userId] || {};
-    
+
                         return {
                             bookingId: key,
                             fieldName: smallField.largeFieldName || 'Large field name not available',
@@ -206,7 +206,7 @@ const HistoryFieldBooked = () => {
                         };
                     });
             }
-    
+
             setBookings(bookingsData);
         } catch (err) {
             console.error(err);
@@ -215,7 +215,7 @@ const HistoryFieldBooked = () => {
             setIsLoading(false);
         }
     };
-    
+
 
     const cancelBooking = async (bookingId) => {
         if (!window.confirm('Are you sure you want to cancel this booking?')) return;
@@ -262,7 +262,7 @@ const HistoryFieldBooked = () => {
             setIsLoading(false);
         }
     };
-    
+
     const rejectBooking = async (bookingId) => {
         if (!bookingId) {
             alert('Invalid booking ID.');
@@ -299,119 +299,119 @@ const HistoryFieldBooked = () => {
     });
 
     return (
-            <Container>
-                <Title>{isOwner ? 'Manage Booking Requests' : 'Booking History'}</Title>
-                {error && <ErrorAlert>{error}</ErrorAlert>}
-                {isLoading ? (
-                    <div style={{ textAlign: 'center' }}>
-                        <CircularProgress />
-                    </div>
-                ) : (
-                    <>
-                        <StatusSelectWrapper>
-                            <label className="mr-2">Filter by status:</label>
-                            <Select
-                                value={statusFilter}
-                                onChange={handleStatusChange}
-                                fullWidth
-                                variant="outlined"
-                            >
-                                <MenuItem value="">All</MenuItem>
-                                <MenuItem value="0">Pending Confirmation</MenuItem>
-                                <MenuItem value="1">Confirmed</MenuItem>
-                                <MenuItem value="2">Cancelled</MenuItem>
-                            </Select>
-                        </StatusSelectWrapper>
-                        <TableWrapper>
-                            <Table>
-                                <thead>
-                                    <TableRow>
-                                        <TableHeader>Large Field</TableHeader>
-                                        <TableHeader>Small Field Name</TableHeader>
-                                        <TableHeader>Address</TableHeader>
-                                        <TableHeader>Date</TableHeader>
-                                        <TableHeader>Time</TableHeader>
-                                        <TableHeader>Number of People</TableHeader>
-                                        <TableHeader>Booker</TableHeader>
-                                        <TableHeader>Phone Number</TableHeader>
-                                        <TableHeader>Status</TableHeader>
-                                        <TableHeader>Action</TableHeader>
-                                    </TableRow>
-                                </thead>
-                                <tbody>
-                                    {filteredBookings.length > 0 ? (
-                                        filteredBookings.map((booking) => (
-                                            <TableRow key={booking.bookingId}>
-                                                <TableCell>{booking.fieldName}</TableCell>
-                                                <TableCell>{booking.fieldNamesmall}</TableCell>
-                                                <TableCell>{booking.location}</TableCell>
-                                                <TableCell>{booking.date}</TableCell>
-                                                <TableCell>{`${booking.startTime} - ${booking.endTime}`}</TableCell>
-                                                <TableCell>{booking.numberOfPeople} people</TableCell>
-                                                <TableCell>{booking.playerName}</TableCell>
-                                                <TableCell>{booking.phoneNumber}</TableCell>
-                                                <TableCell>
-                                                    {booking.status === '0' ? 'Pending Confirmation' :
-                                                     booking.status === '1' ? 'Confirmed' : 'Cancelled'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {booking.status === '0' && isOwner ? (
-                                                        <>
-                                                            <Button
-                                                                variant="contained"
-                                                                color="primary"
-                                                                onClick={() => confirmBooking(booking.bookingId)}
-                                                                disabled={isLoading}
-                                                                style={{ marginRight: '5px' }}
-                                                            >
-                                                                Confirm
-                                                            </Button>
-                                                            <Button
-                                                                variant="contained"
-                                                                color="secondary"
-                                                                onClick={() => rejectBooking(booking.bookingId)}
-                                                                disabled={isLoading}
-                                                            >
-                                                                Reject
-                                                            </Button>
-                                                        </>
-                                                    ) : isOwner && booking.status !== '2' ? (
+        <Container>
+            <Title>{isOwner ? 'Manage Booking Requests' : 'Booking History'}</Title>
+            {error && <ErrorAlert>{error}</ErrorAlert>}
+            {isLoading ? (
+                <div style={{ textAlign: 'center' }}>
+                    <CircularProgress />
+                </div>
+            ) : (
+                <>
+                    <StatusSelectWrapper>
+                        <label className="mr-2">Filter by status:</label>
+                        <Select
+                            value={statusFilter}
+                            onChange={handleStatusChange}
+                            fullWidth
+                            variant="outlined"
+                        >
+                            <MenuItem value="">All</MenuItem>
+                            <MenuItem value="0">Pending Confirmation</MenuItem>
+                            <MenuItem value="1">Confirmed</MenuItem>
+                            <MenuItem value="2">Cancelled</MenuItem>
+                        </Select>
+                    </StatusSelectWrapper>
+                    <TableWrapper>
+                        <Table>
+                            <thead>
+                                <TableRow>
+                                    <TableHeader>Large Field</TableHeader>
+                                    <TableHeader>Small Field Name</TableHeader>
+                                    <TableHeader>Address</TableHeader>
+                                    <TableHeader>Date</TableHeader>
+                                    <TableHeader>Time</TableHeader>
+                                    <TableHeader>Number of People</TableHeader>
+                                    <TableHeader>Booker</TableHeader>
+                                    <TableHeader>Phone Number</TableHeader>
+                                    <TableHeader>Status</TableHeader>
+                                    <TableHeader>Action</TableHeader>
+                                </TableRow>
+                            </thead>
+                            <tbody>
+                                {filteredBookings.length > 0 ? (
+                                    filteredBookings.map((booking) => (
+                                        <TableRow key={booking.bookingId}>
+                                            <TableCell>{booking.fieldName}</TableCell>
+                                            <TableCell>{booking.fieldNamesmall}</TableCell>
+                                            <TableCell>{booking.location}</TableCell>
+                                            <TableCell>{booking.date}</TableCell>
+                                            <TableCell>{`${booking.startTime} - ${booking.endTime}`}</TableCell>
+                                            <TableCell>{booking.numberOfPeople} people</TableCell>
+                                            <TableCell>{booking.playerName}</TableCell>
+                                            <TableCell>{booking.phoneNumber}</TableCell>
+                                            <TableCell>
+                                                {booking.status === '0' ? 'Pending Confirmation' :
+                                                    booking.status === '1' ? 'Confirmed' : 'Cancelled'}
+                                            </TableCell>
+                                            <TableCell>
+                                                {booking.status === '0' && isOwner ? (
+                                                    <>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="primary"
+                                                            onClick={() => confirmBooking(booking.bookingId)}
+                                                            disabled={isLoading}
+                                                            style={{ marginRight: '5px' }}
+                                                        >
+                                                            Confirm
+                                                        </Button>
+                                                        <Button
+                                                            variant="contained"
+                                                            color="secondary"
+                                                            onClick={() => rejectBooking(booking.bookingId)}
+                                                            disabled={isLoading}
+                                                        >
+                                                            Reject
+                                                        </Button>
+                                                    </>
+                                                ) : isOwner && booking.status !== '2' ? (
+                                                    <Button
+                                                        variant="contained"
+                                                        color="error"
+                                                        onClick={() => cancelBooking(booking.bookingId)}
+                                                        disabled={isLoading}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                ) : (
+                                                    booking.status === '1' && (
                                                         <Button
                                                             variant="contained"
                                                             color="error"
                                                             onClick={() => cancelBooking(booking.bookingId)}
                                                             disabled={isLoading}
                                                         >
-                                                            Cancel
+                                                            Cancel Booking
                                                         </Button>
-                                                    ) : (
-                                                        booking.status === '1' && (
-                                                            <Button
-                                                                variant="contained"
-                                                                color="error"
-                                                                onClick={() => cancelBooking(booking.bookingId)}
-                                                                disabled={isLoading}
-                                                            >
-                                                                Cancel Booking
-                                                            </Button>
-                                                        )
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan="10" style={{ textAlign: 'center' }}>
-                                                No booking requests found.
+                                                    )
+                                                )}
                                             </TableCell>
                                         </TableRow>
-                                    )}
-                                </tbody>
-                            </Table>
-                        </TableWrapper>
-                    </>
-                )}
-            </Container>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan="10" style={{ textAlign: 'center' }}>
+                                            No booking requests found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </tbody>
+                        </Table>
+                    </TableWrapper>
+                </>
+            )}
+        </Container>
     );
 };
 

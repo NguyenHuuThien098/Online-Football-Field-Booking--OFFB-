@@ -91,6 +91,7 @@ const Sidebar = () => {
 
   return (
     <nav className="nav flex-column">
+      {console.log(role)}
       <Link
         className="btn"
         to="/"
@@ -192,7 +193,7 @@ const Sidebar = () => {
               </div>
             </div>
           </Collapse>
-          {role === 'field-owner' && (
+          {role === 'field_owner' && (
             <Link
               className="btn"
               to="/field-owner-dashboard"

@@ -132,15 +132,14 @@ const App = () => {
             </MainLayout>
           }
         />
-        {/* <Route
-          path="/History_FieldBooked"
+        <Route
+          path="/historyFieldBooked"
           element={
             <MainLayout>
-              <ProtectedRoute element={<History_FieldBooked />} />
+              <ProtectedRoute element={<HistoryFieldBooked />} />
             </MainLayout>
           }
-        /> */}
-
+        />
         <Route
           path="/historyMatchJoined"
           element={
