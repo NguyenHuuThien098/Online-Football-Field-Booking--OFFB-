@@ -1,6 +1,10 @@
 const User = require('../models/User'); // Nhập model User để tương tác với cơ sở dữ liệu người dùng
 const admin = require('../firebase'); // Nhập Firebase Admin SDK để sử dụng các chức năng của Firebase
 
+// token
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const router = express.Router();
 // Hàm xử lý đăng ký người dùng bằng Google
 exports.registerWithGoogle = async (req, res) => {
     const { idToken, role } = req.body; // Nhận idToken và vai trò từ yêu cầu của client
@@ -21,9 +25,9 @@ exports.registerWithGoogle = async (req, res) => {
         // Nếu người dùng chưa tồn tại, tạo người dùng mới
         const newUser = await User.createUser(email, role);
         // Lưu thông tin người dùng vào Realtime Database
-        await admin.database().ref(`users/${uid}`).set({ 
-            email, 
-            role, 
+        await admin.database().ref(`users/${uid}`).set({
+            email,
+            role,
             token: idToken // Lưu token vào Firebase
         });
 
@@ -89,3 +93,4 @@ exports.getPlayersByFieldOwner = async (req, res) => {
         res.status(500).json({ error: 'Có lỗi xảy ra khi lấy danh sách người chơi!' });
     }
 };
+

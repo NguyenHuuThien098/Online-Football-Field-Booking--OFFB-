@@ -1,13 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab } from '@mui/material';
-import Field from '../Field/Field';
+import checkFieldOwner from '../function/checkFieldOwner';
 
 const Match = () => {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const token = localStorage.getItem('token');
+    const ownerId = localStorage.getItem('userId');
+    const [owner, setOwner] = useState({ fullName: '' });
+
+    const fetchUserInformation = async () => {
+        const token = localStorage.getItem('token');
+        const response = await axios.get("http://localhost:5000/api/user/me", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        setOwner(response.data);
+        setNewMatch((prevMatch) => ({ ...prevMatch, ownerName: response.data.fullName }));
+    };
+
+    useEffect(() => {
+        if (!owner.fullName) {
+            fetchUserInformation();
+        }
+    }, [owner.fullName]);
+
     const [newMatch, setNewMatch] = useState({
         address: '',
         time: '',
@@ -17,30 +37,17 @@ const Match = () => {
         questions: '',
         type: '5 person'
     });
-    const [tabIndex, setTabIndex] = useState(0);
 
     const fetchMatches = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
-            const role = localStorage.getItem('userRole');
-            if (!ownerId) {
-                setError('Owner ID not found');
-                setLoading(false);
-                return;
-            }
-            if (role !== 'field_owner') {
-                setError('Not an owner');
-                setLoading(false);
-                return;
-            }
-
+            checkFieldOwner();
             // Fetch matches
             const matchesResponse = await axios.get(`http://localhost:5000/api/matches/owner/${ownerId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(matchesResponse.data);
             const matchesData = matchesResponse.data;
             if (Array.isArray(matchesData)) {
                 setMatches(matchesData);
@@ -69,9 +76,8 @@ const Match = () => {
 
     const handleAddMatch = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
-            const response = await axios.post('http://localhost:5000/api/matches', {
+            checkFieldOwner();
+            const response = await axios.post('http://localhost:5000/api/matches/', {
                 ...newMatch,
                 ownerId
             }, {
@@ -97,8 +103,7 @@ const Match = () => {
 
     const handleUpdateMatch = async (matchId) => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
+            checkFieldOwner();
             const response = await axios.put(`http://localhost:5000/api/matches/${matchId}`, {
                 ...newMatch,
                 ownerId
@@ -125,7 +130,6 @@ const Match = () => {
 
     const handleDeleteMatch = async (matchId) => {
         try {
-            const token = localStorage.getItem('token');
             await axios.delete(`http://localhost:5000/api/matches/${matchId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -136,10 +140,6 @@ const Match = () => {
             console.error("Error deleting match:", error);
             setError('An error occurred while deleting the match.');
         }
-    };
-
-    const handleTabChange = (event, newValue) => {
-        setTabIndex(newValue);
     };
 
     return (

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Button, Row, Col, ListGroup } from 'react-bootstrap';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getDatabase, ref, get } from 'firebase/database'; // Import Firebase functions
+import { getDatabase, ref, get, set } from 'firebase/database'; // Import Firebase functions
+import { IconButton, Box } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import axios from 'axios';
 
 const FieldDetail = () => {
     const location = useLocation();
@@ -11,36 +14,30 @@ const FieldDetail = () => {
     const [ownerName, setOwnerName] = useState(null); // Store owner's name
     const [ownerPhone, setOwnerPhone] = useState(null); // Store owner's phone number
     const [largeField, setLargeField] = useState(null); // State to store large field info
+    const [smallField, setSmallField] = useState(null); // State to store small field info
 
     useEffect(() => {
-        if (field?.ownerId) {
-            fetchOwnerInfo(field.ownerId); // Fetch owner info when ownerId is available
-        } else {
-            // Fallback data if no ownerId is available
-            setOwnerName("Default Owner");
-            setOwnerPhone("000-000-0000");
-        }
         if (field?.largeFieldId) {
             fetchLargeField(field.largeFieldId); // Fetch large field info when largeFieldId is available
-        } else {
-            // Fallback data if no largeFieldId is available
-            setLargeField({ name: "Default Large Field", address: "Default Address" });
+        }
+        if (largeField?.ownerId) {
+            fetchOwnerInfo(largeField.ownerId); // Fetch owner info when ownerId is available
+        }
+        if (field?.smallFieldId) {
+            fetchSmallField(field.smallFieldId); // Fetch small field info when smallFieldId is available
         }
     }, [field]);
 
     const fetchOwnerInfo = async (ownerId) => {
         try {
-            const db = getDatabase();
-            const userRef = ref(db, `users/${ownerId}`);
-            const snapshot = await get(userRef);
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                setOwnerName(userData.fullName || "Unknown");
-                setOwnerPhone(userData.phoneNumber || "Not available");
-            } else {
-                setOwnerName("Unknown");
-                setOwnerPhone("Not available");
-            }
+            const response = await axios.get(`http://localhost:5000/api/admin/users/${ownerId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log("Owner info:", response.data);
+            setOwnerName(response.data.fullName || "Unknown"); // Get name or display "Unknown"
+            setOwnerPhone(response.data.phoneNumber || "Not available"); // Get phone number or display "Not available"
         } catch (error) {
             console.error("Error fetching owner info:", error);
             setOwnerName("Unknown");
@@ -50,17 +47,30 @@ const FieldDetail = () => {
 
     const fetchLargeField = async (largeFieldId) => {
         try {
+            const response = await axios.get(`http://localhost:5000/api/field-owner/large-field/${largeFieldId}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            setLargeField(response.data);
+        } catch (error) {
+            console.error("Error fetching large field info:", error);
+        }
+    };
+
+    const fetchSmallField = async (smallFieldId) => {
+        try {
             const db = getDatabase();
-            const fieldRef = ref(db, `field-owner/large-field/${largeFieldId}`);
+            const fieldRef = ref(db, `field-owner/small-field/${smallFieldId}`);
             const snapshot = await get(fieldRef);
             if (snapshot.exists()) {
                 const fieldData = snapshot.val();
-                setLargeField(fieldData);
+                setSmallField(fieldData);
             } else {
-                console.error("No large field data available");
+                console.error("No small field data available");
             }
         } catch (error) {
-            console.error("Error fetching large field info:", error);
+            console.error("Error fetching small field info:", error);
         }
     };
 
@@ -70,7 +80,6 @@ const FieldDetail = () => {
         if (!token) {
             // If not logged in, redirect to login page
             alert('You need to log in to book a field.');
-            navigate('/login');
             return;
         }
 
@@ -128,55 +137,68 @@ const FieldDetail = () => {
         }
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     if (!field) {
         return <p>No field information. Please go back to the previous page.</p>;
     }
 
     return (
-        <Container className="mt-5">
+        <>
             <Row className="justify-content-center">
                 <Col md={8}>
-                    <Card className="shadow rounded">
-                        <Card.Img variant="top" src={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'} rounded />
-                        <Card.Body>
-                            <Card.Title>{field.name}</Card.Title>
-                            <Card.Text>
-                                <b>Owner:</b> {ownerName || "Loading..."} <br />
-                                <b>Phone:</b> {ownerPhone || "Loading..."} <br />
-                                <b>Address:</b> {field.location || "Default Address"} <br />
-                                <b>Large field name:</b> {largeField?.name || "Default Large Field"} <br />
-                                <b>Large field address:</b> {largeField?.address || "Default Address"}
-                            </Card.Text>
-                            <div className="d-flex justify-content-end mb-3">
-                                <Button variant="primary" onClick={handleBookField}>
-                                    Book field
-                                </Button>
-                            </div>
-                            <Card.Title>Available Time Slots</Card.Title>
-                            <Card.Text>
-                                {availableTimeSlots()}
-                            </Card.Text>
-                            <Card.Title>Contact information</Card.Title>
-                            <Card.Text>
-                                <div className="d-flex justify-content-between">
-                                    <div>
-                                        <b>Zalo:</b> <a href="#" className="btn btn-outline-primary btn-sm">Zalo</a>
-                                    </div>
-                                    <div>
-                                        <b>Facebook:</b> <a href="#" className="btn btn-outline-primary btn-sm">Facebook</a>
-                                    </div>
+                    <Box sx={{ position: 'relative' }}>
+                        <Card className="shadow rounded">
+                            <Card.Img variant="top" src={field.image || 'https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg'} rounded />
+                            <Card.Body>
+                                <IconButton
+                                    onClick={handleBackClick}
+                                    sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white', margin: '16px 0' }}
+                                >
+                                    <ArrowBackIcon />
+                                </IconButton>
+                                <Card.Title>{field.name}</Card.Title>
+                                <Card.Text>
+                                    <b>Owner:</b> {ownerName || "Loading..."} <br />
+                                    <b>Phone:</b> {ownerPhone || "Loading..."} <br />
+                                    <b>Large field name:</b> {largeField?.name || "Loading..."} <br />
+                                    <b>Large field address:</b> {largeField?.address || "Loading..."} <br />
+                                    <b>Large field operating hours:</b> {largeField?.operatingHours || "Loading..."} <br />
+                                    <b>Large field other info:</b> {largeField?.otherInfo || "Loading..."} <br />
+                                </Card.Text>
+                                <div className="d-flex justify-content-end mb-3">
+                                    <Button variant="primary" onClick={handleBookField}>
+                                        Book field
+                                    </Button>
                                 </div>
-                                <Card.Title>Notes</Card.Title>
-                                <ListGroup variant="flush">
-                                    <ListGroup.Item>10 AM - 3 PM sale</ListGroup.Item>
-                                    <ListGroup.Item>10 AM - 3 PM sale</ListGroup.Item>
-                                </ListGroup>
-                            </Card.Text>
-                        </Card.Body>
-                    </Card>
+                                <Card.Title>Available Time Slots</Card.Title>
+                                <Card.Text>
+                                    {availableTimeSlots()}
+                                </Card.Text>
+                                <Card.Title>Contact information</Card.Title>
+                                <Card.Text>
+                                    <div className="d-flex justify-content-between">
+                                        <div>
+                                            <b>Zalo:</b> <a href="#" className="btn btn-outline-primary btn-sm">Zalo</a>
+                                        </div>
+                                        <div>
+                                            <b>Facebook:</b> <a href="#" className="btn btn-outline-primary btn-sm">Facebook</a>
+                                        </div>
+                                    </div>
+                                    <Card.Title>Notes</Card.Title>
+                                    <ListGroup variant="flush">
+                                        <ListGroup.Item>10 AM - 3 PM sale</ListGroup.Item>
+                                        <ListGroup.Item>10 AM - 3 PM sale</ListGroup.Item>
+                                    </ListGroup>
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Box>
                 </Col>
             </Row>
-        </Container>
+        </>
     );
 };
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { signInWithGoogle, database } from '../firebase';
 import { ref, get } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
-import Login from '../components/Login';
+import Login from '../components/UserManagerment/login';
 const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -20,10 +20,13 @@ const LoginForm = ({ setIsAuthenticated, setUserRole }) => {
                 setIsAuthenticated(true);
                 setUserRole(userData.role);
                 localStorage.setItem('token', token);
+                localStorage.setItem('role', userData.role);
                 localStorage.setItem('userId', userId);
 
                 if (userData.role === 'field_owner') {
                     navigate('/field-owner-dashboard');
+                } else if (userData.role === 'admin') {
+                    navigate('/admin-dashboard');
                 } else {
                     navigate('/');
                 }

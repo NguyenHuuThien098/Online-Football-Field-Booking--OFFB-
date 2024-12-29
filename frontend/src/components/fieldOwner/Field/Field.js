@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
+import { Container, Button, Grid, Card, CardContent, Typography, TextField, Box, Tabs, Tab, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, CardMedia, IconButton, Menu, MenuItem, Backdrop } from '@mui/material';
+import SettingsIcon from '@mui/icons-material/Settings';
+import checkFieldOwner from '../function/checkFieldOwner';
+
 const Field = () => {
-    const [fields, setFields] = useState([]);
+    const [largeFields, setLargeFields] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [newField, setNewField] = useState({
-        name: '',
-        location: '',
-        type: '5 person',
-        price: '',
-        image: '',
-        contactNumber: '',
-        operatingHours: ''
-    });
     const [newLargeField, setNewLargeField] = useState({
         name: '',
         address: '',
@@ -25,38 +19,33 @@ const Field = () => {
     const [deletingFieldId, setDeletingFieldId] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [fieldToDelete, setFieldToDelete] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedFieldId, setSelectedFieldId] = useState(null);
     const token = localStorage.getItem('token');
     const ownerId = localStorage.getItem('userId');
+    const navigate = useNavigate();
+
+    const defaultImage = "https://thptlethipha.edu.vn/wp-content/uploads/2023/03/SAN-BONG.jpg";
+
     useEffect(() => {
-        fetchFields();
+        fetchLargeFields();
     }, []);
-    const fetchFields = async () => {
+
+    const fetchLargeFields = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const ownerId = localStorage.getItem('userId');
-            const role = localStorage.getItem('userRole');
-            if (!ownerId) {
-                setError('Owner ID not found');
-                setLoading(false);
-                return;
-            }
-            if (role !== 'field_owner') {
-                setError('Not an owner');
-                setLoading(false);
-                return;
-            }
-            // Fetch fields
-            const fieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
+            checkFieldOwner();
+            // Fetch large fields
+            const largeFieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            const fieldsData = fieldsResponse.data;
-            if (Array.isArray(fieldsData)) {
-                if (fieldsData.length === 0) {
-                    setError('No fields found');
+            const largeFieldsData = largeFieldsResponse.data;
+            if (Array.isArray(largeFieldsData)) {
+                if (largeFieldsData.length === 0) {
+                    setError('No large fields found');
                 }
-                setFields(fieldsData);
+                setLargeFields(largeFieldsData);
             } else {
                 setError('Invalid data returned');
             }
@@ -77,11 +66,14 @@ const Field = () => {
             setLoading(false);
         }
     };
+
     const scrollToAddField = () => {
         document.getElementById('add-field-section').scrollIntoView({ behavior: 'smooth' });
     };
+
     const handleUpdateField = async (fieldId) => {
     };
+
     const handleAddLargeField = async () => {
         try {
             const response = await axios.post('http://localhost:5000/api/field-owner/large-field', {
@@ -92,7 +84,7 @@ const Field = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setFields([...fields, response.data.largeField]);
+            setLargeFields([...largeFields, response.data.largeField]);
             setNewLargeField({
                 name: '',
                 address: '',
@@ -109,15 +101,17 @@ const Field = () => {
             }
         }
     };
+
     const handleDeleteLargeField = async (largeFieldId) => {
         setDeletingFieldId(largeFieldId);
+        setConfirmDelete(false); // Close the confirmation dialog
         try {
             await axios.delete(`http://localhost:5000/api/field-owner/large-field/${largeFieldId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setFields(fields.filter(field => field.largeFieldId !== largeFieldId));
+            setLargeFields(largeFields.filter(largeField => largeField.largeFieldId !== largeFieldId));
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 setError('Resource not found.');
@@ -127,7 +121,6 @@ const Field = () => {
             }
         } finally {
             setDeletingFieldId(null);
-            setConfirmDelete(false);
         }
     };
 
@@ -141,34 +134,82 @@ const Field = () => {
         setConfirmDelete(false);
     };
 
+    const handleLargeFieldDetail = (largeField) => {
+        navigate(`/largeField/${largeField.largeFieldId}`, { state: largeField });
+    };
+
+    const handleMenuClick = (event, fieldId) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedFieldId(fieldId);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedFieldId(null);
+    };
+
+    const handleCardClick = (event, largeField) => {
+        if (event.target.closest('.settings-icon') || event.target.closest('.MuiMenu-root')) {
+            return;
+        }
+        handleLargeFieldDetail(largeField);
+    };
+
     return (
         <div>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={deletingFieldId !== null}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <Typography variant="h3" gutterBottom align="center" sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, marginTop: 2, borderRadius: 1 }}>
-                Your Fields
+                Your Large Fields
             </Typography>
             <Button variant="contained" color="primary" onClick={scrollToAddField} sx={{ my: 2, width: '100%', fontSize: '1.6rem', backgroundColor: 'green', color: 'white', padding: 2, borderRadius: 1 }}>
                 Add New Large Field +
             </Button>
             <hr />
-            {/* {console.log(fields)} */}
             <Grid container spacing={2}>
-                {fields.map((field, index) => (
+                {largeFields.map((largeField, index) => (
                     <Grid item xs={12} sm={6} md={6} key={index}>
-                        <Card key={field.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black' }}>
-                            <CardContent>
-                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{field.name || 'Unnamed Field'}</Typography>
-                                <Typography variant="body1">Location: {field.address}</Typography>
-                                <Typography variant="body1">Contact Number: {field.ownerPhone}</Typography>
-                                <Typography variant="body1">Operating Hours: {field.operatingHours}</Typography>
-                                <Typography variant="body1">Description: {field.otherInfo}</Typography>
-                                <Button variant="contained" color="primary" onClick={() => handleUpdateField(field.largeFieldId)} sx={{ mt: 2, mr: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }}>
-                                    Update
-                                </Button>
-                                <Button variant="contained" onClick={() => handleConfirmDelete(field.largeFieldId)} sx={{ backgroundColor: 'red', mt: 2, width: 'calc(50% - 8px)', fontSize: '1rem' }} disabled={deletingFieldId === field.largeFieldId}>
-                                    {deletingFieldId === field.largeFieldId ? <CircularProgress size={24} /> : 'Delete'}
-                                </Button>
-                            </CardContent>
-                        </Card>
+                        <div onClick={(event) => handleCardClick(event, largeField)} style={{ textDecoration: 'none', cursor: 'pointer' }}>
+                            <Card key={largeField.fieldId} variant="outlined" sx={{ border: '1px solid #ccc', boxShadow: 3, borderRadius: 2, height: '100%', backgroundColor: '#f5f5f5', color: 'black', position: 'relative' }}>
+                                <IconButton
+                                    aria-label="settings"
+                                    onClick={(event) => handleMenuClick(event, largeField.largeFieldId)}
+                                    className="settings-icon"
+                                    sx={{ position: 'absolute', top: 8, right: 8 }}
+                                >
+                                    <SettingsIcon />
+                                </IconButton>
+                                <CardContent sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <CardMedia
+                                        component="img"
+                                        sx={{ width: 160, height: 160, marginRight: 2, borderRadius: 2 }}
+                                        image={largeField.images || defaultImage}
+                                        alt={largeField.name || 'Unnamed Field'}
+                                    />
+                                    <Box sx={{ flex: 1 }}>
+                                        <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center' }}>{largeField.name || 'Unnamed Field'}</Typography>
+                                        <Divider sx={{ marginBottom: 2, borderBottomWidth: 2 }} />
+                                        <Typography variant="body1"><strong>Location:</strong> {largeField.address}</Typography>
+                                        <Typography variant="body1"><strong>Contact Number:</strong> {largeField.ownerPhone}</Typography>
+                                        <Typography variant="body1"><strong>Operating Hours:</strong> {largeField.operatingHours}</Typography>
+                                        <Typography variant="body1"><strong>Description:</strong> {largeField.otherInfo}</Typography>
+                                    </Box>
+                                </CardContent>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl) && selectedFieldId === largeField.largeFieldId}
+                                    onClose={handleMenuClose}
+                                    className="MuiMenu-root"
+                                >
+                                    <MenuItem onClick={() => { handleUpdateField(largeField.largeFieldId); handleMenuClose(); }}>Update</MenuItem>
+                                    <MenuItem onClick={() => { handleConfirmDelete(largeField.largeFieldId); handleMenuClose(); }}>Delete</MenuItem>
+                                </Menu>
+                            </Card>
+                        </div>
                     </Grid>
                 ))}
             </Grid>
@@ -228,9 +269,7 @@ const Field = () => {
                     <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%', fontSize: '1.2rem' }}>
                         Add Large Field
                     </Button>
-                </form>
-            </Box>
-            <Dialog open={confirmDelete} onClose={handleCancelDelete}>
+                </form>            </Box>            <Dialog open={confirmDelete} onClose={handleCancelDelete}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -249,4 +288,5 @@ const Field = () => {
         </div>
     );
 };
+
 export default Field;

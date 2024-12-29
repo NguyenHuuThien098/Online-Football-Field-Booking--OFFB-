@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Collapse } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 import style from "./Sidebar.module.scss";
@@ -8,13 +8,18 @@ import PersonIcon from '@mui/icons-material/Person';
 import HistoryIcon from '@mui/icons-material/History';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; // New icon
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const role = localStorage.getItem('userRole');
   const [imagePreview, setImagePreview] = useState(null);
+
+  const [role, setRole] = useState('');
+  useEffect(() => {
+    setRole(localStorage.getItem('userRole'));
+  }, [role]);
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -38,7 +43,7 @@ const Sidebar = () => {
       transition: 'background-color 0.3s ease',
     },
     activeLink: {
-      textDecoration:  'none',
+      textDecoration: 'none',
       padding: '10px 20px', // Increased padding
       color: '#fff',
       backgroundColor: '#80bfff', // Lighter blue background color
@@ -63,7 +68,7 @@ const Sidebar = () => {
       width: '100%',
     },
     accordionHeader: {
-      fontWeight: 'bold', 
+      fontWeight: 'bold',
     },
     hover: {
       backgroundColor: '#f0f0f0',
@@ -82,14 +87,14 @@ const Sidebar = () => {
     },
   };
 
-  const sidebarStyle = {
-    boxShadow: '3px 0 5px -2px rgba(0,0,0,0.2)', // Add shadow only on the right side
-  };
+  // const sidebarStyle = {
+  //   boxShadow: '3px 0 5px -2px rgba(0,0,0,0.2)', // Add shadow only on the right side
+  // };
 
   const isHistoryActive = location.pathname.startsWith('/History');
 
   return (
-    <nav className="nav flex-column" style={sidebarStyle}>
+    <nav className="nav flex-column">
       <Link
         className="btn"
         to="/"
@@ -139,8 +144,8 @@ const Sidebar = () => {
             Personal
             <span style={{ ...styles.underline, ...(location.pathname === '/personal' && styles.activeUnderline) }}></span>
           </Link>
-          <Link 
-            className="btn" 
+          <Link
+            className="btn"
             onClick={() => setIsOpen(!isOpen)}
             style={isHistoryActive ? styles.activeLink : styles.link}
             onMouseEnter={(e) => {
@@ -191,7 +196,7 @@ const Sidebar = () => {
               </div>
             </div>
           </Collapse>
-          {role !== 'player' && (
+          {role === 'field_owner' && (
             <Link
               className="btn"
               to="/field-owner-dashboard"
@@ -206,6 +211,23 @@ const Sidebar = () => {
               <DashboardIcon sx={{ mr: 1 }} />
               Field management
               <span style={{ ...styles.underline, ...(location.pathname === '/field-owner-dashboard' && styles.activeUnderline) }}></span>
+            </Link>
+          )}
+          {role === 'admin' && (
+            <Link
+              className="btn"
+              to="/admin-dashboard"
+              style={location.pathname === '/admin-dashboard' ? styles.activeLink : styles.link}
+              onMouseEnter={(e) => {
+                if (location.pathname !== '/admin-dashboard') e.currentTarget.style.backgroundColor = styles.hover.backgroundColor;
+              }}
+              onMouseLeave={(e) => {
+                if (location.pathname !== '/admin-dashboard') e.currentTarget.style.backgroundColor = '';
+              }}
+            >
+              <AdminPanelSettingsIcon sx={{ mr: 1 }} /> {/* Updated icon */}
+              Admin dashboard
+              <span style={{ ...styles.underline, ...(location.pathname === '/admin-dashboard' && styles.activeUnderline) }}></span>
             </Link>
           )}
         </>

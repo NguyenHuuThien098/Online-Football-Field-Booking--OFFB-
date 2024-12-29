@@ -7,7 +7,6 @@ import { styled } from '@mui/material/styles';
 import Chip from '@mui/material/Chip';
 import Tooltip from '@mui/material/Tooltip';
 
-
 const StyledCard = styled(Card)(({ theme }) => ({
   borderRadius: '16px',
   border: '0.1px solid #ccc',
@@ -19,7 +18,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-
 const Item = ({ field, match }) => {
   const [ownerName, setOwnerName] = useState(null); // State to store owner's name
   const [ownerPhone, setOwnerPhone] = useState(null); // State to store owner's phone number
@@ -27,10 +25,6 @@ const Item = ({ field, match }) => {
   useEffect(() => {
     if (field?.ownerId) {
       fetchOwnerInfo(field.ownerId); // Fetch owner info when ownerId is available
-    } else {
-      // Fallback data if no ownerId is available
-      setOwnerName("Default Owner");
-      setOwnerPhone("000-000-0000");
     }
   }, [field]);
 
@@ -56,9 +50,46 @@ const Item = ({ field, match }) => {
 
   const handleBookingClick = () => {
     if (field) {
-      navigate(`/fieldDetail/`, { state: field }); // Navigate to field detail page
+      navigate(`/fieldDetail/`, { state: field }); // Chuyển đến trang chi tiết sân
     }
   };
+  const handleJoinClick = () => {
+    if (match) {
+      navigate(`/join_match`, { state: match }); // Chuyển hướng đến trang join_match với dữ liệu trận đấu
+    }
+  };
+
+  // const availableTimeSlots = () => {
+  //   const today = new Date().toISOString().slice(0, 10); // Get today's date
+  //   const availableSlots = [];
+
+  //   for (const date in field.bookingSlots) {
+  //     if (date >= today && field.bookingSlots[date]["15:00-16:00"]) {
+  //       availableSlots.push(date);
+  //     }
+  //   }
+
+  //   if (availableSlots.length > 0) {
+  //     return (
+  //       <div>
+  //         <Typography variant="h6" color="primary">
+  //           Available on:
+  //         </Typography>
+  //         <div sx={{ display: 'flex', flexWrap: 'wrap' }}>
+  //           {availableSlots.map((date) => (
+  //             <Chip key={date} label={date} sx={{ marginRight: 1 }} />
+  //           ))}
+  //         </div>
+  //       </div>
+  //     );
+  //   } else {
+  //     return (
+  //       <Typography variant="h6" color="#f44336">
+  //         Currently unavailable
+  //       </Typography>
+  //     );
+  //   }
+  // };
 
   const formatDateTime = (dateTimeString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -84,13 +115,13 @@ const Item = ({ field, match }) => {
         </CardActionArea>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, px: 5, py: 2 }}>
           <Typography variant="h5" component="div">
-            {field.name || "Default Field Name"}
+            {field.name || "Field Name"}
           </Typography>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems:"center"}}>
             <Typography variant="body2" color="text.secondary">
-              Address: {field.largeFieldAddress || "Default Address"}
+              Address: {field.largeFieldAddress || "Address"}
             </Typography>
-            <Chip label={field.type || "Default Type"}
+            <Chip label={field.type || "Type"}
               className="text-success my-2"
               sx={{
                 backgroundColor: '#FCE0D3',
@@ -102,7 +133,7 @@ const Item = ({ field, match }) => {
           </div>
 
           <Typography variant="body2" color="text.secondary">
-              Large field names: {field.largeFieldName || "Default Large Field Name"}
+              Large field names: {field.largeFieldName || "Large Field Name"}
             </Typography>
 
           <Typography variant="body2" color="success" fontSize={24}>
@@ -146,19 +177,18 @@ const Item = ({ field, match }) => {
         </CardActionArea>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', flex: 1, p: 5 }}>
           <Typography variant="h5" component="div">
-            {match.ownerName || "Default Owner Name"}
+            {match.ownerName || "Owner Name"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Address: {match.address || "Default Address"}
+            Address: {match.address || "Address"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Time: {formatDateTime(match.time) || "Default Time"}
+            Time: {formatDateTime(match.time) || "Time"}
           </Typography>
           <div>
-
           </div>
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" sx={{ width: 150, height: 40 }}>
+            <Button variant="contained" sx={{ width: 150, height: 40 }} onClick={handleJoinClick}>
               Join
             </Button>
           </Box>

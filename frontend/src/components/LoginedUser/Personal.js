@@ -30,7 +30,7 @@ const UserProfile = () => {
             if (!token) {
                 const confirm = window.confirm('You are not logged in. Please log in to continue.');
                 if (confirm) {
-                    navigate('/login');
+                    navigate('/');
                 }
                 return;
             }
@@ -136,17 +136,17 @@ const UserProfile = () => {
     return (
         <div maxWidth="lg" sx={{ mt: 5 }}>
             <Card sx={{ padding: 3, fontFamily: 'Helvetica, sans-serif' }}>
-                <CardHeader 
+                <CardHeader
                     title={
                         <Typography variant="h3" sx={{ textAlign: 'center', fontFamily: 'Helvetica, sans-serif' }}>
                             Personal
                         </Typography>
                     }
-                    sx={{ 
-                        backgroundColor: 'primary.main', 
-                        color: 'white', 
-                        textAlign: 'center' 
-                    }} 
+                    sx={{
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        textAlign: 'center'
+                    }}
                 />
                 <CardContent>
                     {message && <Alert severity="success" sx={{ fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif' }}>{message}</Alert>}
