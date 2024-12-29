@@ -91,8 +91,8 @@ const FieldBooked = () => {
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            alert('Field booking request sent successfully!');
-            navigate('/');
+            alert('Field booking request sent successfully! Click OK to navigate to the booking history page!');
+            navigate('/historyFieldBooked');
         } catch (error) {
             console.error('Field booking error:', error);
 

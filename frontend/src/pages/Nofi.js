@@ -21,6 +21,7 @@ const Nofi = () => {
             const token = localStorage.getItem("token");
             const userId = localStorage.getItem("userId");
             const userRole = localStorage.getItem("role");
+            console.log(token);
             setRole(userRole);
 
             try {

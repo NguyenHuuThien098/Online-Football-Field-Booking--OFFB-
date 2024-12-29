@@ -213,15 +213,14 @@ exports.playerHome = (req, res) => {
     res.status(200).send('Đây là trang chủ của Player');
 };
 
-// Lấy tên người chơi
+// Hàm lấy tên người chơi từ Firebase
 const getPlayerName = async (userId) => {
     try {
-        const user = await User.getUserById(userId);
-        if (user && user.name) {
-            console.log("Player name:", user.name);  
-            return user.name;
+        const userSnapshot = await admin.database().ref(`users/${userId}`).once('value');
+        const userData = userSnapshot.val();
+        if (userData && userData.fullName) {
+            return userData.fullName;
         }
-        console.log("Player name: Player");  
         return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
     } catch (error) {
         console.error("Error fetching player name:", error);

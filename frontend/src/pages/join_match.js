@@ -54,7 +54,11 @@ const JoinMatch = () => {
         { matchId: matchData.id, playerId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert(response.data.message || 'Request to join successfully sent');
+      const alertResponse = window.alert(response.data.message || 'Request to join successfully sent'); 
+      if (alertResponse === undefined) { 
+        navigate('/historyMatchjoined');
+      }
+
     } catch (err) {
       handleError(err);
     } finally {
