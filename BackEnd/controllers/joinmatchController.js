@@ -312,19 +312,18 @@ exports.getPlayerMatchHistory = async (req, res) => {
         const matchesSnapshot = await matchesRef.once('value');
         const matchesData = matchesSnapshot.val();
 
-        const history = playerMatches.map(matchId => {
+        const history = await Promise.all(playerMatches.map(async matchId => {
             const match = matchesData[matchId];
             const slot = matchSlotsData[matchId].find(slot => slot.playerId === playerId);
+            const ownerName = await getPlayerName(match.ownerId);
 
             return {
                 matchId,
-                name: match.name,
-                location: match.location,
+                ownerName,
                 time: match.time,
                 status: slot.status, // Status: 0 (pending approval), 1 (joined), 2 (rejected)
-                ownerId: match.ownerId,
             };
-        });
+        }));
 
         return res.status(200).json({ history });
     } catch (error) {

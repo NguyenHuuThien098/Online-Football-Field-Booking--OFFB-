@@ -350,10 +350,8 @@ const HistoryMatchJoined = () => {
                             {playerMatchHistory.map((history, index) => (
                                 <li key={index} className="list-group-item">
                                     {index + 1}.
-                                    <p><strong>Trận đấu:</strong> {history.matchId}</p>
+                                    <p><strong>Tên chủ trận đấu:</strong> {history.ownerName}</p>
                                     <p><strong>Thời gian trận đấu bắt đầu:</strong> {history.time}</p>
-                                    <p><strong>Tên người chơi:</strong> {history.playerName}</p>
-                                    <p><strong>Số điện thoại người chơi:</strong> {history.playerPhone}</p>
                                     <p>
                                         <strong>Trạng thái:</strong>{' '}
                                         {history.status === 1 ? (
