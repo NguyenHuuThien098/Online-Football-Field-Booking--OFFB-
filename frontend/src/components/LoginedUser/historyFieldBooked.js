@@ -351,9 +351,12 @@ const HistoryFieldBooked = () => {
                                             <TableCell>{booking.playerName}</TableCell>
                                             <TableCell>{booking.phoneNumber}</TableCell>
                                             <TableCell>
-                                                {booking.status === '0' ? 'Pending Confirmation' :
-                                                    booking.status === '1' ? 'Confirmed' : 'Cancelled'}
-                                            </TableCell>
+    {booking.status === '0' ? 'Pending Confirmation' :
+        booking.status === '1' ? 'Confirmed' :
+            booking.status === '2' ? 'Cancelled' : 'Finished'
+    }
+</TableCell>
+
                                             <TableCell>
                                                 {booking.status === '0' && isOwner ? (
                                                     <>

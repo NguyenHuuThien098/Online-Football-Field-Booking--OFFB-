@@ -9,6 +9,7 @@ exports.googleLogin = async (req, res) => {
     const { token } = req.body;
     try {
         const user = await User.verifyGoogleToken(token);
+        console.log('User:', user);
         await User.setUserRole(user.uid, 'player');
         res.status(200).send({ message: 'Đăng nhập thành công với tư cách Player', uid: user.uid });
     } catch (error) {
@@ -57,6 +58,7 @@ exports.bookField = async (req, res) => {
     const { largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople } = req.body;
 
     try {
+        console.log("bookField request received with body:", req.body);
 
         // Lấy thông tin sân lớn và sân nhỏ (nếu có)
         const largeField = await Field.getLargeFieldById(largeFieldId);
@@ -93,7 +95,7 @@ exports.bookField = async (req, res) => {
                 });
             }
         }
-        const fullName = await getPlayerName(userId);
+
         // Tạo booking mới
         const booking = await Booking.createBooking(largeFieldId, smallFieldId, userId, date, startTime, endTime, numberOfPeople);
 
@@ -107,11 +109,9 @@ exports.bookField = async (req, res) => {
 
         // Thông báo cho chủ sân
         const notificationData = {
-            message: `${fullName} đã yêu cầu đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
+            message: `Player đã yêu cầu đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
-            createdAt: Date.now(),
             smallFieldId,
-           
         };
         await Notification.notifyFieldOwner(largeField.ownerId, notificationData);
 
@@ -132,6 +132,7 @@ exports.cancelBooking = async (req, res) => {
     const { bookingId } = req.params;
 
     try {
+        console.log("Cancel booking request received for bookingId:", bookingId);
 
         // Lấy thông tin đặt sân từ Firebase
         const bookingRef = admin.database().ref('bookings').child(bookingId);
@@ -172,7 +173,6 @@ exports.cancelBooking = async (req, res) => {
         const notificationData = {
             message: `${playerName} đã hủy đặt sân cho ngày ${date} từ ${startTime} đến ${endTime}.`,
             date: new Date().toISOString(),
-            createdAt,
             smallFieldId,
         };
 
@@ -211,21 +211,21 @@ exports.playerHome = (req, res) => {
     res.status(200).send('Đây là trang chủ của Player');
 };
 
-// Hàm lấy tên người chơi từ Firebase
+// Lấy tên người chơi
 const getPlayerName = async (userId) => {
     try {
-        const userSnapshot = await admin.database().ref(`users/${userId}`).once('value');
-        const userData = userSnapshot.val();
-        if (userData && userData.fullName) {
-            return userData.fullName;
+        const user = await User.getUserById(userId);
+        if (user && user.name) {
+            console.log("Player name:", user.name);  
+            return user.name;
         }
+        console.log("Player name: Player");  
         return 'Player';  // Trả về 'Player' nếu không tìm thấy tên
     } catch (error) {
         console.error("Error fetching player name:", error);
         return 'Player';  // Trả về 'Player' nếu có lỗi xảy ra
     }
 };
-
 
 // Hàm lấy email của chủ sân dựa trên ownerId
 const getFieldOwnerEmail = async (ownerId) => {
