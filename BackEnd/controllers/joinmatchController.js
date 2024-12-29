@@ -240,12 +240,25 @@ exports.getJoinRequests = async (req, res) => {
         // Filter matchSlots to get players with status "pending approval" (status = 0)
         const pendingRequests = matchSlotData.filter(slot => slot.status === 0);
 
+        // Fetch player details (name and phone number) for each pending request
+        const playerDetailsPromises = pendingRequests.map(async (request) => {
+            const playerSnapshot = await admin.database().ref(`users/${request.playerId}`).once('value');
+            const playerData = playerSnapshot.val();
+            return {
+                ...request,
+                playerName: playerData.fullName || 'Name not available',
+                phoneNumber: playerData.phoneNumber || 'Phone number not available',
+            };
+        });
+
+        const detailedPendingRequests = await Promise.all(playerDetailsPromises);
+
         // If no join requests
-        if (pendingRequests.length === 0) {
-            return res.status(200).json({ message: 'No join requests', pendingRequests });
+        if (detailedPendingRequests.length === 0) {
+            return res.status(200).json({ message: 'No join requests', pendingRequests: detailedPendingRequests });
         }
 
-        return res.status(200).json({ pendingRequests });
+        return res.status(200).json({ pendingRequests: detailedPendingRequests });
     } catch (error) {
         console.error('Error getting join requests:', error);
         return res.status(500).json({ error: 'Unable to get join requests', details: error.message });

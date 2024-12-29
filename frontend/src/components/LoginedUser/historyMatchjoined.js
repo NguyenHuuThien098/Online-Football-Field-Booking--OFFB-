@@ -1,8 +1,6 @@
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, CircularProgress } from '@mui/material';
 import styled from 'styled-components';
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -54,31 +52,6 @@ const ErrorAlert = styled.div`
 `;
 
 const HistoryMatchJoined = () => {
-    const isLoading = false; // Mock loading state
-    //const error = ''; // Mock error state
-    const mockMatches = [
-        {
-            id: 1,
-            name: 'Bitcode',
-            owner: 'Tien',
-            date: '16/10/2024',
-            time: '17:00',
-        },
-        {
-            id: 2,
-            name: 'Sân bóng AT',
-            owner: 'Lâm',
-            date: '17/10/2024',
-            time: '19:00',
-        },
-        {
-            id: 3,
-            name: 'Bitcode',
-            owner: 'Tien',
-            date: '18/10/2024',
-            time: '17:00',
-        },
-    ];
     const [matches, setMatches] = useState([]);
     const [requests, setRequests] = useState({});
     const [loadingRequests, setLoadingRequests] = useState({});
@@ -279,50 +252,6 @@ const HistoryMatchJoined = () => {
         return null;
     }
 
-    // return (
-    //     <Container>
-    //         <Title>Match Joined</Title>
-    //         {error && <ErrorAlert>{error}</ErrorAlert>}
-    //         {isLoading ? (
-    //             <div style={{ textAlign: 'center' }}>
-    //                 <CircularProgress />
-    //             </div>
-    //         ) : (
-    //             <TableWrapper>
-    //                 <Table>
-    //                     <thead>
-    //                         <TableRow>
-    //                             <TableHeader>#</TableHeader>
-    //                             <TableHeader>Name</TableHeader>
-    //                             <TableHeader>Owner</TableHeader>
-    //                             <TableHeader>Date</TableHeader>
-    //                             <TableHeader>Time</TableHeader>
-    //                         </TableRow>
-    //                     </thead>
-    //                     <tbody>
-    //                         {mockMatches.length > 0 ? (
-    //                             mockMatches.map((match) => (
-    //                                 <TableRow key={match.id}>
-    //                                     <TableCell>{match.id}</TableCell>
-    //                                     <TableCell>{match.name}</TableCell>
-    //                                     <TableCell>{match.owner}</TableCell>
-    //                                     <TableCell>{match.date}</TableCell>
-    //                                     <TableCell>{match.time}</TableCell>
-    //                                 </TableRow>
-    //                             ))
-    //                         ) : (
-    //                             <TableRow>
-    //                                 <TableCell colSpan="5" style={{ textAlign: 'center' }}>
-    //                                     No matches found.
-    //                                 </TableCell>
-    //                             </TableRow>
-    //                         )}
-    //                     </tbody>
-    //                 </Table>
-    //             </TableWrapper>
-    //         )}
-    //     </Container>
-    // );
     return (
         <div className="container mt-5">
             <h1>{isOwner ? 'Quản lý trận đấu' : 'Lịch sử tham gia trận đấu'}</h1>
@@ -354,6 +283,8 @@ const HistoryMatchJoined = () => {
                                             <tr>
                                                 <th scope="col">#</th>
                                                 <th scope="col">Player ID</th>
+                                                <th scope="col">Player Name</th>
+                                                <th scope="col">Player Phone</th>
                                                 <th scope="col">Actions</th>
                                                 <th scope="col">Trạng thái</th>
                                             </tr>
@@ -363,6 +294,8 @@ const HistoryMatchJoined = () => {
                                                 <tr key={request.playerId}>
                                                     <th scope="row">{index + 1}</th>
                                                     <td>{request.playerId}</td>
+                                                    <td>{request.playerName}</td>
+                                                    <td>{request.phoneNumber}</td>
                                                     <td>
                                                         {processedRequests[`${match.id}_${request.playerId}`] !== 'accepted' &&
                                                             processedRequests[`${match.id}_${request.playerId}`] !== 'rejected' && (
@@ -415,12 +348,12 @@ const HistoryMatchJoined = () => {
                     ) : (
                         <ul className="list-group">
                             {playerMatchHistory.map((history, index) => (
-
                                 <li key={index} className="list-group-item">
                                     {index + 1}.
                                     <p><strong>Trận đấu:</strong> {history.matchId}</p>
                                     <p><strong>Thời gian trận đấu bắt đầu:</strong> {history.time}</p>
-
+                                    <p><strong>Tên người chơi:</strong> {history.playerName}</p>
+                                    <p><strong>Số điện thoại người chơi:</strong> {history.playerPhone}</p>
                                     <p>
                                         <strong>Trạng thái:</strong>{' '}
                                         {history.status === 1 ? (
