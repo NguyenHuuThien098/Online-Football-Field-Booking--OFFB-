@@ -157,12 +157,12 @@ exports.rejectPlayer = async (req, res) => {
         matchSlotData[playerIndex].status = 2;
         await matchSlotRef.set(matchSlotData);
 
-        // Update player status in the waitingList to 2 (rejected)
-        const waitingIndex = matchData.waitingList.findIndex(player => player.playerId === playerId);
-        if (waitingIndex !== -1) {
-            matchData.waitingList[waitingIndex].status = 2;
-        }
-        await matchRef.update({ waitingList: matchData.waitingList });
+        // // Update player status in the waitingList to 2 (rejected)
+        // const waitingIndex = matchData.waitingList.findIndex(player => player.playerId === playerId);
+        // if (waitingIndex !== -1) {
+        //     matchData.waitingList[waitingIndex].status = 2;
+        // }
+        // await matchRef.update({ waitingList: matchData.waitingList });
 
         // Send notification to player
         await sendNotificationToPlayer(playerId, matchId, 'You have been rejected from joining the match');
@@ -180,52 +180,57 @@ exports.cancelJoinMatch = async (req, res) => {
     try {
         const matchRef = admin.database().ref(`matches/${matchId}`);
         const matchSnapshot = await matchRef.once('value');
-        if (!matchSnapshot.exists()) return res.status(404).json({ error: 'Match not found' });
+        if (!matchSnapshot.exists()) return res.status(404).json({ error: 'Trận đấu không tồn tại' });
 
         const matchData = matchSnapshot.val();
         const matchSlotRef = admin.database().ref(`matchSlots/${matchId}`);
         const matchSlotSnapshot = await matchSlotRef.once('value');
         const matchSlotData = matchSlotSnapshot.val() || [];
 
-        // Check if player is in matchSlots with status 1 (joined)
-        const playerIndex = matchSlotData.findIndex(slot => slot.playerId === playerId);
-        if (playerIndex !== -1) {
-            // If player is in matchSlots, remove them
-            matchSlotData.splice(playerIndex, 1);
-            await matchSlotRef.set(matchSlotData);  // Update matchSlots
+        // Lọc ra các slot mà player có trạng thái là 1 (đã tham gia)
+        const playerSlots = matchSlotData.filter(slot => slot.playerId === playerId && slot.status === 1);
+
+        if (playerSlots.length === 0) {
+            return res.status(400).json({ error: 'Bạn không thể hủy tham gia nếu chưa được chấp nhận' });
         }
 
-        // Check if player is in the players list (and status is 1)
+        // Hủy tất cả các slot với trạng thái 1
+        const updatedMatchSlotData = matchSlotData.filter(slot => !(slot.playerId === playerId && slot.status === 1));
+
+        // Cập nhật lại matchSlots
+        await matchSlotRef.set(updatedMatchSlotData);
+
+        // Cập nhật lại danh sách player trong trận đấu
         const playerIndexInPlayers = matchData.players?.indexOf(playerId);
         if (playerIndexInPlayers !== -1) {
-            // Remove player from players list
-            matchData.players.splice(playerIndexInPlayers, 1);
-            matchData.remainingPlayerCount += 1;  // Adjust remaining player count
-        } else if (matchData.waitingList && matchData.waitingList.some(player => player.playerId === playerId && player.status === 1)) {
-            // If player is in waitingList and has been accepted (status 1)
-            matchData.waitingList = matchData.waitingList.filter(player => player.playerId !== playerId);
-        } else {
-            return res.status(400).json({ error: 'You cannot cancel participation if not accepted or not in the list' });
+            matchData.players.splice(playerIndexInPlayers, 1);  // Xóa người chơi khỏi danh sách player
+            matchData.remainingPlayerCount += 1;  // Điều chỉnh số lượng người chơi còn lại
         }
 
-        // Update matchRef with updated players and waitingList
+        // Nếu người chơi có trong danh sách waitingList và trạng thái là 1, xóa khỏi waitingList
+        if (matchData.waitingList) {
+            matchData.waitingList = matchData.waitingList.filter(player => player.playerId !== playerId || player.status !== 1);
+        }
+
+        // Cập nhật lại matchRef với matchData đã thay đổi
         await matchRef.update(matchData);
 
         const fullName = await getPlayerName(playerId);
-        // Send notification to the owner if player cancels
+        // Gửi thông báo cho chủ sở hữu nếu người chơi hủy tham gia
         const ownerNotificationRef = admin.database().ref(`notifications/${matchData.ownerId}`).push();
         await ownerNotificationRef.set({
-            message: `${fullName} has canceled their participation in your match.`,
+            message: `${fullName} đã hủy tham gia trận đấu của bạn.`,
             matchId,
             timestamp: new Date().toISOString()
         });
 
-        res.status(200).json({ message: 'Successfully canceled participation in the match', match: matchData });
+        res.status(200).json({ message: 'Hủy tham gia trận đấu thành công', match: matchData });
     } catch (error) {
-        console.error('Error canceling participation in the match:', error);
-        res.status(500).json({ error: 'Unable to cancel participation in the match', details: error.message });
+        console.error('Lỗi khi hủy tham gia trận đấu:', error);
+        res.status(500).json({ error: 'Không thể hủy tham gia trận đấu', details: error.message });
     }
 };
+
 
 exports.getJoinRequests = async (req, res) => {
     const { matchId } = req.params; // matchId passed in URL
@@ -279,55 +284,63 @@ const getPlayerName = async (userId) => {
         return 'Player';  // Return 'Player' if there is an error
     }
 };
-
-// Get player's match history
+// Lấy lịch sử tham gia trận đấu của người chơi
 exports.getPlayerMatchHistory = async (req, res) => {
-    const { playerId } = req.params; // Get playerId from URL
+    const { playerId } = req.params; // Lấy playerId từ URL
     
     if (!playerId) {
-        return res.status(400).json({ error: 'Missing playerId' });
+        return res.status(400).json({ error: 'Thiếu playerId' });
     }   
 
     try {
-        // Query matchSlots to get a list of matches the player has joined
+        // Truy vấn matchSlots để lấy danh sách các trận đấu mà người chơi đã tham gia
         const matchSlotsRef = admin.database().ref('matchSlots');
         const matchSlotsSnapshot = await matchSlotsRef.once('value');
         const matchSlotsData = matchSlotsSnapshot.val();
 
         if (!matchSlotsData) {
-            return res.status(200).json({ message: 'No participation history', history: [] });
+            return res.status(200).json({ message: 'Không có lịch sử tham gia', history: [] });
         }
 
-        // Filter matches where the player participated
+        // Lọc các trận đấu mà người chơi đã tham gia
         const playerMatches = Object.keys(matchSlotsData).filter(matchId =>
             matchSlotsData[matchId].some(slot => slot.playerId === playerId)
         );
 
         if (playerMatches.length === 0) {
-            return res.status(200).json({ message: 'No participation history', history: [] });
+            return res.status(200).json({ message: 'Không có lịch sử tham gia', history: [] });
         }
 
-        // Get detailed match information from the matches list
+        // Lấy thông tin chi tiết của các trận đấu từ danh sách matches
         const matchesRef = admin.database().ref('matches');
         const matchesSnapshot = await matchesRef.once('value');
         const matchesData = matchesSnapshot.val();
 
         const history = await Promise.all(playerMatches.map(async matchId => {
             const match = matchesData[matchId];
-            const slot = matchSlotsData[matchId].find(slot => slot.playerId === playerId);
-            const ownerName = await getPlayerName(match.ownerId);
+            const slots = matchSlotsData[matchId].filter(slot => slot.playerId === playerId); // Lấy tất cả các slots mà player tham gia
 
-            return {
-                matchId,
-                ownerName,
-                time: match.time,
-                status: slot.status, // Status: 0 (pending approval), 1 (joined), 2 (rejected)
-            };
+            // Duyệt qua các slot và tạo lịch sử cho từng trận đấu
+            const historyForMatch = await Promise.all(slots.map(async slot => {
+                const ownerName = await getPlayerName(match.ownerId);
+
+                return {
+                    matchId,
+                    ownerName,
+                    time: match.time,
+                    status: slot.status, // Status: 0 (chờ phê duyệt), 1 (đã tham gia), 2 (bị từ chối)
+                };
+            }));
+
+            return historyForMatch;
         }));
 
-        return res.status(200).json({ history });
+        // Mở rộng kết quả nếu có nhiều trận đấu
+        const flatHistory = history.flat(); // Làm phẳng mảng nếu có nhiều trận đấu
+
+        return res.status(200).json({ history: flatHistory });
     } catch (error) {
-        console.error('Error fetching match history:', error);
-        return res.status(500).json({ error: 'Unable to fetch match history', details: error.message });
+        console.error('Lỗi khi lấy lịch sử tham gia trận đấu:', error);
+        return res.status(500).json({ error: 'Không thể lấy lịch sử tham gia trận đấu', details: error.message });
     }
 };
