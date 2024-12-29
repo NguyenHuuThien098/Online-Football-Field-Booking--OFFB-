@@ -320,6 +320,7 @@ const HistoryFieldBooked = () => {
                             <MenuItem value="0">Pending Confirmation</MenuItem>
                             <MenuItem value="1">Confirmed</MenuItem>
                             <MenuItem value="2">Cancelled</MenuItem>
+                            <MenuItem value="3">Finished</MenuItem>
                         </Select>
                     </StatusSelectWrapper>
                     <TableWrapper>
