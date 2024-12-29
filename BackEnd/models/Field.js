@@ -236,6 +236,7 @@ static async getAllFields(limit = 10, startAfter = null) {
         throw new Error('Không thể lấy tất cả các sân');
     }
 }
+
 static async searchFields(query) {
     try {
         const snapshot = await admin.database().ref('largeFields').once('value');

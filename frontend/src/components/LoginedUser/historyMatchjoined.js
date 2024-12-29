@@ -229,7 +229,6 @@ const HistoryMatchJoined = () => {
                                     <p><strong>Notes:</strong> {match.notes}</p>
                                     <p><strong>Players:</strong> {match.playerCount}</p>
                                     <p><strong>Remaining Players:</strong> {match.remainingPlayerCount}</p>
-                                   
                                     <h4>Join Requests:</h4>
                                     <button
                                         className="btn btn-info"
@@ -331,58 +330,62 @@ const HistoryMatchJoined = () => {
 
             {/* Style nhúng vào file JSX */}
             <style>{`
-                
 
-    /* Button hover effect */
-    button:hover {
-        background-color: #0056b3;
-        transition: background-color 0.3s ease;
-    }
+                .card {
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                }
 
-    button:active {
-        background-color: #003d80;
-    }
+                .card:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                }
 
-    /* List group item hover effect */
-    .list-group-item {
-        transition: background-color 0.3s ease;
-    }
+                button:hover {
+                    background-color: #0056b3;
+                    transition: background-color 0.3s ease;
+                }
 
-    .list-group-item:hover {
-        background-color: #f0f0f0;
-    }
+                button:active {
+                    background-color: #003d80;
+                }
 
-    /* Table row hover effect for both player and owner */
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f9f9f9;
-    }
+                .list-group-item {
+                    transition: background-color 0.3s ease;
+                }
 
-    .table-hover tbody tr:hover {
-        background-color: #e9e9e9;
-    }
+                .list-group-item:hover {
+                    background-color: #f0f0f0;
+                }
 
-    /* Header style */
-    h1 {
-        display: flex;
-        align-items: center;
-    }
+                .table-striped tbody tr:nth-of-type(odd) {
+                    background-color: #f9f9f9;
+                }
 
-    h1 i {
-        margin-right: 10px;
-        font-size: 24px;
-        color: #007bff;
-    }
+                .table-hover tbody tr:hover {
+                    background-color: #e9e9e9;
+                }
 
-    h3, p {
-        color: #333;
-    }
+                h1 {
+                    display: flex;
+                    align-items: center;
+                }
 
-    button {
-        padding: 8px 16px;
-        font-size: 16px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
+                h1 i {
+                    margin-right: 10px;
+                    font-size: 24px;
+                    color: #007bff;
+                }
+
+                h3, p {
+                    color: #333;
+                }
+
+                button {
+                    padding: 8px 16px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    border-radius: 5px;
+                }
             `}</style>
         </div>
     );
