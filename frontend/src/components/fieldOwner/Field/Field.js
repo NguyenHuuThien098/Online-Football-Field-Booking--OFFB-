@@ -260,38 +260,44 @@ const Field = () => {
                         InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                     />
                     <Typography variant="h6" color="black" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}> Operating Hours: </Typography>
-                    <TextField
-                        label="Start Time"
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => {
-                            setStartTime(e.target.value);
-                            setNewLargeField({ ...newLargeField, operatingHours: `${e.target.value} - ${endTime}` });
-                        }}
-                        fullWidth
-                        margin="normal"
-                        required
-                        InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
-                        InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
-                    />
-                    <TextField
-                        label="End Time"
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => {
-                            setEndTime(e.target.value);
-                            setNewLargeField({ ...newLargeField, operatingHours: `${startTime} - ${e.target.value}` });
-                        }}
-                        fullWidth
-                        margin="normal"
-                        required
-                        InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
-                        InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                        <Typography variant="body1" sx={{ marginRight: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif', backgroundColor: 'primary.main', color: 'white', padding: '8px 16px', borderRadius: 1, minWidth: '150px', textAlign: 'center', whiteSpace: 'nowrap' }}>Start Time:</Typography>
+                        <TextField
+                            type="time"
+                            value={startTime}
+                            onChange={(e) => {
+                                setStartTime(e.target.value);
+                                setNewLargeField({ ...newLargeField, operatingHours: `${e.target.value} - ${endTime}` });
+                            }}
+                            fullWidth
+                            margin="normal"
+                            required
+                            InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                            InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
+                        />
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                        <Typography variant="body1" sx={{ marginRight: 2, fontSize: '1.2rem', fontFamily: 'Helvetica, sans-serif', backgroundColor: 'primary.main', color: 'white', padding: '8px 16px', borderRadius: 1, minWidth: '150px', textAlign: 'center', whiteSpace: 'nowrap' }}>End Time:</Typography>
+                        <TextField
+                            type="time"
+                            value={endTime}
+                            onChange={(e) => {
+                                setEndTime(e.target.value);
+                                setNewLargeField({ ...newLargeField, operatingHours: `${startTime} - ${e.target.value}` });
+                            }}
+                            fullWidth
+                            margin="normal"
+                            required
+                            InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                            InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
+                        />
+                    </Box>
                     <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, width: '100%', fontSize: '1.2rem' }}>
                         Add Large Field
                     </Button>
-                </form>            </Box>            <Dialog open={confirmDelete} onClose={handleCancelDelete}>
+                </form>
+            </Box>
+            <Dialog open={confirmDelete} onClose={handleCancelDelete}>
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -307,7 +313,7 @@ const Field = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </div >
     );
 };
 
