@@ -15,6 +15,7 @@ const HistoryMatchJoined = () => {
     const [playerMatchHistory, setPlayerMatchHistory] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [hasNewRequests, setHasNewRequests] = useState({});
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -73,35 +74,51 @@ const HistoryMatchJoined = () => {
     const fetchRequests = async (matchId) => {
         const token = localStorage.getItem('token');
         if (loadingRequests[matchId]) return;
+    
+        // Đánh dấu trận đấu đang trong quá trình tải yêu cầu
         setLoadingRequests((prevState) => ({
             ...prevState,
             [matchId]: true,
         }));
-
+    
         if (!matchId) {
             console.error('Invalid matchId!');
             return;
         }
-
+    
         try {
+            // Gọi API để lấy yêu cầu tham gia cho trận đấu
             const response = await axios.get(`http://localhost:5000/api/join/${matchId}/join-requests`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-
+    
+            // Lọc các yêu cầu có trạng thái pending (0) hoặc đã chấp nhận (1)
             const filteredRequests = response.data.pendingRequests.filter(request => [0, 1].includes(request.status));
+    
+            // Cập nhật yêu cầu tham gia
             setRequests((prevRequests) => ({
                 ...prevRequests,
                 [matchId]: filteredRequests,
             }));
+    
+            // Đánh dấu có yêu cầu mới
+            if (filteredRequests.length > 0) {
+                setHasNewRequests((prev) => ({
+                    ...prev,
+                    [matchId]: true, // Đánh dấu có yêu cầu mới
+                }));
+            }
         } catch (error) {
             console.error('Error fetching join requests:', error);
         } finally {
+            // Đánh dấu hoàn tất việc tải yêu cầu
             setLoadingRequests((prevState) => ({
                 ...prevState,
                 [matchId]: false,
             }));
         }
     };
+    
 
     const acceptPlayer = async (matchId, playerId) => {
         const token = localStorage.getItem('token');
@@ -205,7 +222,16 @@ const HistoryMatchJoined = () => {
             fetchPlayerMatchHistory(playerId);
         }
     }, [isOwner, isPlayer]);
-
+    useEffect(() => {
+        if (matches.length > 0) {
+            matches.forEach(match => {
+                // Nếu chưa có yêu cầu cho trận đấu này, gọi fetchRequests
+                if (!requests[match.id]) {
+                    fetchRequests(match.id);  // Lấy yêu cầu tham gia ngay lập tức khi trận đấu xuất hiện
+                }
+            });
+        }
+    }, [matches, requests]); 
     if (!isOwner && !isPlayer) {
         return null;
     }
@@ -215,7 +241,8 @@ const HistoryMatchJoined = () => {
             <h1>
                 <FaUserShield /> {isOwner ? 'MATCH MANAGEMENT' : 'HISTORY OF MATCH PARTICIPATION'}
             </h1>
-
+    
+            {/* Section for Match Owner */}
             {isOwner && (
                 <>
                     {matches.length === 0 ? (
@@ -230,13 +257,8 @@ const HistoryMatchJoined = () => {
                                     <p><strong>Players:</strong> {match.playerCount}</p>
                                     <p><strong>Remaining Players:</strong> {match.remainingPlayerCount}</p>
                                     <h4>Join Requests:</h4>
-                                    <button
-                                        className="btn btn-info"
-                                        onClick={() => fetchRequests(match.id)}
-                                    >
-                                        View Join Requests
-                                    </button>
-
+    
+                                    {/* Display join requests */}
                                     {requests[match.id] && requests[match.id].length > 0 ? (
                                         <>
                                             <p className="text-muted mt-2">Total Requests: {requests[match.id].length}</p>
@@ -251,28 +273,33 @@ const HistoryMatchJoined = () => {
                                                 </thead>
                                                 <tbody>
                                                     {requests[match.id].map((request, index) => (
-                                                        <tr key={request.playerId}>
+                                                        <tr
+                                                            key={request.playerId}
+                                                            // Kiểm tra trạng thái yêu cầu và áp dụng lớp 'request-pending' nếu yêu cầu chưa được xử lý
+                                                            className={processedRequests[`${match.id}_${request.playerId}`] !== 'accepted' && processedRequests[`${match.id}_${request.playerId}`] !== 'rejected' ? 'request-pending' : ''}
+                                                        >
                                                             <th scope="row">{index + 1}</th>
                                                             <td>{request.playerName}</td>
                                                             <td>{request.phoneNumber}</td>
                                                             <td>
-                                                                {processedRequests[`${match.id}_${request.playerId}`] !== 'accepted' &&
-                                                                    processedRequests[`${match.id}_${request.playerId}`] !== 'rejected' && (
-                                                                        <>
-                                                                            <button
-                                                                                className="btn btn-success me-2"
-                                                                                onClick={() => acceptPlayer(match.id, request.playerId)}
-                                                                            >
-                                                                                Accept
-                                                                            </button>
-                                                                            <button
-                                                                                className="btn btn-danger"
-                                                                                onClick={() => rejectPlayer(match.id, request.playerId)}
-                                                                            >
-                                                                                Reject
-                                                                            </button>
-                                                                        </>
-                                                                    )}
+                                                                {processedRequests[`${match.id}_${request.playerId}`] !== 'accepted' && processedRequests[`${match.id}_${request.playerId}`] !== 'rejected' ? (
+                                                                    <>
+                                                                        <button
+                                                                            className="btn btn-success me-2"
+                                                                            onClick={() => acceptPlayer(match.id, request.playerId)}
+                                                                        >
+                                                                            Accept
+                                                                        </button>
+                                                                        <button
+                                                                            className="btn btn-danger"
+                                                                            onClick={() => rejectPlayer(match.id, request.playerId)}
+                                                                        >
+                                                                            Reject
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    <span className="text-muted">Processed</span>
+                                                                )}
                                                             </td>
                                                         </tr>
                                                     ))}
@@ -282,7 +309,7 @@ const HistoryMatchJoined = () => {
                                     ) : loadingRequests[match.id] ? (
                                         <p>Loading requests...</p>
                                     ) : (
-                                        <p></p>
+                                        <p>No requests available.</p>
                                     )}
                                 </div>
                             </div>
@@ -290,105 +317,118 @@ const HistoryMatchJoined = () => {
                     )}
                 </>
             )}
-
-{isPlayer && (
-    <>
-        {playerMatchHistory.length === 0 ? (
-            <p>No history data available</p>
-        ) : (
-            <ul className="list-group">
-                {playerMatchHistory.map((history, index) => (
-                    <li key={index} className="list-group-item">
-                        {index + 1}.
-                        <p><strong>Match Owner:</strong> {history.ownerName}</p>
-                        <p><strong>Match Start Time:</strong> {history.time}</p>
-                        <p>
-                            <strong>Status:</strong>{' '}
-                            {history.status === 1 ? (
-                                <span className="text-success">Joined</span>
-                            ) : history.status === 2 ? (
-                                <span className="text-danger">Rejected</span>
-                            ) : (
-                                <span className="text-warning">Pending</span>
-                            )}
-                        </p>
-                        {history.status === 1 && (
-                            <button
-                                className="btn btn-danger"
-                                onClick={() => handleCancelJoinMatch(history.matchId)}
-                            >
-                                Cancel Participation
-                            </button>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        )}
-    </>
-)}
-
-
-            {/* Style nhúng vào file JSX */}
+    
+            {/* Section for Player History */}
+            {isPlayer && (
+                <>
+                    {playerMatchHistory.length === 0 ? (
+                        <p>No history data available</p>
+                    ) : (
+                        <ul className="list-group">
+                            {playerMatchHistory.map((history, index) => (
+                                <li key={index} className="list-group-item">
+                                    {index + 1}.
+                                    <p><strong>Match Owner:</strong> {history.ownerName}</p>
+                                    <p><strong>Match Start Time:</strong> {history.time}</p>
+                                    <p>
+                                        <strong>Status:</strong>{' '}
+                                        {history.status === 1 ? (
+                                            <span className="text-success">Joined</span>
+                                        ) : history.status === 2 ? (
+                                            <span className="text-danger">Rejected</span>
+                                        ) : (
+                                            <span className="text-warning">Pending</span>
+                                        )}
+                                    </p>
+                                    {history.status === 1 && (
+                                        <button
+                                            className="btn btn-danger"
+                                            onClick={() => handleCancelJoinMatch(history.matchId)}
+                                        >
+                                            Cancel Participation
+                                        </button>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </>
+            )}
+    
+            {/* CSS Styling */}
             <style>{`
-
-                .card {
-                    transition: transform 0.3s ease, box-shadow 0.3s ease;
-                }
-
-                .card:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                }
-
+                /* Button hover effect */
                 button:hover {
                     background-color: #0056b3;
                     transition: background-color 0.3s ease;
                 }
-
+    
                 button:active {
                     background-color: #003d80;
                 }
-
+    
+                /* List group item hover effect */
                 .list-group-item {
                     transition: background-color 0.3s ease;
                 }
-
+    
                 .list-group-item:hover {
                     background-color: #f0f0f0;
                 }
-
+    
+                /* Table row hover effect for both player and owner */
                 .table-striped tbody tr:nth-of-type(odd) {
                     background-color: #f9f9f9;
                 }
-
+    
                 .table-hover tbody tr:hover {
                     background-color: #e9e9e9;
                 }
-
+    
+                /* Header style */
                 h1 {
                     display: flex;
                     align-items: center;
                 }
-
+    
                 h1 i {
                     margin-right: 10px;
                     font-size: 24px;
                     color: #007bff;
                 }
-
+    
                 h3, p {
                     color: #333;
                 }
-
+    
                 button {
                     padding: 8px 16px;
                     font-size: 16px;
                     cursor: pointer;
                     border-radius: 5px;
                 }
+    
+                /* Blinking effect for pending requests with red flashing */
+                .request-pending {
+                    animation: blink-animation 1s infinite;
+                    background-color: #ffcccc; /* Light red background */
+                }
+    
+                @keyframes blink-animation {
+                    0% {
+                        background-color: #ffcccc;
+                    }
+                    50% {
+                        background-color: #ff6666; /* Darker red during blinking */
+                    }
+                    100% {
+                        background-color: #ffcccc;
+                    }
+                }
             `}</style>
         </div>
     );
+    
 };
 
 export default HistoryMatchJoined;

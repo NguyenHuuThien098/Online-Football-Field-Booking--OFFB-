@@ -92,7 +92,7 @@ exports.bookField = async (req, res) => {
             if (conflictResult === true) {
                 const availableSlots = Booking.getAvailableTimeSlots(smallField.bookingSlots, date, parseInt(startTime), parseInt(endTime));
                 return res.status(400).json({
-                    message: 'Khoảng thời gian đã được đặt.',
+                    message: 'TIME SLOT BOOKED.',
                     availableSlots: availableSlots.length ? availableSlots : 'Không có khung giờ nào khả dụng trong ngày này.'
                 });
             }

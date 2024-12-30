@@ -126,119 +126,261 @@ const FieldBooked = () => {
     return (
         <Container maxWidth="sm" sx={{ mt: 5 }}>
             <Box sx={{ position: 'relative' }}>
-                <IconButton
-                    onClick={handleBackClick}
-                    sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white' }}
-                >
-                    <ArrowBackIcon />
-                </IconButton>
-                <Card sx={{ boxShadow: 3 }}>
-                    <CardContent>
-                        <Typography variant="h4" gutterBottom sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1, fontSize: '2rem' }}>
-                            Book Field
-                        </Typography>
-                        <Typography variant="h6" gutterBottom sx={{ fontSize: '1.5rem' }}>
-                            Field: {field?.name || 'Unknown'}
-                        </Typography>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Date"
-                                    type="date"
-                                    value={bookingDetails.date}
-                                    onChange={(e) => handleBookingChange('date', e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    required
-                                    inputProps={{ style: { fontSize: '1.2rem' } }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="Start Time"
-                                    type="time"
-                                    value={bookingDetails.startTime}
-                                    onChange={(e) => handleBookingChange('startTime', e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    required
-                                    inputProps={{ style: { fontSize: '1.2rem' } }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <TextField
-                                    label="End Time"
-                                    type="time"
-                                    value={bookingDetails.endTime}
-                                    onChange={(e) => handleBookingChange('endTime', e.target.value)}
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                    required
-                                    inputProps={{ style: { fontSize: '1.2rem' } }}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Number of People"
-                                    select
-                                    SelectProps={{ native: true }}
-                                    value={bookingDetails.numberOfPeople}
-                                    onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
-                                    fullWidth
-                                    required
-                                    inputProps={{ style: { fontSize: '1.2rem' } }}
-                                >
-                                    <option value="5">{field.type}</option>
-
-                                </TextField>
-                            </Grid>
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <Button variant="contained" color="primary" onClick={() => handleBookField()} disabled={isLoading} sx={{ fontSize: '1.2rem' }}>
-                                    Confirm Booking
-                                </Button>
-                                <Button variant="contained" sx={{ backgroundColor: 'red', fontSize: '1.2rem' }} onClick={handleCancel} disabled={isLoading}>
-                                    Cancel
-                                </Button>
-                            </Grid>
-                        </Grid>
-                        {error && <Typography color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>{error}</Typography>}
-                    </CardContent>
-                </Card>
-            </Box>
-
-            <Modal open={showModal} onClose={() => setShowModal(false)}>
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: 400,
-                    bgcolor: 'background.paper',
-                    border: '2px solid #000',
-                    boxShadow: 24,
-                    p: 4,
-                }}>
-                    <Typography variant="h6" component="h2" sx={{ fontSize: '1.5rem' }}>
-                        Available Time Slots
-                    </Typography>
-                    <Box sx={{ mt: 2 }}>
-                        {availableSlots.map((slot, index) => (
-                            <Button
-                                key={index}
-                                variant="outlined"
-                                sx={{ m: 1, fontSize: '1.2rem' }}
-                                onClick={() => handleBookField(slot)}
-                                disabled={isLoading}
-                            >
-                                {slot}
-                            </Button>
-                        ))}
-                    </Box>
-                    <Button onClick={() => setShowModal(false)} variant="contained" color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>
-                        Close
+    {/* Lớp phủ toàn màn hình khi đang xử lý */}
+    {isLoading && (
+        <Box
+            sx={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)', // Màu nền mờ
+                zIndex: 1300, // Đảm bảo lớp phủ nằm trên tất cả
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <Typography
+                sx={{
+                    color: 'white',
+                    fontSize: '2rem',
+                    fontWeight: 'bold',
+                }}
+            >
+                PROCESSING THE REQUEST...
+            </Typography>
+        </Box>
+    )}
+    {/* Nút quay lại */}
+    <IconButton
+        onClick={handleBackClick}
+        sx={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'white' }}
+        disabled={isLoading} // Vô hiệu hóa khi đang xử lý
+    >
+        <ArrowBackIcon />
+    </IconButton>
+    {/* Nội dung chính */}
+    <Card sx={{ boxShadow: 3 }}>
+        <CardContent>
+            <Typography
+                variant="h4"
+                gutterBottom
+                sx={{
+                    textAlign: 'center',
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    padding: 2,
+                    borderRadius: 1,
+                    fontSize: '2rem',
+                }}
+            >
+                Book Field
+            </Typography>
+            <Typography variant="h6" gutterBottom sx={{ fontSize: '1.5rem' }}>
+                Field: {field?.name || 'Unknown'}
+            </Typography>
+            <Grid container spacing={2}>
+                {/* Trường ngày */}
+                <Grid item xs={12}>
+                    <TextField
+                        label="Date"
+                        type="date"
+                        value={bookingDetails.date}
+                        onChange={(e) => handleBookingChange('date', e.target.value)}
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        required
+                        inputProps={{ style: { fontSize: '1.2rem' } }}
+                        disabled={isLoading} // Vô hiệu hóa khi đang xử lý
+                    />
+                </Grid>
+                {/* Giờ bắt đầu và kết thúc */}
+                <Grid item xs={6}>
+                    <TextField
+                        label="Start Time"
+                        type="time"
+                        value={bookingDetails.startTime}
+                        onChange={(e) => handleBookingChange('startTime', e.target.value)}
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        required
+                        inputProps={{ style: { fontSize: '1.2rem' } }}
+                        disabled={isLoading}
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField
+                        label="End Time"
+                        type="time"
+                        value={bookingDetails.endTime}
+                        onChange={(e) => handleBookingChange('endTime', e.target.value)}
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                        required
+                        inputProps={{ style: { fontSize: '1.2rem' } }}
+                        disabled={isLoading}
+                    />
+                </Grid>
+                {/* Số người */}
+                <Grid item xs={12}>
+                    <TextField
+                        label="Number of People"
+                        select
+                        SelectProps={{ native: true }}
+                        value={bookingDetails.numberOfPeople}
+                        onChange={(e) => handleBookingChange('numberOfPeople', Number(e.target.value))}
+                        fullWidth
+                        required
+                        inputProps={{ style: { fontSize: '1.2rem' } }}
+                        disabled={isLoading}
+                    >
+                        <option value="5">{field.type}</option>
+                    </TextField>
+                </Grid>
+                {/* Nút hành động */}
+                <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                            setIsLoading(true); // Kích hoạt trạng thái xử lý
+                            handleBookField();
+                        }}
+                        disabled={isLoading}
+                        sx={{ fontSize: '1.2rem' }}
+                    >
+                        Confirm Booking
                     </Button>
+                    <Button
+                        variant="contained"
+                        sx={{ backgroundColor: 'red', fontSize: '1.2rem' }}
+                        onClick={handleCancel}
+                        disabled={isLoading}
+                    >
+                        Cancel
+                    </Button>
+                </Grid>
+            </Grid>
+            {/* Thông báo lỗi */}
+            {error && (
+                <Typography color="error" sx={{ mt: 2, fontSize: '1.2rem' }}>
+                    {error}
+                </Typography>
+            )}
+        </CardContent>
+    </Card>
+</Box>
+
+
+
+            <Modal open={showModal} onClose={!isLoading ? () => setShowModal(false) : null}>
+    <Box
+        sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 500, // Rộng hơn để phù hợp với bố cục hàng ngang
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            border: 'none',
+            pointerEvents: isLoading ? 'none' : 'auto', // Vô hiệu hóa toàn bộ modal khi đang xử lý
+            opacity: isLoading ? 0.6 : 1, // Hiệu ứng mờ khi vô hiệu hóa
+        }}
+    >
+        {isLoading ? (
+            <Typography
+                variant="h6"
+                sx={{
+                    textAlign: 'center',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
+                    color: 'primary.main',
+                }}
+            >
+                PROCESSING THE REQUEST...
+            </Typography>
+        ) : (
+            <>
+                <Typography
+                    variant="h6"
+                    component="h2"
+                    sx={{
+                        fontSize: '1.5rem',
+                        fontWeight: 600,
+                        textAlign: 'center',
+                        color: 'primary.main',
+                        mb: 2,
+                    }}
+                >
+                    Available Time Slots
+                </Typography>
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', // Tự động căn đều
+                        gap: 2, // Khoảng cách giữa các nút
+                        justifyItems: 'center', // Căn giữa nội dung từng ô
+                        alignItems: 'center',
+                    }}
+                >
+                    {availableSlots.map((slot, index) => (
+                        <Button
+                            key={index}
+                            variant="outlined"
+                            sx={{
+                                fontSize: '1rem',
+                                padding: '8px 12px',
+                                borderRadius: '12px', // Bo tròn nút
+                                whiteSpace: 'nowrap', // Không xuống dòng
+                                color: 'primary.main',
+                                borderColor: 'primary.main',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    backgroundColor: 'primary.main',
+                                    color: 'white',
+                                },
+                                '&:disabled': {
+                                    backgroundColor: 'grey.200',
+                                    color: 'grey.500',
+                                },
+                            }}
+                            onClick={() => {
+                                setIsLoading(true); // Kích hoạt trạng thái đang xử lý
+                                handleBookField(slot);
+                            }}
+                            disabled={isLoading}
+                        >
+                            {slot}
+                        </Button>
+                    ))}
                 </Box>
-            </Modal>
+                <Button
+                    onClick={!isLoading ? () => setShowModal(false) : null}
+                    variant="contained"
+                    color="error"
+                    sx={{
+                        mt: 3,
+                        fontSize: '1.2rem',
+                        display: 'block',
+                        mx: 'auto',
+                        padding: '10px 30px',
+                        borderRadius: '8px',
+                    }}
+                    disabled={isLoading}
+                >
+                    Close
+                </Button>
+            </>
+        )}
+    </Box>
+</Modal>
+
+
         </Container>
     );
 };
