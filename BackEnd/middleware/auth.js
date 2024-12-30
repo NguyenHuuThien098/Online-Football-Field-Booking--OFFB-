@@ -43,3 +43,21 @@ exports.authorizeRole = (roles) => {
         next();
     };
 };
+
+// Middleware để xác thực token
+exports.authenticateToken = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Lấy token từ header
+
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    }
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = decodedToken; // Lưu thông tin người dùng vào req.user
+        next();
+    } catch (error) {
+        console.error('Error during token verification:', error.message);
+        return res.status(403).json({ error: 'Forbidden: Invalid token' });
+    }
+};

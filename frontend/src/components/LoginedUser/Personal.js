@@ -45,6 +45,7 @@ const UserProfile = () => {
             } catch (error) {
                 console.error('Error fetching user data:', error);
                 alert('Error loading user data. Please try again.');
+                navigate('/');
                 setIsLoading(false);
             }
         };

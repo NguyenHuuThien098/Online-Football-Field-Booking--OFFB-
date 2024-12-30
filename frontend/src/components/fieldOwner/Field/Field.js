@@ -33,7 +33,6 @@ const Field = () => {
 
     const fetchLargeFields = async () => {
         try {
-            checkFieldOwner();
             // Fetch large fields
             const largeFieldsResponse = await axios.get(`http://localhost:5000/api/field-owner/fields/${ownerId}`, {
                 headers: {

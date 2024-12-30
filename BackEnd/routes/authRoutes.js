@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const { authenticateUser, authorizeRole } = require('../middleware/auth')
+const { authenticateUser, authorizeRole, authenticateToken } = require('../middleware/auth')
 
 // Định nghĩa các route cho đăng ký và đăng nhập
 router.post('/register/google', authController.registerWithGoogle);
@@ -16,20 +16,6 @@ router.get('/api/auth', authenticateUser, authorizeRole(['field_owner', 'player'
     res.send('Đây là một route được bảo vệ!');
 });
 
-
-// Middleware để xác thực token
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (token == null) return res.sendStatus(401); // Nếu không có token, trả về 401
-
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); // Nếu token không hợp lệ, trả về 403
-        req.user = user;
-        next();
-    });
-};
 
 // Route để kiểm tra token
 router.get('/check-token', authenticateToken, (req, res) => {

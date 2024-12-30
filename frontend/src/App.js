@@ -30,12 +30,15 @@ const App = () => {
     localStorage.getItem("isAuthenticated") === "true"
   );
   const [userRole, setUserRole] = useState(localStorage.getItem("userRole"));
-
+  var token = localStorage.getItem('token');
   useEffect(() => {
     localStorage.setItem("isAuthenticated", isAuthenticated.toString());
     localStorage.setItem("userRole", userRole || "");
-    checkTokenValidity();
-  }, [isAuthenticated, userRole]);
+    token = localStorage.getItem('token');
+    if (token) {
+      checkTokenValidity(token);
+    }
+  }, [isAuthenticated, userRole, token]);
 
   const ProtectedRoute = ({ element, role }) => {
     if (!isAuthenticated) {
@@ -47,9 +50,9 @@ const App = () => {
     return element;
   };
 
-  const checkTokenValidity = async () => {
-    const token = localStorage.getItem('token');
+  const checkTokenValidity = async (token) => {
     if (!token) {
+      handleLogout();
       return false;
     }
 
@@ -62,11 +65,14 @@ const App = () => {
       if (response.status === 200) {
         console.log('Token is valid');
         return true;
-      } else if (response.status === 401) {
-        console.log('Token is invalid');
+      } else if (response.status === 401 || response.status === 403) {
+        console.log('Token is invalid or expired');
         handleLogout();
+        return false;
       }
     } catch (error) {
+      console.log('Token is invalid or expired');
+      handleLogout();
       return false;
     }
   };
