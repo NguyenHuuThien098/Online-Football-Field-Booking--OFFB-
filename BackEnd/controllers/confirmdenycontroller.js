@@ -2,9 +2,63 @@ const Booking = require('../models/Booking');
 const Field = require('../models/Field');
 const Notification = require('../models/Notification');
 const admin = require('../firebase');
+const nodemailer = require('nodemailer');
+
+// Hàm lấy tên người chơi từ Firebase
+const getownername = async (userId) => {
+    try {
+        const userSnapshot = await admin.database().ref(`users/${userId}`).once('value');
+        const userData = userSnapshot.val();
+        if (userData && userData.fullName) {
+            return userData.fullName;
+        }
+        return 'owner'; // Trả về 'owner' nếu không tìm thấy tên
+    } catch (error) {
+        console.error("Error fetching owner name:", error);
+        return 'owner'; // Trả về 'owner' nếu có lỗi xảy ra
+    }
+};
+
+// Hàm lấy email của chủ sân dựa trên ownerId
+const getplayerEmail = async (userId) => {
+    try {
+        const playerSnapshot = await admin.database().ref(`users/${userId}`).once('value');
+        const player = playerSnapshot.val();
+        if (player && player.email) {
+            return player.email;
+        }
+        return null; // Không tìm thấy email
+    } catch (error) {
+        console.error("Error fetching player email:", error);
+        return null;
+    }
+};
+
+// Hàm gửi email thông báo
+const sendEmailNotification = async (email, notificationData) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'huut789@gmail.com',
+            pass: 'urvjqxxggqbkmgst',
+        },
+    });
+
+    const mailOptions = {
+        from: 'huut789@gmail.com',
+        to: email,
+        subject: 'Thông báo: Chủ sân từ chối / chấp nhận yêu cầu đặt sân của bạn',
+        text: notificationData.message,
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
+};
 
 class FieldController {
-
     // Lấy danh sách các sân của chủ sở hữu và các yêu cầu đặt sân của họ
     static async getBookingsForOwner(req, res) {
         try {
@@ -86,21 +140,20 @@ class FieldController {
             if (!booking) {
                 return res.status(404).json({ success: false, message: 'Không tìm thấy booking.' });
             }
-  // Lấy thông tin chủ sân qua userId (ownerId)
-  const ownerSnapshot = await admin.database().ref('users').child(booking.userId).once('value');
-  const owner = ownerSnapshot.val();
-  if (!owner) {
-      return res.status(404).json({ success: false, message: 'Không tìm thấy thông tin chủ sân.' });
-  }
-  const ownerName = owner.fullName; // Lấy tên đầy đủ từ trường 'fullName'
+
+            const ownerName = await getownername(booking.ownerId);
+            const userId = booking.userId;
 
             // Xác nhận booking
             const updatedBooking = await Booking.confirmBooking(bookingId);
 
-            // Gửi thông báo cho người chơi về việc xác nhận
-            const userId = booking.userId;
-            const message = `Yêu cầu đặt sân của bạn vào ngày ${booking.date} lúc ${booking.startTime}-${booking.endTime} đã được  ${ownerName} (chủ sân) xác nhận.`;
+            // Gửi thông báo và email cho người chơi
+            const message = `Yêu cầu đặt sân của bạn vào ngày ${booking.date} lúc ${booking.startTime}-${booking.endTime} đã được ${ownerName} (chủ sân) xác nhận.`;
             await Notification.notifyPlayer(userId, { message, bookingId });
+            const playerEmail = await getplayerEmail(userId);
+            if (playerEmail) {
+                await sendEmailNotification(playerEmail, { message });
+            }
 
             return res.status(200).json({
                 success: true,
@@ -128,21 +181,19 @@ class FieldController {
                 return res.status(404).json({ success: false, message: 'Không tìm thấy booking.' });
             }
 
-            // Lấy thông tin chủ sân qua userId (ownerId)
-            const ownerSnapshot = await admin.database().ref('users').child(booking.userId).once('value');
-            const owner = ownerSnapshot.val();
-            if (!owner) {
-                return res.status(404).json({ success: false, message: 'Không tìm thấy thông tin chủ sân.' });
-            }
-            const ownerName = owner.fullName; // Lấy tên đầy đủ từ trường 'fullName'
+            const ownerName = await getownername(booking.ownerId);
+            const userId = booking.userId;
 
             // Từ chối booking
             const updatedBooking = await Booking.rejectBooking(bookingId);
 
-            // Gửi thông báo cho người chơi về việc từ chối
-            const userId = booking.userId;
-            const message = `yêu cầu đặt sân của bạn vào ngày ${booking.date} lúc ${booking.startTime}-${booking.endTime} đã bị ${ownerName} (chủ sân) từ chối.`;
+            // Gửi thông báo và email cho người chơi
+            const message = `Yêu cầu đặt sân của bạn vào ngày ${booking.date} lúc ${booking.startTime}-${booking.endTime} đã bị ${ownerName} (chủ sân) từ chối.`;
             await Notification.notifyPlayer(userId, { message, bookingId });
+            const playerEmail = await getplayerEmail(userId);
+            if (playerEmail) {
+                await sendEmailNotification(playerEmail, { message });
+            }
 
             return res.status(200).json({
                 success: true,
@@ -161,3 +212,4 @@ class FieldController {
 }
 
 module.exports = FieldController;
+//

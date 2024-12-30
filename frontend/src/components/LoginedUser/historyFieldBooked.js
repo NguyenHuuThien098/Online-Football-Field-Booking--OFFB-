@@ -320,6 +320,7 @@ const HistoryFieldBooked = () => {
                             <MenuItem value="0">Pending Confirmation</MenuItem>
                             <MenuItem value="1">Confirmed</MenuItem>
                             <MenuItem value="2">Cancelled</MenuItem>
+                            <MenuItem value="3">Finished</MenuItem>
                         </Select>
                     </StatusSelectWrapper>
                     <TableWrapper>
@@ -351,9 +352,12 @@ const HistoryFieldBooked = () => {
                                             <TableCell>{booking.playerName}</TableCell>
                                             <TableCell>{booking.phoneNumber}</TableCell>
                                             <TableCell>
-                                                {booking.status === '0' ? 'Pending Confirmation' :
-                                                    booking.status === '1' ? 'Confirmed' : 'Cancelled'}
-                                            </TableCell>
+    {booking.status === '0' ? 'Pending Confirmation' :
+        booking.status === '1' ? 'Confirmed' :
+            booking.status === '2' ? 'Cancelled' : 'Finished'
+    }
+</TableCell>
+
                                             <TableCell>
                                                 {booking.status === '0' && isOwner ? (
                                                     <>

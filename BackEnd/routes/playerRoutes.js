@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/google-login', playerController.googleLogin);
 
 // Route để tìm kiếm sân
-router.get('/fields', authenticateUser, authorizeRole(['player']), playerController.searchFields);
+router.get('/fields', playerController.searchFields);
 
 // Route để đặt sân
 router.post('/book-field', authenticateUser, authorizeRole(['player']), playerController.bookField);
