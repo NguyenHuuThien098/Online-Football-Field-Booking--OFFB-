@@ -16,6 +16,8 @@ const Field = () => {
         images: '',
         operatingHours: ''
     });
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
     const [deletingFieldId, setDeletingFieldId] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [fieldToDelete, setFieldToDelete] = useState(null);
@@ -91,6 +93,8 @@ const Field = () => {
                 images: '',
                 operatingHours: ''
             });
+            setStartTime('');
+            setEndTime('');
         } catch (error) {
             if (error.response && error.response.status === 404) {
                 setError('Resource not found.');
@@ -255,10 +259,29 @@ const Field = () => {
                         InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
                         InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
                     />
+                    <Typography variant="h6" color="black" gutterBottom sx={{ backgroundColor: 'primary.main', color: 'white', padding: 2, borderRadius: 1 }}> Operating Hours: </Typography>
                     <TextField
-                        label="Operating Hours"
-                        value={newLargeField.operatingHours}
-                        onChange={(e) => setNewLargeField({ ...newLargeField, operatingHours: e.target.value })}
+                        label="Start Time"
+                        type="time"
+                        value={startTime}
+                        onChange={(e) => {
+                            setStartTime(e.target.value);
+                            setNewLargeField({ ...newLargeField, operatingHours: `${e.target.value} - ${endTime}` });
+                        }}
+                        fullWidth
+                        margin="normal"
+                        required
+                        InputLabelProps={{ style: { color: 'black', fontSize: '1.2rem' } }}
+                        InputProps={{ style: { color: 'black', backgroundColor: 'white', fontSize: '1.2rem' } }}
+                    />
+                    <TextField
+                        label="End Time"
+                        type="time"
+                        value={endTime}
+                        onChange={(e) => {
+                            setEndTime(e.target.value);
+                            setNewLargeField({ ...newLargeField, operatingHours: `${startTime} - ${e.target.value}` });
+                        }}
                         fullWidth
                         margin="normal"
                         required
