@@ -5,17 +5,17 @@ const checkFieldOwner = () => {
     const role = localStorage.getItem('userRole');
 
     if (!ownerId) {
-        alert('Owner ID not found');
+      //  alert('Owner ID not found');
         Navigate('/')
         return;
     }
     if (role !== 'field_owner') {
-        alert('Not an owner');
+        // alert('Not an owner');
         Navigate('/')
         return;
     }
     if (!token) {
-        alert('No token found');
+       // alert('No token found');
         Navigate('/')
         return;
     }

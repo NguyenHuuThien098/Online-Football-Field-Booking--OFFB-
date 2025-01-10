@@ -48,7 +48,7 @@ const AvailableField = () => {
       setLoadingFields(false);
     }
   };
-
+  console.log(fields)
   // Search fields
   const searchFields = async () => {
     setLoadingFields(true);

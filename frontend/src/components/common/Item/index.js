@@ -99,7 +99,7 @@ const Item = ({ field, match }) => {
   const formatPrice = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
-
+  // console.log(field);
   if (field) {
     return (
       <StyledCard className={`mt-4 mx-3 border-primary `}
